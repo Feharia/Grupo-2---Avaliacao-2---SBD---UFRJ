@@ -1,0 +1,8 @@
+estrutura,dados_antes,dados_depois,overflow_antes,overflow_depois,total_antes,total_depois,delta_pct
+aluno_bt_curso:btree,953,955,0,0,959,961,0.2086
+aluno_bt_dre:btree,953,1015,0,0,959,1021,6.4651
+aluno_h_curso:hash,211,211,580,616,792,828,4.5455
+aluno_h_dre:hash,809,809,87,125,897,935,4.2363
+aluno_heap:heap,646,678,0,0,647,679,4.9459
+aluno_heap:sec_btree(professor_orientador),62,63,0,0,64,65,1.5625
+aluno_heap:sec_btree(cr),61,62,93,117,156,181,16.0256

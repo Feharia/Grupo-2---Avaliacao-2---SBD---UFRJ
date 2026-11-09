@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1080" viewBox="0 0 1100 1080" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<rect width="1100" height="1080" fill="#FFFFFF"/>
+<text x="40" y="38" font-size="20" font-weight="600" fill="#1F1F1F" text-anchor="start">Bancada de teste · entidades por camada</text>
+<text x="40" y="58" font-size="12.5" font-weight="400" fill="#6B6A65" text-anchor="start">versão 4 · decisões até a 169 · 08/11/2026</text>
+<rect x="40" y="76" width="820" height="90" rx="14" fill="#F5F4EF" stroke="#CFCDC6" stroke-width="1.25"/>
+<text x="60" y="100" font-size="16" font-weight="600" fill="#1F1F1F" text-anchor="start">Camada 1 · Bancada de teste</text>
+<rect x="60" y="116" width="303" height="36" rx="6" fill="none" stroke="#8A8882" stroke-width="1.1" stroke-dasharray="5 4"/>
+<text x="211.5" y="138.5" font-size="13" font-weight="400" fill="#2B2B2B" text-anchor="middle">main · roteiro do experimento</text>
+<rect x="378" y="116" width="462" height="36" rx="6" fill="none" stroke="#8A8882" stroke-width="1.1" stroke-dasharray="5 4"/>
+<text x="609" y="138.5" font-size="13" font-weight="400" fill="#2B2B2B" text-anchor="middle">tools/ · reference.py · compare.py · conferência no SQLite</text>
+<line x1="135" y1="168" x2="135" y2="225" stroke="#555555" stroke-width="1.5"/>
+<path d="M130.5,224 L139.5,224 L135,232 Z" fill="#555555"/>
+<text x="152" y="183" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">chama: join(…), select_points(…), select_range(…), que são as primitivas medidas,</text>
+<text x="152" y="201" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">e repasses sem medição (definição, carga, manutenção, stats, occupancy, flush_all, invalidate_all)</text>
+<text x="152" y="219" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">devolve: OpResult ou NotApplicable, com o motivo</text>
+<rect x="40" y="234" width="820" height="182" rx="14" fill="#F5F4EF" stroke="#CFCDC6" stroke-width="1.25"/>
+<text x="60" y="258" font-size="16" font-weight="600" fill="#1F1F1F" text-anchor="start">Camada 2 · Mini monitor de execução</text>
+<rect x="60" y="274" width="144" height="36" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="132" y="296.6" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">Monitor</text>
+<rect x="219" y="274" width="144" height="36" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="291" y="296.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">JoinPlan</text>
+<rect x="378" y="274" width="144" height="36" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="450" y="296.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">SelectPlan</text>
+<rect x="537" y="274" width="144" height="36" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="609" y="296.6" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">ResultSink</text>
+<rect x="696" y="274" width="144" height="36" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="768" y="296.6" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">PhaseRecorder</text>
+<rect x="60" y="320" width="462" height="36" rx="6" fill="none" stroke="#8A8882" stroke-width="1.1" stroke-dasharray="5 4"/>
+<text x="291" y="342.5" font-size="13" font-weight="400" fill="#2B2B2B" text-anchor="middle">bnl_join · sort_merge_join · hash_join</text>
+<rect x="537" y="320" width="303" height="36" rx="6" fill="none" stroke="#8A8882" stroke-width="1.1" stroke-dasharray="5 4"/>
+<text x="688.5" y="342.5" font-size="13" font-weight="400" fill="#2B2B2B" text-anchor="middle">estimate_join · estimate_select</text>
+<rect x="60" y="366" width="144" height="36" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="132" y="388.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">JoinInput</text>
+<rect x="219" y="366" width="144" height="36" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="291" y="388.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">ResultShape</text>
+<rect x="378" y="366" width="144" height="36" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="450" y="388.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">JoinParams</text>
+<rect x="537" y="366" width="144" height="36" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="609" y="388.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">SelectParams</text>
+<text x="700" y="380.5" font-size="11.5" font-weight="400" fill="#6B6A65" text-anchor="start">tipos da</text>
+<text x="700" y="395.5" font-size="11.5" font-weight="400" fill="#6B6A65" text-anchor="start">interface 1 → 2</text>
+<line x1="135" y1="418" x2="135" y2="493" stroke="#555555" stroke-width="1.5"/>
+<path d="M130.5,492 L139.5,492 L135,500 Z" fill="#555555"/>
+<text x="152" y="433" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">chama: scan_blocks, scan_buckets, bucket_of, find, probe, fetch(RID), schema,</text>
+<text x="152" y="451" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">create_temp, create_scratch e create_rid_scratch,</text>
+<text x="152" y="469" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">e, por repasse da camada 4: reserve(n), snapshot, flush_all, invalidate_all</text>
+<text x="152" y="487" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">devolve: BlockScan, SearchCursor, RidCursor, PinnedRecord, TempFile, ScratchSpace e a Reservation, opaca</text>
+<rect x="40" y="502" width="820" height="190" rx="14" fill="#F5F4EF" stroke="#CFCDC6" stroke-width="1.25"/>
+<text x="60" y="526" font-size="16" font-weight="600" fill="#1F1F1F" text-anchor="start">Camada 3 · Gerente de armazenamento</text>
+<rect x="60" y="542" width="144" height="36" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="132" y="564.6" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">StorageManager</text>
+<rect x="219" y="542" width="144" height="36" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="291" y="564.6" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">BlockScan</text>
+<rect x="378" y="542" width="144" height="36" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="450" y="564.6" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">BlockCursor</text>
+<rect x="537" y="542" width="144" height="36" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="609" y="564.6" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">SearchCursor</text>
+<rect x="696" y="542" width="144" height="36" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="768" y="564.6" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">RidCursor</text>
+<rect x="60" y="588" width="144" height="36" rx="6" fill="#FAEBD8" stroke="#A9651E" stroke-width="1.25"/>
+<text x="132" y="610.6" font-size="13.5" font-weight="600" fill="#6E3A08" text-anchor="middle">RecordView</text>
+<rect x="219" y="588" width="144" height="36" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="291" y="610.6" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">PinnedRecord</text>
+<rect x="378" y="588" width="144" height="36" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="450" y="610.6" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">TempFile</text>
+<rect x="537" y="588" width="144" height="36" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="609" y="610.6" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">ScratchSpace</text>
+<rect x="696" y="588" width="144" height="36" rx="6" fill="#FAEBD8" stroke="#A9651E" stroke-width="1.25"/>
+<text x="768" y="610.6" font-size="13.5" font-weight="600" fill="#6E3A08" text-anchor="middle">ScratchMatches</text>
+<text x="64" y="652.5" font-size="11.5" font-weight="400" fill="#6B6A65" text-anchor="start">por dentro,</text>
+<text x="64" y="667.5" font-size="11.5" font-weight="400" fill="#6B6A65" text-anchor="start">fora da interface</text>
+<rect x="219" y="634" width="144" height="44" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="291" y="654.5" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">Catalog</text>
+<text x="291" y="668.5" font-size="10.5" font-weight="400" fill="#2E2A8C" text-anchor="middle" fill-opacity="0.85">esquemas e stats</text>
+<rect x="378" y="634" width="144" height="44" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="450" y="654.5" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">PrimaryFile</text>
+<text x="450" y="668.5" font-size="10.5" font-weight="400" fill="#2E2A8C" text-anchor="middle" fill-opacity="0.85">Heap · B+ · Hash</text>
+<rect x="537" y="634" width="144" height="44" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="609" y="654.5" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">SecondaryIndex</text>
+<text x="609" y="668.5" font-size="10.5" font-weight="400" fill="#2E2A8C" text-anchor="middle" fill-opacity="0.85">Hash · B+</text>
+<rect x="696" y="634" width="144" height="44" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="768" y="654.5" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">IndexMaintainer</text>
+<text x="768" y="668.5" font-size="10.5" font-weight="400" fill="#2E2A8C" text-anchor="middle" fill-opacity="0.85">MoveListener</text>
+<line x1="135" y1="694" x2="135" y2="769" stroke="#555555" stroke-width="1.5"/>
+<path d="M130.5,768 L139.5,768 L135,776 Z" fill="#555555"/>
+<text x="152" y="709" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">chama: create, open, fetch(BlockId, Intent, res), allocate(arquivo, res), scratch(res),</text>
+<text x="152" y="727" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">free_block, flush_file, remove_file, header_blocks</text>
+<text x="152" y="745" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">e o controle: reserve(n), snapshot, flush_all, invalidate_all</text>
+<text x="152" y="763" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">devolve: PageGuard e Reservation · res é sempre explícito (kNoReservation fora das medidas)</text>
+<rect x="40" y="778" width="820" height="144" rx="14" fill="#F5F4EF" stroke="#CFCDC6" stroke-width="1.25"/>
+<text x="60" y="802" font-size="16" font-weight="600" fill="#1F1F1F" text-anchor="start">Camada 4 · Gerente de arquivos e buffer pool</text>
+<rect x="60" y="818" width="144" height="44" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="132" y="838.5" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">BufferPool</text>
+<text x="132" y="852.5" font-size="10.5" font-weight="400" fill="#2E2A8C" text-anchor="middle" fill-opacity="0.85">áreas e subpools</text>
+<rect x="219" y="818" width="144" height="44" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="291" y="838.5" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">ReplacementPolicy</text>
+<text x="291" y="852.5" font-size="10.5" font-weight="400" fill="#2E2A8C" text-anchor="middle" fill-opacity="0.85">Lru · Mru</text>
+<rect x="378" y="818" width="144" height="44" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="450" y="838.5" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">PageGuard</text>
+<text x="450" y="852.5" font-size="10.5" font-weight="400" fill="#0D5A3E" text-anchor="middle" fill-opacity="0.85">um pin</text>
+<rect x="537" y="818" width="144" height="44" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="609" y="838.5" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">Reservation</text>
+<text x="609" y="852.5" font-size="10.5" font-weight="400" fill="#0D5A3E" text-anchor="middle" fill-opacity="0.85">subpool de m molduras</text>
+<rect x="696" y="818" width="144" height="44" rx="6" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="768" y="838.5" font-size="13.5" font-weight="600" fill="#2E2A8C" text-anchor="middle">FileManager</text>
+<text x="768" y="852.5" font-size="10.5" font-weight="400" fill="#2E2A8C" text-anchor="middle" fill-opacity="0.85">único contador físico</text>
+<rect x="219" y="872" width="462" height="36" rx="6" fill="none" stroke="#8A8882" stroke-width="1.1" stroke-dasharray="5 4"/>
+<text x="450" y="894.5" font-size="13" font-weight="400" fill="#2B2B2B" text-anchor="middle">pread_full · pwrite_full · create_excl · open_existing</text>
+<rect x="696" y="872" width="144" height="36" rx="6" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="768" y="894.6" font-size="13.5" font-weight="600" fill="#0D5A3E" text-anchor="middle">UniqueFd</text>
+<line x1="135" y1="924" x2="135" y2="963" stroke="#555555" stroke-width="1.5"/>
+<path d="M130.5,962 L139.5,962 L135,970 Z" fill="#555555"/>
+<text x="152" y="939" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">chama: pread, pwrite e ftruncate (POSIX), só pelo FileManager,</text>
+<text x="152" y="957" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">que conta cada leitura e gravação física por bloco, sequencial ou aleatória (seek)</text>
+<rect x="40" y="972" width="820" height="46" rx="10" fill="none" stroke="#8A8882" stroke-width="1.1" stroke-dasharray="6 5"/>
+<text x="60" y="1000" font-size="13.5" font-weight="400" fill="#2B2B2B" text-anchor="start">Disco simulado · arquivos em ext4 (Linux ou WSL2), divididos em blocos; o bloco 0 é o cabeçalho com o bitmap</text>
+<rect x="890" y="76" width="170" height="846" rx="14" fill="#F5F4EF" stroke="#CFCDC6" stroke-width="1.25"/>
+<text x="910" y="100" font-size="16" font-weight="600" fill="#1F1F1F" text-anchor="start">common/</text>
+<text x="910" y="122" font-size="12" font-weight="400" fill="#6B6A65" text-anchor="start">valores usados por</text>
+<text x="910" y="138" font-size="12" font-weight="400" fill="#6B6A65" text-anchor="start">todas as camadas</text>
+<rect x="910" y="156" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="176.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">BlockId</text>
+<rect x="910" y="200" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="220.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">RID</text>
+<rect x="910" y="244" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="264.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">Counters</text>
+<rect x="910" y="288" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="308.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">Config</text>
+<rect x="910" y="332" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="352.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">Stats</text>
+<rect x="910" y="376" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="396.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">AccessPath</text>
+<rect x="910" y="420" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="440.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">OpResult</text>
+<rect x="910" y="464" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="484.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">Intent</text>
+<rect x="910" y="508" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="528.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">Occupancy</text>
+<rect x="910" y="552" width="130" height="32" rx="6" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="975" y="572.6" font-size="13.5" font-weight="600" fill="#2B2B2B" text-anchor="middle">Schema · FieldDef</text>
+<text x="910" y="604" font-size="11.5" font-weight="400" fill="#6B6A65" text-anchor="start">e os tipos auxiliares:</text>
+<text x="910" y="619" font-size="11.5" font-weight="400" fill="#6B6A65" text-anchor="start">ids, enums, Key,</text>
+<text x="910" y="634" font-size="11.5" font-weight="400" fill="#6B6A65" text-anchor="start">Predicate, PrimarySpec,</text>
+<text x="910" y="649" font-size="11.5" font-weight="400" fill="#6B6A65" text-anchor="start">IndexSpec, RecordStream</text>
+<rect x="40" y="1045" width="14" height="14" rx="3" fill="#EEEDFB" stroke="#5A55C8" stroke-width="1.25"/>
+<text x="62" y="1056.5" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">serviço</text>
+<rect x="150" y="1045" width="14" height="14" rx="3" fill="#E2F3EC" stroke="#2E8B6A" stroke-width="1.25"/>
+<text x="172" y="1056.5" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">handle (só move)</text>
+<rect x="310" y="1045" width="14" height="14" rx="3" fill="#FAEBD8" stroke="#A9651E" stroke-width="1.25"/>
+<text x="332" y="1056.5" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">visão</text>
+<rect x="400" y="1045" width="14" height="14" rx="3" fill="#F1EFEA" stroke="#6E6C66" stroke-width="1.25"/>
+<text x="422" y="1056.5" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">valor</text>
+<rect x="490" y="1045" width="14" height="14" rx="3" fill="none" stroke="#8A8882" stroke-width="1.1" stroke-dasharray="3 2.5"/>
+<text x="512" y="1056.5" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">função / programa</text>
+<line x1="680" y1="1052" x2="712" y2="1052" stroke="#555555" stroke-width="1.5"/>
+<path d="M712,1047.5 L720,1052 L712,1056.5 Z" fill="#555555"/>
+<text x="730" y="1056.5" font-size="12.5" font-weight="400" fill="#3A3A3A" text-anchor="start">chamada para a camada de baixo</text>
+</svg>

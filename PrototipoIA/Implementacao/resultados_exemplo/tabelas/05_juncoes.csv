@@ -1,0 +1,34 @@
+operacao,tipo,tamanho,config,variante,externa,interna,algoritmo,leituras,gravacoes,total,estimado_transf,erro_pct,tempo_ms,vezes_melhor
+j_mestre_detalhe,natural_join,maior_maior,a,aluno_heap:scan x inscricao_heap:scan,aluno_heap,inscricao_heap,bnl,70141,0,70141,70141.0,0.0,166.025,9.928
+j_mestre_detalhe,natural_join,maior_maior,a,aluno_heap:scan x inscricao_heap:scan (papeis trocados),inscricao_heap,aluno_heap,bnl,70171,0,70171,70171.0,0.0,132.415,9.9322
+j_mestre_detalhe,natural_join,maior_maior,a,aluno_heap:scan x inscricao_heap:scan,inscricao_heap,aluno_heap,sort_merge,6404,4063,10467,10413.0,-0.5159,91.488,1.4815
+j_mestre_detalhe,natural_join,maior_maior,a,aluno_heap:scan x inscricao_heap:scan (papeis trocados),aluno_heap,inscricao_heap,sort_merge,6404,4063,10467,10413.0,-0.5159,91.374,1.4815
+j_mestre_detalhe,natural_join,maior_maior,a,aluno_heap:scan x inscricao_heap:scan,aluno_heap,inscricao_heap,hash,4703,2362,7065,7127.0,0.8776,58.038,1.0
+j_mestre_detalhe,natural_join,maior_maior,a,aluno_heap:scan x inscricao_heap:scan (papeis trocados),inscricao_heap,aluno_heap,hash,7134,4793,11927,15549.0,30.3681,82.241,1.6882
+j_mestre_detalhe,natural_join,maior_maior,b,aluno_bt_dre:primary_btree x inscricao_heap:scan,aluno_bt_dre,inscricao_heap,bnl,102653,0,102653,102653.0,0.0,238.629,13.9247
+j_mestre_detalhe,natural_join,maior_maior,b,aluno_bt_dre:primary_btree x inscricao_heap:scan,inscricao_heap,aluno_bt_dre,sort_merge,6067,3417,9484,9428.0,-0.5905,84.446,1.2865
+j_mestre_detalhe,natural_join,maior_maior,b,aluno_bt_dre:primary_btree x inscricao_heap:scan,aluno_bt_dre,inscricao_heap,hash,5010,2362,7372,7434.0,0.841,58.709,1.0
+j_mestre_detalhe,natural_join,maior_maior,c,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,aluno_bt_dre,inscricao_bt_dre,bnl,147353,0,147353,147353.0,0.0,213.049,43.3774
+j_mestre_detalhe,natural_join,maior_maior,c,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,inscricao_bt_dre,aluno_bt_dre,sort_merge,3397,0,3397,3393.0,-0.1178,42.12,1.0
+j_mestre_detalhe,natural_join,maior_maior,c,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,aluno_bt_dre,inscricao_bt_dre,hash,5755,2362,8117,8179.0,0.7638,58.508,2.3895
+j_mestre_detalhe,natural_join,maior_maior,c,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,aluno_h_dre,inscricao_h_dre,bnl,147840,0,147840,147840.0,0.0,271.296,30.5581
+j_mestre_detalhe,natural_join,maior_maior,c,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,inscricao_h_dre,aluno_h_dre,sort_merge,7583,4063,11646,11592.0,-0.4637,93.837,2.4072
+j_mestre_detalhe,natural_join,maior_maior,c,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,aluno_h_dre,inscricao_h_dre,hash,4179,659,4838,4916.0,1.6122,49.329,1.0
+j_mestre_detalhe,natural_join,maior_maior,d,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,aluno_bt_dre,inscricao_heap,bnl,102653,0,102653,102653.0,0.0,239.764,13.9247
+j_mestre_detalhe,natural_join,maior_maior,d,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,inscricao_heap,aluno_bt_dre,sort_merge,6067,3417,9484,9428.0,-0.5905,84.618,1.2865
+j_mestre_detalhe,natural_join,maior_maior,d,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,aluno_bt_dre,inscricao_heap,hash,5010,2362,7372,7434.0,0.841,58.28,1.0
+j_pequenas,natural_join,menor_menor,a,curso_heap:scan x disciplina_heap:scan,curso_heap,disciplina_heap,bnl,19,0,19,19.0,0.0,0.35,1.0
+j_pequenas,natural_join,menor_menor,a,curso_heap:scan x disciplina_heap:scan,disciplina_heap,curso_heap,sort_merge,38,19,57,57.0,0.0,0.842,3.0
+j_pequenas,natural_join,menor_menor,a,curso_heap:scan x disciplina_heap:scan,curso_heap,disciplina_heap,hash,19,0,19,19.0,0.0,0.436,1.0
+j_grande_pequena,natural_join,menor_maior,a,curso_heap:scan x aluno_heap:scan,curso_heap,aluno_heap,bnl,653,0,653,653.0,0.0,9.107,1.0
+j_grande_pequena,natural_join,menor_maior,a,curso_heap:scan x aluno_heap:scan,aluno_heap,curso_heap,sort_merge,1306,653,1959,1959.0,0.0,16.741,3.0
+j_grande_pequena,natural_join,menor_maior,a,curso_heap:scan x aluno_heap:scan,curso_heap,aluno_heap,hash,653,0,653,653.0,0.0,9.346,1.0
+j_grande_pequena,natural_join,menor_maior,b,curso_heap:scan x aluno_bt_curso:primary_btree,curso_heap,aluno_bt_curso,bnl,960,0,960,960.0,0.0,9.158,1.0
+j_grande_pequena,natural_join,menor_maior,b,curso_heap:scan x aluno_bt_curso:primary_btree,aluno_bt_curso,curso_heap,sort_merge,969,7,976,974.0,-0.2049,9.71,1.0167
+j_grande_pequena,natural_join,menor_maior,b,curso_heap:scan x aluno_bt_curso:primary_btree,curso_heap,aluno_bt_curso,hash,960,0,960,960.0,0.0,9.368,1.0
+j_unique,equijoin_unique,maior_maior,a,aluno_heap:scan x detalhes_heap:scan,detalhes_heap,aluno_heap,bnl,22506,0,22506,22506.0,0.0,58.438,6.2103
+j_unique,equijoin_unique,maior_maior,a,aluno_heap:scan x detalhes_heap:scan,detalhes_heap,aluno_heap,sort_merge,3027,1839,4866,7816.0,60.6247,34.799,1.3427
+j_unique,equijoin_unique,maior_maior,a,aluno_heap:scan x detalhes_heap:scan,detalhes_heap,aluno_heap,hash,2406.0,1218.0,3624.0,12952.0,257.3951,22.002,1.0
+j_not_unique,equijoin_not_unique,maior_maior,e,aluno_heap:secondary_btree x turma_heap:secondary_btree,turma_heap,aluno_heap,bnl,1980,0,1980,1980.0,0.0,76.152,1.0248
+j_not_unique,equijoin_not_unique,maior_maior,e,aluno_heap:secondary_btree x turma_heap:secondary_btree,turma_heap,aluno_heap,sort_merge,1310,622,1932,2064.0,6.8323,81.984,1.0
+j_not_unique,equijoin_not_unique,maior_maior,e,aluno_heap:secondary_btree x turma_heap:secondary_btree,turma_heap,aluno_heap,hash,1312,624,1936,2072.0,7.0248,78.81,1.0021

@@ -1,0 +1,13 @@
+data: 2026-11-08 21:26:21
+compilador: Apple LLVM 21.0.0 (clang-2100.1.1.101)
+flags: -std=c++20 -O2 -g
+commit: sem git
+escala: 1
+semente: 20261122
+reps: 3..10
+tolerancia: 0.05
+m_juncao: 32
+m_selecao: 2
+lote: 1000
+hash_especificacao: c4dfc85415d9de0d
+duracao_s: 23.6

@@ -1,0 +1,6 @@
+familia,combinacoes,mediana_abs_erro_pct,ate_10pct,maior_erro_pct,operacao,variante
+junção: BNL,11,0.0,11,0.0,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan
+junção: hash,11,0.841,9,257.3951,j_unique,aluno_heap:scan x detalhes_heap:scan
+junção: sort-merge,11,0.5159,10,60.6247,j_unique,aluno_heap:scan x detalhes_heap:scan
+seleção: faixa,16,10.0369,8,-51.4881,sel_rg_curso_alta,aluno_h_curso:clustering_btree
+seleção: igualdade (lote),5,5.2078,4,187.0813,sel_pt_dre,aluno_bt_dre:primary_btree

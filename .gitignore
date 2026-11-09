@@ -1,0 +1,16 @@
+# Builds (make, make asan, CMake, CLion)
+build/
+build-asan/
+cmake-build-*/
+
+# Saídas da bancada
+saida*/
+**/motor_LRU/
+**/motor_MRU/
+
+# Python
+__pycache__/
+
+# IDE e sistema
+.idea/
+.DS_Store

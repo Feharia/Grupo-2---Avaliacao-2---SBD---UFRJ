@@ -1,0 +1,9 @@
+operacao,seletividade,heap:scan,bt:primary_btree,h:primary_hash,heap:secondary_hash,heap:secondary_btree,bt:clustering_btree,h:clustering_btree
+sel_pt_cpf,pontual,321360.0,,,1901,,,
+sel_pt_dre,pontual,326680,1045,1008.5,,,,
+sel_rg_dre_baixa,"0,1%",646,4,caso 4,,,,
+sel_rg_dre_alta,50%,646,479,caso 4,,,,
+sel_rg_cr_baixa,"0,1%",646,,,,23,,
+sel_rg_cr_alta,50%,646,,,,9715,,
+sel_rg_curso_baixa,"0,1%",646,8.0,caso 4,,,8.0,6
+sel_rg_curso_alta,50%,646,482,caso 4,,,482,672

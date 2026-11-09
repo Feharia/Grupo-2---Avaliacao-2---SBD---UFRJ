@@ -1,0 +1,5 @@
+status,caso,linhas,operacoes,motivo
+nao_aplicavel,caso 1,54,j_unique j_not_unique,"caso 1: o tipo exige campos que não ditam a organização primária, e a configuração exige que um ou os dois campos a ditem (§5.1; 170)"
+nao_aplicavel,caso 2,2,sel_rg_dre_baixa sel_rg_dre_alta,caso 2: o §4.2 só admite hash como secundário de campo UNIQUE (heap) e só clustering NOT UNIQUE nas outras organizações; hash não responde a faixa (170)
+nao_aplicavel,caso 3,6,sel_igualdade_unique,caso 3: igualdade em UNIQUE devolve 1 registro (s = 1/N); medida no nível pontual (170)
+nao_aplicavel,caso 4,4,sel_rg_dre_baixa sel_rg_curso_baixa sel_rg_dre_alta sel_rg_curso_alta,"caso 4: faixa no hash primário, que não preserva a ordem das chaves (128, 170)"

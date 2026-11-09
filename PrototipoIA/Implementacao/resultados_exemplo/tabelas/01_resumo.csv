@@ -1,0 +1,14 @@
+Item,Valor
+Escala,1
+Políticas comparadas,"LRU, MRU"
+Repetições por combinação,3..10 (tolerância 0.05)
+M das junções / das seleções,32 / 2 molduras
+Chaves por lote de seleção pontual,1000
+Combinações medidas (por política),54
+Linhas medidas no CSV (todas as repetições e políticas),358
+Células `nao_aplicavel` (caso 1) por política,54
+Células `nao_aplicavel` (caso 2) por política,2
+Células `nao_aplicavel` (caso 3) por política,6
+Células `nao_aplicavel` (caso 4) por política,4
+Conferência com o SQLite,conferidas: 358 linhas medidas; sem execução: nao_aplicavel: 132; divergências: 0
+Duração da rodada,23.6 s

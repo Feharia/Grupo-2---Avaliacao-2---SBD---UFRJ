@@ -1,0 +1,7 @@
+operacao,lo,hi,linhas_esperadas
+sel_rg_dre_baixa,120009990,120010009,20
+sel_rg_cr_baixa,927,946,21
+sel_rg_curso_baixa,102,102,107
+sel_rg_dre_alta,120005000,120014999,10000
+sel_rg_cr_alta,346,651,10044
+sel_rg_curso_alta,1,102,10074

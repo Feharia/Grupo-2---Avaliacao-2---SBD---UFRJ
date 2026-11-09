@@ -1,0 +1,15 @@
+operacao,config,variante,algoritmo,LRU,MRU,delta_pct,acerto_LRU,acerto_MRU
+j_unique,a,aluno_heap:scan x detalhes_heap:scan,bnl,22506,21995,-2.2705,0.0,0.0227
+j_mestre_detalhe,a,aluno_heap:scan x inscricao_heap:scan (papeis trocados),bnl,70171,68580,-2.2673,0.0,0.0227
+j_not_unique,e,aluno_heap:secondary_btree x turma_heap:secondary_btree,bnl,1980,1948,-1.6162,0.0,0.0162
+j_mestre_detalhe,a,aluno_heap:scan x inscricao_heap:scan,bnl,70141,69525,-0.8782,0.0,0.0088
+j_mestre_detalhe,b,aluno_bt_dre:primary_btree x inscricao_heap:scan,bnl,102653,101752,-0.8777,0.0,0.0088
+j_mestre_detalhe,d,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,bnl,102653,101752,-0.8777,0.0,0.0088
+j_mestre_detalhe,c,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,bnl,147353,146452,-0.6115,0.0,0.0061
+sel_pt_cpf,a,aluno_heap:scan,,321360.0,319477,-0.5859,0.0,0.0017
+j_mestre_detalhe,c,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,bnl,147840,147000,-0.5682,0.0,0.0057
+sel_pt_cpf,c,aluno_heap:secondary_hash,,1901,1892,-0.4734,0.0495,0.054
+sel_pt_dre,a,aluno_heap:scan,,326680,325976,-0.2155,0.0,0.0014
+sel_rg_curso_alta,c,aluno_h_curso:clustering_btree,,672,671,-0.1488,0.0,0.0015
+sel_rg_cr_alta,c,aluno_heap:secondary_btree,,9715,9702,-0.1338,0.0406,0.0419
+sel_pt_dre,b,aluno_h_dre:primary_hash,,1008.5,1009.5,0.0992,0.004,0.002
