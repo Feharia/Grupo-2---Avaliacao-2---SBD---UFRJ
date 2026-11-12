@@ -1,0 +1,5 @@
+d7203aa034b3e3bf3fd9365db80a6ea262eec1727d31b206382b884f24b018fd  PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp
+f10e1948e8cd1eea7d8c096ec780bb9bc15be2e197c1f9a0bee73c40a4a4d94a  evidencias/CBD-001/2026-11-12-red-zCo7RS/baseline-40.log
+97a61a37b03addfef7e1d2df7dfb0b4c9a8d4c416c4b349e17bc68fddb2402c2  evidencias/CBD-001/2026-11-12-red-zCo7RS/final-targeted-normal.log
+cc427bf6e8c8fb9184680193ffa7275914e78313984062d069f4d9f5e2affd9d  evidencias/CBD-001/2026-11-12-red-zCo7RS/final-full-normal.log
+1a766a4f436094efd9a1aacb4c04d676c76a63048d432cef2565b315f0b1ea9e  evidencias/CBD-001/2026-11-12-red-zCo7RS/final-full-sanitizers.log

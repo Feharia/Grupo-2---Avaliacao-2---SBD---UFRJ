@@ -1,0 +1,110 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+[==========] Running 40 tests from 8 test suites.
+[----------] Global test environment set-up.
+[----------] 12 tests from Monitor
+[ RUN      ] Monitor.TresAlgoritmosConcordamEmTodasAsOrganizacoes
+[       OK ] Monitor.TresAlgoritmosConcordamEmTodasAsOrganizacoes (716 ms)
+[ RUN      ] Monitor.PapeisTrocadosNaoMudamOChecksum
+[       OK ] Monitor.PapeisTrocadosNaoMudamOChecksum (308 ms)
+[ RUN      ] Monitor.MruLeMenosQueLruNoBnlComVariasPassadas
+[       OK ] Monitor.MruLeMenosQueLruNoBnlComVariasPassadas (518 ms)
+[ RUN      ] Monitor.SemCacheOcultoEntreAreasDeTrabalho
+[       OK ] Monitor.SemCacheOcultoEntreAreasDeTrabalho (520 ms)
+[ RUN      ] Monitor.InaplicaveisDevolvemMotivo
+[       OK ] Monitor.InaplicaveisDevolvemMotivo (252 ms)
+[ RUN      ] Monitor.HashJoinRecursivoComMPequeno
+[       OK ] Monitor.HashJoinRecursivoComMPequeno (295 ms)
+[ RUN      ] Monitor.HashJoinBailoutEmGrupoIndivisivel
+[       OK ] Monitor.HashJoinBailoutEmGrupoIndivisivel (6000 ms)
+[ RUN      ] Monitor.SelecoesConcordamEntreCaminhos
+[       OK ] Monitor.SelecoesConcordamEntreCaminhos (265 ms)
+[ RUN      ] Monitor.GrupoDeDuplicatasQueNaoCabeViraInaplicavel
+[       OK ] Monitor.GrupoDeDuplicatasQueNaoCabeViraInaplicavel (260 ms)
+[ RUN      ] Monitor.HashPreParticionadoIncompativelUsaSoOMaior
+[       OK ] Monitor.HashPreParticionadoIncompativelUsaSoOMaior (267 ms)
+[ RUN      ] Monitor.SortMergeAproveitaEntradaOrdenada
+[       OK ] Monitor.SortMergeAproveitaEntradaOrdenada (270 ms)
+[ RUN      ] Monitor.TabelaMenorCabeNumaPassada
+[       OK ] Monitor.TabelaMenorCabeNumaPassada (262 ms)
+[----------] 12 tests from Monitor (9938 ms total)
+
+[----------] 1 test from SlottedPage
+[ RUN      ] SlottedPage.SlotsNaoSaoRenumerados
+[       OK ] SlottedPage.SlotsNaoSaoRenumerados (0 ms)
+[----------] 1 test from SlottedPage (0 ms total)
+
+[----------] 1 test from Record
+[ RUN      ] Record.NuloVarCharEVerificacaoSempreLigada
+[       OK ] Record.NuloVarCharEVerificacaoSempreLigada (0 ms)
+[----------] 1 test from Record (0 ms total)
+
+[----------] 9 tests from StorageManager
+[ RUN      ] StorageManager.BPlusUnicaContraOraculo
+[       OK ] StorageManager.BPlusUnicaContraOraculo (906 ms)
+[ RUN      ] StorageManager.BPlusNaoUnicaComDuplicatas
+[       OK ] StorageManager.BPlusNaoUnicaComDuplicatas (368 ms)
+[ RUN      ] StorageManager.HashRejeitaDuplicataSoNoUnique
+[       OK ] StorageManager.HashRejeitaDuplicataSoNoUnique (0 ms)
+[ RUN      ] StorageManager.OverflowDoHashESeguidoELiberado
+[       OK ] StorageManager.OverflowDoHashESeguidoELiberado (6 ms)
+[ RUN      ] StorageManager.RidsEstaveisComDivisoesEReorganize
+[       OK ] StorageManager.RidsEstaveisComDivisoesEReorganize (749 ms)
+[ RUN      ] StorageManager.HeapNaoLiberaBlocosForaDoReorganize
+[       OK ] StorageManager.HeapNaoLiberaBlocosForaDoReorganize (1 ms)
+[ RUN      ] StorageManager.EstatisticasSemEntradaESaida
+[       OK ] StorageManager.EstatisticasSemEntradaESaida (2 ms)
+[ RUN      ] StorageManager.ValidaCriacaoDeIndices
+[       OK ] StorageManager.ValidaCriacaoDeIndices (0 ms)
+[ RUN      ] StorageManager.ClusteringSobreHashEBPlus
+[       OK ] StorageManager.ClusteringSobreHashEBPlus (154 ms)
+[----------] 9 tests from StorageManager (2190 ms total)
+
+[----------] 1 test from TempFile
+[ RUN      ] TempFile.SealGravaKBlocosEReleituraLeK
+[       OK ] TempFile.SealGravaKBlocosEReleituraLeK (0 ms)
+[----------] 1 test from TempFile (0 ms total)
+
+[----------] 1 test from ScratchSpace
+[ RUN      ] ScratchSpace.OrdenaEMontaHash
+[       OK ] ScratchSpace.OrdenaEMontaHash (1 ms)
+[----------] 1 test from ScratchSpace (1 ms total)
+
+[----------] 4 tests from FileManager
+[ RUN      ] FileManager.CriaAbreEConfereCabecalho
+[       OK ] FileManager.CriaAbreEConfereCabecalho (0 ms)
+[ RUN      ] FileManager.BlockSizeDiferenteNaAberturaLanca
+[       OK ] FileManager.BlockSizeDiferenteNaAberturaLanca (0 ms)
+[ RUN      ] FileManager.CabecalhoTruncadoLancaEmVezDeTravar
+[       OK ] FileManager.CabecalhoTruncadoLancaEmVezDeTravar (0 ms)
+[ RUN      ] FileManager.ClassificaSequencialEAleatorio
+[       OK ] FileManager.ClassificaSequencialEAleatorio (0 ms)
+[----------] 4 tests from FileManager (0 ms total)
+
+[----------] 11 tests from BufferPool
+[ RUN      ] BufferPool.AcertosFaltasEAlocacoes
+[       OK ] BufferPool.AcertosFaltasEAlocacoes (0 ms)
+[ RUN      ] BufferPool.SubpoolNaoPassaDeM
+[       OK ] BufferPool.SubpoolNaoPassaDeM (0 ms)
+[ RUN      ] BufferPool.LruEMruEscolhemVitimasDiferentes
+[       OK ] BufferPool.LruEMruEscolhemVitimasDiferentes (0 ms)
+[ RUN      ] BufferPool.TossImmediateViraProximaVitima
+[       OK ] BufferPool.TossImmediateViraProximaVitima (0 ms)
+[ RUN      ] BufferPool.FreeBlockDePaginaFixadaLanca
+[       OK ] BufferPool.FreeBlockDePaginaFixadaLanca (0 ms)
+[ RUN      ] BufferPool.FlushAllContaEDepoisZera
+[       OK ] BufferPool.FlushAllContaEDepoisZera (0 ms)
+[ RUN      ] BufferPool.InvalidateAllComCatalogoFixado
+[       OK ] BufferPool.InvalidateAllComCatalogoFixado (0 ms)
+[ RUN      ] BufferPool.ReservaLiberadaLancaLogicError
+[       OK ] BufferPool.ReservaLiberadaLancaLogicError (0 ms)
+[ RUN      ] BufferPool.PedidoSemReservaEmDadosEContado
+[       OK ] BufferPool.PedidoSemReservaEmDadosEContado (0 ms)
+[ RUN      ] BufferPool.MigracaoParaOSubpoolContaComoAcerto
+[       OK ] BufferPool.MigracaoParaOSubpoolContaComoAcerto (0 ms)
+[ RUN      ] BufferPool.PrefetchLeAteOFimDoExtent
+[       OK ] BufferPool.PrefetchLeAteOFimDoExtent (0 ms)
+[----------] 11 tests from BufferPool (2 ms total)
+
+[----------] Global test environment tear-down
+[==========] 40 tests from 8 test suites ran. (12134 ms total)
+[  PASSED  ] 40 tests.
