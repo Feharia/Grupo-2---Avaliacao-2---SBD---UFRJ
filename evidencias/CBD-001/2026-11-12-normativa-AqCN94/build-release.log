@@ -1,0 +1,5 @@
+[ 68%] Built target cbd_motor
+[ 77%] Built target bancada
+[ 81%] Building CXX object CMakeFiles/testes.dir/tests/test_bplus_bulk_load_integration.cpp.o
+[ 86%] Linking CXX executable testes
+[100%] Built target testes

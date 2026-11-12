@@ -1,0 +1,38 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = BPlusBulkLoadIntegration.*
+[==========] Running 14 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 14 tests from BPlusBulkLoadIntegration
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+[       OK ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros (67 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+[       OK ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo
+[       OK ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros
+[       OK ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes
+[       OK ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes (4 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes (133 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada (67 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis
+[       OK ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis (96 ms)
+[ RUN      ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo
+[       OK ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo (6 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes
+[       OK ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes (3 ms)
+[ RUN      ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario
+[       OK ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario (1 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas
+[       OK ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas (1 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada
+[       OK ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada (0 ms)
+[----------] 14 tests from BPlusBulkLoadIntegration (383 ms total)
+
+[----------] Global test environment tear-down
+[==========] 14 tests from 1 test suite ran. (383 ms total)
+[  PASSED  ] 14 tests.

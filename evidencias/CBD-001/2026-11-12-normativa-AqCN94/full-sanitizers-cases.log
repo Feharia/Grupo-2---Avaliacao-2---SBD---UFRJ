@@ -1,0 +1,172 @@
+Start testing: Nov 12 19:49 -03
+----------------------------------------------------------
+1/1 Testing: testes
+1/1 Test: testes
+Command: "/tmp/cbd001-fix-fqENRi/fixed-sanitizers/testes"
+Directory: /tmp/cbd001-fix-fqENRi/fixed-sanitizers
+"testes" start time: Nov 12 19:49 -03
+Output:
+----------------------------------------------------------
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+[==========] Running 59 tests from 10 test suites.
+[----------] Global test environment set-up.
+[----------] 16 tests from BPlusBulkLoadIntegration
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+[       OK ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros (2 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros (198 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+[       OK ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada (2 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes
+[       OK ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes (2 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo
+[       OK ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo (2 ms)
+[ RUN      ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros
+[       OK ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros (2 ms)
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes
+[       OK ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes (12 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes (403 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada (199 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis
+[       OK ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis (438 ms)
+[ RUN      ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo
+[       OK ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo (20 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes
+[       OK ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes (12 ms)
+[ RUN      ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario
+[       OK ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario (4 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas
+[       OK ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas (3 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada
+[       OK ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada (1 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados
+[       OK ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados (1 ms)
+[----------] 16 tests from BPlusBulkLoadIntegration (1309 ms total)
+
+[----------] 3 tests from StorageBPlusContract
+[ RUN      ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas
+[       OK ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas (18805 ms)
+[ RUN      ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites
+[       OK ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites (2 ms)
+[ RUN      ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas
+[       OK ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas (5 ms)
+[----------] 3 tests from StorageBPlusContract (18813 ms total)
+
+[----------] 12 tests from Monitor
+[ RUN      ] Monitor.TresAlgoritmosConcordamEmTodasAsOrganizacoes
+[       OK ] Monitor.TresAlgoritmosConcordamEmTodasAsOrganizacoes (2692 ms)
+[ RUN      ] Monitor.PapeisTrocadosNaoMudamOChecksum
+[       OK ] Monitor.PapeisTrocadosNaoMudamOChecksum (1040 ms)
+[ RUN      ] Monitor.MruLeMenosQueLruNoBnlComVariasPassadas
+[       OK ] Monitor.MruLeMenosQueLruNoBnlComVariasPassadas (1718 ms)
+[ RUN      ] Monitor.SemCacheOcultoEntreAreasDeTrabalho
+[       OK ] Monitor.SemCacheOcultoEntreAreasDeTrabalho (1922 ms)
+[ RUN      ] Monitor.InaplicaveisDevolvemMotivo
+[       OK ] Monitor.InaplicaveisDevolvemMotivo (890 ms)
+[ RUN      ] Monitor.HashJoinRecursivoComMPequeno
+[       OK ] Monitor.HashJoinRecursivoComMPequeno (1013 ms)
+[ RUN      ] Monitor.HashJoinBailoutEmGrupoIndivisivel
+[       OK ] Monitor.HashJoinBailoutEmGrupoIndivisivel (23664 ms)
+[ RUN      ] Monitor.SelecoesConcordamEntreCaminhos
+[       OK ] Monitor.SelecoesConcordamEntreCaminhos (878 ms)
+[ RUN      ] Monitor.GrupoDeDuplicatasQueNaoCabeViraInaplicavel
+[       OK ] Monitor.GrupoDeDuplicatasQueNaoCabeViraInaplicavel (858 ms)
+[ RUN      ] Monitor.HashPreParticionadoIncompativelUsaSoOMaior
+[       OK ] Monitor.HashPreParticionadoIncompativelUsaSoOMaior (883 ms)
+[ RUN      ] Monitor.SortMergeAproveitaEntradaOrdenada
+[       OK ] Monitor.SortMergeAproveitaEntradaOrdenada (908 ms)
+[ RUN      ] Monitor.TabelaMenorCabeNumaPassada
+[       OK ] Monitor.TabelaMenorCabeNumaPassada (869 ms)
+[----------] 12 tests from Monitor (37342 ms total)
+
+[----------] 1 test from SlottedPage
+[ RUN      ] SlottedPage.SlotsNaoSaoRenumerados
+[       OK ] SlottedPage.SlotsNaoSaoRenumerados (0 ms)
+[----------] 1 test from SlottedPage (0 ms total)
+
+[----------] 1 test from Record
+[ RUN      ] Record.NuloVarCharEVerificacaoSempreLigada
+[       OK ] Record.NuloVarCharEVerificacaoSempreLigada (0 ms)
+[----------] 1 test from Record (0 ms total)
+
+[----------] 9 tests from StorageManager
+[ RUN      ] StorageManager.BPlusUnicaContraOraculo
+[       OK ] StorageManager.BPlusUnicaContraOraculo (2694 ms)
+[ RUN      ] StorageManager.BPlusNaoUnicaComDuplicatas
+[       OK ] StorageManager.BPlusNaoUnicaComDuplicatas (1232 ms)
+[ RUN      ] StorageManager.HashRejeitaDuplicataSoNoUnique
+[       OK ] StorageManager.HashRejeitaDuplicataSoNoUnique (1 ms)
+[ RUN      ] StorageManager.OverflowDoHashESeguidoELiberado
+[       OK ] StorageManager.OverflowDoHashESeguidoELiberado (26 ms)
+[ RUN      ] StorageManager.RidsEstaveisComDivisoesEReorganize
+[       OK ] StorageManager.RidsEstaveisComDivisoesEReorganize (2817 ms)
+[ RUN      ] StorageManager.HeapNaoLiberaBlocosForaDoReorganize
+[       OK ] StorageManager.HeapNaoLiberaBlocosForaDoReorganize (8 ms)
+[ RUN      ] StorageManager.EstatisticasSemEntradaESaida
+[       OK ] StorageManager.EstatisticasSemEntradaESaida (8 ms)
+[ RUN      ] StorageManager.ValidaCriacaoDeIndices
+[       OK ] StorageManager.ValidaCriacaoDeIndices (1 ms)
+[ RUN      ] StorageManager.ClusteringSobreHashEBPlus
+[       OK ] StorageManager.ClusteringSobreHashEBPlus (562 ms)
+[----------] 9 tests from StorageManager (7353 ms total)
+
+[----------] 1 test from TempFile
+[ RUN      ] TempFile.SealGravaKBlocosEReleituraLeK
+[       OK ] TempFile.SealGravaKBlocosEReleituraLeK (3 ms)
+[----------] 1 test from TempFile (3 ms total)
+
+[----------] 1 test from ScratchSpace
+[ RUN      ] ScratchSpace.OrdenaEMontaHash
+[       OK ] ScratchSpace.OrdenaEMontaHash (3 ms)
+[----------] 1 test from ScratchSpace (3 ms total)
+
+[----------] 4 tests from FileManager
+[ RUN      ] FileManager.CriaAbreEConfereCabecalho
+[       OK ] FileManager.CriaAbreEConfereCabecalho (0 ms)
+[ RUN      ] FileManager.BlockSizeDiferenteNaAberturaLanca
+[       OK ] FileManager.BlockSizeDiferenteNaAberturaLanca (0 ms)
+[ RUN      ] FileManager.CabecalhoTruncadoLancaEmVezDeTravar
+[       OK ] FileManager.CabecalhoTruncadoLancaEmVezDeTravar (0 ms)
+[ RUN      ] FileManager.ClassificaSequencialEAleatorio
+[       OK ] FileManager.ClassificaSequencialEAleatorio (0 ms)
+[----------] 4 tests from FileManager (1 ms total)
+
+[----------] 11 tests from BufferPool
+[ RUN      ] BufferPool.AcertosFaltasEAlocacoes
+[       OK ] BufferPool.AcertosFaltasEAlocacoes (0 ms)
+[ RUN      ] BufferPool.SubpoolNaoPassaDeM
+[       OK ] BufferPool.SubpoolNaoPassaDeM (0 ms)
+[ RUN      ] BufferPool.LruEMruEscolhemVitimasDiferentes
+[       OK ] BufferPool.LruEMruEscolhemVitimasDiferentes (1 ms)
+[ RUN      ] BufferPool.TossImmediateViraProximaVitima
+[       OK ] BufferPool.TossImmediateViraProximaVitima (0 ms)
+[ RUN      ] BufferPool.FreeBlockDePaginaFixadaLanca
+[       OK ] BufferPool.FreeBlockDePaginaFixadaLanca (0 ms)
+[ RUN      ] BufferPool.FlushAllContaEDepoisZera
+[       OK ] BufferPool.FlushAllContaEDepoisZera (0 ms)
+[ RUN      ] BufferPool.InvalidateAllComCatalogoFixado
+[       OK ] BufferPool.InvalidateAllComCatalogoFixado (6 ms)
+[ RUN      ] BufferPool.ReservaLiberadaLancaLogicError
+[       OK ] BufferPool.ReservaLiberadaLancaLogicError (0 ms)
+[ RUN      ] BufferPool.PedidoSemReservaEmDadosEContado
+[       OK ] BufferPool.PedidoSemReservaEmDadosEContado (0 ms)
+[ RUN      ] BufferPool.MigracaoParaOSubpoolContaComoAcerto
+[       OK ] BufferPool.MigracaoParaOSubpoolContaComoAcerto (0 ms)
+[ RUN      ] BufferPool.PrefetchLeAteOFimDoExtent
+[       OK ] BufferPool.PrefetchLeAteOFimDoExtent (0 ms)
+[----------] 11 tests from BufferPool (12 ms total)
+
+[----------] Global test environment tear-down
+[==========] 59 tests from 10 test suites ran. (64839 ms total)
+[  PASSED  ] 59 tests.
+<end of output>
+Test time =  64.90 sec
+----------------------------------------------------------
+Test Passed.
+"testes" end time: Nov 12 19:50 -03
+"testes" time elapsed: 00:01:04
+----------------------------------------------------------
+
+End testing: Nov 12 19:50 -03

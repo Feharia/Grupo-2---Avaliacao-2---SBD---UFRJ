@@ -1,0 +1,49 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = BPlusBulkLoadIntegration.*:StorageBPlusContract.*
+[==========] Running 18 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 15 tests from BPlusBulkLoadIntegration
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+[       OK ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros (4 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+[       OK ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo
+[       OK ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros
+[       OK ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes
+[       OK ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes (9 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada (4 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis
+[       OK ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis (10 ms)
+[ RUN      ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo
+[       OK ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo (1 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes
+[       OK ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario
+[       OK ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas
+[       OK ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada
+[       OK ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados
+[       OK ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados (0 ms)
+[----------] 15 tests from BPlusBulkLoadIntegration (34 ms total)
+
+[----------] 3 tests from StorageBPlusContract
+[ RUN      ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas
+[       OK ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas (53 ms)
+[ RUN      ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites
+[       OK ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites (0 ms)
+[ RUN      ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas
+[       OK ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas (0 ms)
+[----------] 3 tests from StorageBPlusContract (54 ms total)
+
+[----------] Global test environment tear-down
+[==========] 18 tests from 2 test suites ran. (89 ms total)
+[  PASSED  ] 18 tests.

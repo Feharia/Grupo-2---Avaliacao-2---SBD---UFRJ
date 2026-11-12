@@ -1,0 +1,34 @@
+gerando a base (escala 0.1)...
+[LRU] construindo as tabelas...
+[LRU] sel_pt_dre
+[LRU] sel_pt_cpf
+[LRU] sel_rg_dre_baixa
+[LRU] sel_rg_cr_baixa
+[LRU] sel_rg_curso_baixa
+[LRU] sel_rg_dre_alta
+[LRU] sel_rg_cr_alta
+[LRU] sel_rg_curso_alta
+[LRU] j_mestre_detalhe
+[LRU] j_pequenas
+[LRU] j_grande_pequena
+[LRU] j_unique
+[LRU] j_not_unique
+aviso: j_not_unique foi declarada maior_maior, mas as tabelas dão menor_maior
+[LRU] carga de manutenção...
+[MRU] construindo as tabelas...
+[MRU] sel_pt_dre
+[MRU] sel_pt_cpf
+[MRU] sel_rg_dre_baixa
+[MRU] sel_rg_cr_baixa
+[MRU] sel_rg_curso_baixa
+[MRU] sel_rg_dre_alta
+[MRU] sel_rg_cr_alta
+[MRU] sel_rg_curso_alta
+[MRU] j_mestre_detalhe
+[MRU] j_pequenas
+[MRU] j_grande_pequena
+[MRU] j_unique
+[MRU] j_not_unique
+aviso: j_not_unique foi declarada maior_maior, mas as tabelas dão menor_maior
+[MRU] carga de manutenção...
+pronto em 3.6 s. Resultados em "/tmp/cbd001-fix-fqENRi/validated-rapido"

@@ -1,0 +1,8 @@
+Internal ctest changing into directory: /tmp/cbd001-fix-fqENRi/fixed-sanitizers
+Test project /tmp/cbd001-fix-fqENRi/fixed-sanitizers
+    Start 1: testes
+1/1 Test #1: testes ...........................   Passed   45.44 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  45.44 sec

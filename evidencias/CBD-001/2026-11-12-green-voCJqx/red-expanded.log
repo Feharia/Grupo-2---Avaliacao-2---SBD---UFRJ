@@ -1,0 +1,459 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = BPlusBulkLoadIntegration.*
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from BPlusBulkLoadIntegration
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 1 vs 16
+[  FAILED  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:148: Failure
+Expected: (node.keys.size()) >= (min_keys), actual: 178 vs 254
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:148: Failure
+Expected: (node.keys.size()) >= (min_keys), actual: 178 vs 254
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:200: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros (63 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:228: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: true
+Expected: false
+[  FAILED  ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo
+[       OK ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros
+[       OK ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 2 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:253: registros=23
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 10 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:253: registros=31
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 11 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:253: registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 12 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:253: registros=33
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 1 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:253: registros=43
+[  FAILED  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes (4 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:148: Failure
+Expected: (node.keys.size()) >= (min_keys), actual: 178 vs 254
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:265: registros=7499
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:148: Failure
+Expected: (node.keys.size()) >= (min_keys), actual: 178 vs 254
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:265: registros=7499
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 2 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:265: registros=7499
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:271: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:265: registros=7499
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:148: Failure
+Expected: (node.keys.size()) >= (min_keys), actual: 178 vs 254
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:265: registros=7501
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:148: Failure
+Expected: (node.keys.size()) >= (min_keys), actual: 178 vs 254
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:265: registros=7501
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 4 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:265: registros=7501
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:271: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:265: registros=7501
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes (116 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:148: Failure
+Expected: (node.keys.size()) >= (min_keys), actual: 178 vs 254
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:148: Failure
+Expected: (node.keys.size()) >= (min_keys), actual: 178 vs 254
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:280: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada (58 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis
+[       OK ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis (98 ms)
+[ RUN      ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 1 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:302: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 2 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:302: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 2 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:302: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.100000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 15 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 7 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:302: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=22
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 15 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 15 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 2 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:302: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 15 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 15 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 15 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 15 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 5 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:302: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=0.500000; registros=65
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 1 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=1.000000; registros=32
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:121: Failure
+Expected: (header.live) >= (minimum), actual: 3 vs 16
+Google Test trace:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:296: fill=1.000000; registros=65
+[  FAILED  ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo (5 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 262 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:313: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 524 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:313: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 786 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 262 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:313: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 262 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 2882 vs 4072
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:117: Failure
+Expected: (used * 2) >= (loaded.pool.block_size() - kPageHeader), actual: 262 vs 4072
+[  FAILED  ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes (3 ms)
+[ RUN      ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario
+[       OK ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario (1 ms)
+[----------] 12 tests from BPlusBulkLoadIntegration (355 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (355 ms total)
+[  PASSED  ] 4 tests.
+[  FAILED  ] 8 tests, listed below:
+[  FAILED  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+[  FAILED  ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+[  FAILED  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada
+[  FAILED  ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo
+[  FAILED  ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes
+
+ 8 FAILED TESTS

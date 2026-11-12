@@ -201,3 +201,217 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   ser descrito como diferença em relação a essa baseline inválida, sem usar
   desempenho como justificativa para preservar o defeito. Não foi executado
   benchmark novo nem implementada a correção nesta análise.
+
+## 2026-11-12 — CBD-001 implementado, validado e medido
+
+### Branch e baseline preservada
+
+- Autorização explícita do usuário: criar branch, mover HEAD, stagear e
+  commitar estado atual, depois implementar a proposta, testar e medir.
+- Branch: `fix/cbd-001-ocupacao-bplus`.
+- Commit: `4d5f1b639f144b6781eaf054fab7fc9c79062a7c`, mensagem
+  `test: adiciona regressões de integração para CBD-001`.
+- Foram incluídos os arquivos locais existentes, inclusive configuração de
+  skills, script GoogleTest e evidências. O motor desse commit é a baseline
+  original. Não houve push, PR, merge ou reescrita de histórico.
+- A correção, os testes ampliados e as evidências novas permanecem na working
+  tree para revisão; não foi feito um segundo commit automático.
+
+### Correção e revisão de IA
+
+- Mudanças de produção limitadas a `src/layer3/bplus.cpp`: metas de fill não
+  ficam abaixo dos mínimos, cauda fixa é fundida/redistribuída, internos são
+  agrupados dentro dos limites e o verificador examina a última folha.
+- A revisão dos consumidores mostrou que callbacks de manutenção não podem
+  ser usados para registros ainda não publicados do bulk load: índices podem
+  estar vazios e são reconstruídos depois por StorageManager. Preservado o
+  comportamento anterior de não emitir callbacks durante a carga.
+- A skill `requesting-code-review` foi aplicada com um revisor independente,
+  somente leitura. Ele encontrou dois contraexemplos de VarChar desigual:
+  carga válida rejeitada ao ajustar só duas últimas folhas e folha
+  intermediária subocupada por falta de espaço para o próximo registro.
+- Ambas as regressões foram adicionadas e executadas em RED (`var-red.log`)
+  antes do ajuste. O ramo variável passou a planejar uma partição válida do
+  sufixo por bytes, recuando fronteiras quando necessário. Reconstrói folhas
+  pelo Buffer Pool e libera as antigas, sem copiar todos os payloads para RAM.
+  A posição da primeira folha problemática é registrada durante a carga,
+  evitando varredura extra para localizá-la.
+- Revisão final aprovada no escopo funcional. O agente principal recompilou
+  e executou o probe independente contra a biblioteca final: 2.500 casos,
+  1.045 válidos e 1.455 realmente impossíveis, todos conferidos contra oráculo
+  de atingibilidade, conteúdo, links, buscas e invariantes.
+- São agora 14 testes de integração do CBD-001: 54 testes no total. Não houve
+  mudança em API pública, RID, layout, quota M, políticas ou contadores.
+
+### Validação final executada
+
+- CMake Release/CTest: 54/54 aprovados, em aproximadamente 0,54 s.
+- Debug + ASan/UBSan: 54/54 aprovados, em aproximadamente 45,94 s.
+  LSan desativado; não há alegação de ausência de vazamentos.
+- Bancada rápida com tuplas, `reference.py` e `compare.py`: 108 linhas
+  conferidas, zero divergências e 132 `nao_aplicavel`. Não é cobertura da
+  matriz experimental integral.
+- O fonte ampliado também passou na verificação de sintaxe sem GoogleTest:
+  `c++ -std=c++20 -Wall -Wextra -Wpedantic -Wshadow -Isrc -Itests
+  -fsyntax-only tests/test_bplus_bulk_load_integration.cpp`.
+- Os builds completos mantêm avisos preexistentes de inicializadores em
+  `tests/test_layer3.cpp`; eles não foram alterados nesta correção.
+
+### Comparação de desempenho
+
+- Driver comum `tools/benchmark_cbd001.cpp`, compilado contra bibliotecas
+  Release da baseline e da correção, com GCC 13.3, `-O3 -DNDEBUG`.
+- Executor `tools/comparar_cbd001.py`: duas rodadas independentes, cada uma
+  com dez repetições pareadas e ordem alternada, sete cenários. Total de 280
+  execuções. Fases separadas: carga com flush, lote de mil pontos e varredura.
+  Mesmos dados, fill 0,7, páginas 4 KiB, LRU e frames 32/16/4/32.
+- Medianas da confirmação: 22 fixos, carga 20,44 → 13,41 µs, escritas 5 → 2;
+  varredura 2 → 1 leitura. Altura 2 → 1.
+- 32 fixos, carga 20,56 → 34,96 µs (+70,1%), com cinco escritas em ambas:
+  custo adicional de redistribuição para tornar a árvore válida.
+- 7.518 fixos, altura 3 → 2, internos 3 → 1 e leituras do lote 1.051 → 1.049;
+  o tempo do lote aumentou 4.251,41 → 5.861,18 µs (+37,9%). A primeira rodada
+  também mostrou aumento (+28,9%). Busca linear em um nó mais largo é uma
+  hipótese a partir do código, ainda sem profiling, não uma causa provada.
+- 64 variáveis desiguais, carga 34,20 → 67,08 µs (+96,1%), folhas 3 → 2:
+  custo de corrigir a distribuição, que antes violava invariantes.
+- 20.000 fixos, carga 5.304,98 → 5.269,68 µs (diferença pequena), escritas
+  959 → 958; folhas 953 → 952. Não houve ganho uniforme de tempo.
+- Contadores de transferências e formas foram determinísticos. Algumas
+  séries de tempo excederam CV 5%; não se afirma convergência ou significância
+  para deltas pequenos. I/O é arquivo↔buffer, não I/O físico do SSD.
+- O reparo variável mantém metadados O(registros do sufixo), que pode crescer
+  e ser replanejado se fronteiras precisarem recuar. Essa memória pertence à
+  carga e não altera M das consultas; pico de RAM não foi medido. CBD-002
+  permanece uma tarefa independente.
+- A baseline medida viola invariantes, embora seus resultados relacionais
+  sejam conferidos pelo driver. A correção deve ser avaliada contra essa
+  referência explicitamente inválida, sem conservar o defeito por desempenho.
+- Fontes, comandos, CSV bruto, variabilidade e limites estão preservados em
+  `evidencias/CBD-001/2026-11-12-green-voCJqx/README.md`, `desempenho/` e
+  `confirmacao/`. Builds temporários: `/tmp/cbd001-fix-fqENRi/`.
+
+### Esclarecimento sobre a origem e independência dos testes
+
+- Ao ser questionado pelo usuário, o Codex confirmou que leu a implementação
+  para construir fixtures, acessar páginas e elaborar regressões. As
+  expectativas foram baseadas principalmente no backlog, nas reproduções
+  anteriores e nos contratos encontrados no contexto/headers. Não houve
+  derivação direta dos testes a partir do PDF normativo e das decisões
+  aprovadas originais; falta essa rastreabilidade normativa explícita.
+- Há dependências do código de produção também nas verificações: capacidades
+  via `sp_capacity`/`internal_cap`, leitura via `read_header`/`sp_record`,
+  ocupação variável via `sp_used_bytes`, ordenação via `sorted_slots` e bytes
+  esperados via `encode_record`, usado também para gerar as entradas.
+  Literais como 31, 509 e 2036 oferecem checagens adicionais, mas não removem
+  todo risco de um erro compartilhado entre implementação e teste.
+- A expressão anterior "oráculo independente" precisa ser qualificada:
+  o oráculo de conteúdo é independente de `BPlusEngine::verify`, não de
+  todas as rotinas da implementação. O probe separado de atingibilidade
+  implementa sua própria decisão de partição, porém adota os mesmos limites
+  estruturais; não prova por si só que esses limites representam a norma.
+- As execuções RED/GREEN e os resultados relatados continuam factuais e
+  demonstram detecção das falhas reproduzidas. Não devem ser apresentados
+  como prova de conformidade integral com uma especificação independente.
+- Próxima revisão recomendada: relacionar cada propriedade à fonte normativa
+  ou decisão aprovada, derivar expectativas sem usar o motor e separar
+  verificações da representação física dos testes de comportamento público.
+  Esta anotação não alterou código, testes ou resultados existentes.
+
+## 2026-11-12 — Revisão normativa e independência dos testes CBD-001
+
+- Pedido do usuário: revisar as propriedades contra a especificação, rastrear
+  suas fontes e reduzir dependências da implementação no oráculo.
+- O usuário esclareceu: “Tenho aprovação prévia de todo o grupo para decidir
+  sozinho esse e outros pontos similares.” Não há necessidade de ata nem de
+  confirmação adicional do grupo para as decisões desta correção.
+- Foram lidos os trechos pertinentes do PDF original de 04/11 (§3, §3.4,
+  §4.2, recomendação de referência após §5.2 e §7.1), o registro D01–D22 e a
+  tabela #32–38 do DOCX de decisões. O PDF exige definir/manter mínimo e
+  encadear folhas, mas não fixa percentual, fan-out ou arredondamento.
+- A tabela histórica diz “Valor sugerido”; não foi tratada como aprovação.
+  Formalizados, sob a autoridade delegada ao usuário: metade da capacidade
+  em registros fixos, metade da área útil em bytes vivos+slots para variáveis,
+  mínimos por filhos em internos, exceção da raiz, fill como meta e rejeição
+  controlada quando nenhuma partição ordenada válida existir. Não se promete
+  rollback transacional nem se atribuem esses números ao professor.
+- Contrato e matriz por teste escritos antes da revisão do fonte:
+  `docs/cbd001/CONTRATO_E_RASTREABILIDADE.md`.
+- Acrescentado `tests/cbd001_spec_fixture.hpp`, independente de headers do
+  motor, com montagem de bytes e leitor de páginas próprios. Os mínimos são
+  literais derivados no contrato; não vêm de `sp_capacity`/`internal_cap`.
+- Os testes deixaram de usar `encode_record` para gerar entradas/esperados e
+  `read_header`, `sp_record`, `sp_used_bytes` ou `sorted_slots` como oráculo.
+  A remoção dirigida para testar o verificador também usa escrita própria.
+- Os testes físicos continuam conhecendo um layout explícito de fixture,
+  separado do enunciado. As APIs e o BufferPool são o sistema observado, não
+  calculadores de expectativas.
+- Acrescentados três testes públicos com modelos lógicos `std::map` e
+  `std::multiset`: conteúdo/pontos UNIQUE, intervalo[20,42] e duplicatas NOT
+  UNIQUE antes/depois de reorganizar. O caso grande consulta todas as 15.811
+  chaves. RecordView é resultado observado; o modelo esperado não usa codecs.
+- O teste de três níveis passou de 10.731 para 15.811 registros: 31×510=15.810
+  é o máximo em dois níveis da fixture. A exigência de altura deixou de
+  depender do arredondamento de fill particular da implementação.
+- Incluídos casos de rejeição de partição impossível e registro maior que a
+  página. `bad_alloc`/`out_of_range` não contam como rejeição semântica; a API
+  atual não distingue todas as causas por código estruturado, limite mantido
+  explícito sem impor mensagens concretas do motor.
+- A revisão independente começou pelas fontes, sem abrir implementação ou
+  testes. Depois identificou esperado antigo 10.731 remanescente e ausência
+  de um negativo variável do verificador. Corrigidos antes da validação final.
+- Novo negativo variável: última folha com 20 registros de custo 100 bytes
+  totaliza 2000<2036, embora 20>=16. O leitor próprio comprova a ocupação;
+  verify(false) aceita as demais invariantes e verify(true) deve rejeitar.
+- A inspeção própria confere níveis pai/filho e igualdade entre as folhas
+  referenciadas nos internos e a cadeia. A revisão estática final aprovou
+  a independência/rastreabilidade nesse escopo, sem pendências materiais.
+- Resultado final: 59/59 testes aprovados no Release/CTest (~0,73 s) e no
+  Debug ASan/UBSan (~64,90 s, LSan desativado). São 40 preexistentes e 19 deste
+  grupo (16 estruturais/diagnósticos e três públicos), todos de integração.
+- Os mesmos 19 testes, ligados à biblioteca original preservada, produziram
+  13 falhas de contrato e seis controles aprovados. Isso reconfirma RED
+  sem retirar a correção da working tree nem alterar HEAD.
+- A fixture compila sem include path do motor; o fonte de testes também
+  passou na verificação de sintaxe usando o substituto local de GoogleTest.
+- O hash de `src/layer3/bplus.cpp` não mudou nesta etapa. Não se repetiram
+  benchmarks/SQLite: resultados anteriores continuam associados ao mesmo
+  fonte de produção. Não houve novo commit, push ou mudança de branch.
+- Fontes de teste anteriores preservadas; logs, hashes de fontes normativas,
+  reprodução e limites em
+  `evidencias/CBD-001/2026-11-12-normativa-AqCN94/README.md`.
+
+### Conferência para encerramento do CBD-001
+
+- Reexecutado CTest Release: suíte aprovada (~0,72 s). Confirmadas integridade
+  dos hashes da revisão normativa e ausência de erros em `git diff --check`.
+- A última execução ASan/UBSan preservada continua sendo59/59 aprovada e
+  corresponde aos mesmos fontes conferidos pelos hashes; não foi repetida
+  nesta conferência sem mudanças de código.
+- Não há pendência técnica conhecida no escopo da correção. Desempenho misto
+  e limites de medição/memória permanecem documentados; não se exigiu ganho
+  uniforme nem otimização adicional para encerrar o CBD-001.
+- Pendência de versionamento: o commit4d5f1b6 contém a baseline de testes;
+  correção, revisão de testes, documentação e novas evidências ainda precisam
+  de stage e commit final autorizado. Nada foi commitado ou enviado agora.
+
+## 2026-11-12 — Versionamento final do CBD-001 autorizado
+
+- O usuário autorizou explicitamente stage e commit da entrega final, mantendo
+  o branch separado de `main`, pois há outras pendências independentes.
+- Entrada preparada para acompanhar o commit
+  `fix: corrige ocupação mínima da B+ no bulk load (CBD-001)` no branch
+  `fix/cbd-001-ocupacao-bplus`: correção, testes revisados, contrato, ferramentas
+  de comparação e evidências RED/GREEN/desempenho.
+- Conferência anterior ao commit: hashes da revisão normativa válidos,
+  `git diff --check` sem erros e CTest Release aprovado novamente (~0,74 s).
+  A evidência ASan/UBSan de 59/59 permanece vinculada aos mesmos fontes.
+- Ao stagear os CSVs brutos, o check do índice apontou seus finais CRLF,
+  gerados pelo escritor CSV padrão. Os dois arquivos e hashes foram
+  preservados. O check final passou com `cr-at-eol` explicitamente permitido,
+  mantendo as verificações de espaços finais, linhas vazias finais e espaços
+  antes de tabs; nenhum outro arquivo stageado contém CRLF.
+- Os registros anteriores de alterações ainda sem commit descrevem o estado
+  à época de cada execução; esta autorização encerra essa pendência local.
+- Merge com `main`, push e resolução de outros problemas não fazem parte
+  desta autorização. Não foram executados.

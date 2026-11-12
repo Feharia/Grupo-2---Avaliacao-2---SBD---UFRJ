@@ -1,0 +1,506 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+[==========] Running 19 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 16 tests from BPlusBulkLoadIntegration
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 1 vs 16
+[  FAILED  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 178 vs 254
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 178 vs 254
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:333: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros (5 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:359: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: true
+Expected: false
+[  FAILED  ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:376: Failure
+Value of: observed.records.size() >= 21
+  Actual: false
+Expected: true
+[  FAILED  ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo
+[       OK ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros
+[       OK ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 2 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:410: registros=23
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 10 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:410: registros=31
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 11 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:410: registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 12 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:410: registros=33
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 1 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:410: registros=43
+[  FAILED  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes (1 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 178 vs 254
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:422: registros=7499
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 178 vs 254
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:422: registros=7499
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 2 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:422: registros=7499
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:428: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:422: registros=7499
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 178 vs 254
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:422: registros=7501
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 178 vs 254
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:422: registros=7501
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 4 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:422: registros=7501
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:428: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:422: registros=7501
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes (10 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 178 vs 254
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 178 vs 254
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:437: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada (4 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 250 vs 254
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 250 vs 254
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:164: Failure
+Expected: (node.keys.size()) >= (spec::min_internal_keys), actual: 250 vs 254
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:447: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+[  FAILED  ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis (10 ms)
+[ RUN      ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 1 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:460: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 2 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:460: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 2 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:460: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.100000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 15 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 7 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:460: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=22
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 15 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 15 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 2 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:460: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 15 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 15 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 15 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 15 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 5 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:460: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=0.500000; registros=65
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 1 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=1.000000; registros=32
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:135: Failure
+Expected: (observed.records.size()) >= (spec::min_leaf_records), actual: 3 vs 16
+Google Test trace:
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:454: fill=1.000000; registros=65
+[  FAILED  ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo (1 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 131 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:471: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 262 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:471: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 393 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 131 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:471: Failure
+Value of: loaded.tree.verify(true).empty()
+  Actual: false
+Expected: true
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 131 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 1441 vs 2036
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:130: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 131 vs 2036
+[  FAILED  ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes (1 ms)
+[ RUN      ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario
+[       OK ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:263: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 1300 vs 2036
+[  FAILED  ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:257: Failure
+Value of: tree.verify(true).empty()
+  Actual: false
+Expected: true
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:263: Failure
+Expected: (observed.used_bytes()) >= (spec::min_variable_bytes), actual: 2000 vs 2036
+[  FAILED  ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados
+PrototipoIA/Implementacao/tests/test_bplus_bulk_load_integration.cpp:253: Failure
+Value of: rejected
+  Actual: false
+Expected: true
+[  FAILED  ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados (0 ms)
+[----------] 16 tests from BPlusBulkLoadIntegration (38 ms total)
+
+[----------] 3 tests from StorageBPlusContract
+[ RUN      ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas
+[       OK ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas (143 ms)
+[ RUN      ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites
+[       OK ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites (0 ms)
+[ RUN      ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas
+[       OK ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas (0 ms)
+[----------] 3 tests from StorageBPlusContract (144 ms total)
+
+[----------] Global test environment tear-down
+[==========] 19 tests from 2 test suites ran. (182 ms total)
+[  PASSED  ] 6 tests.
+[  FAILED  ] 13 tests, listed below:
+[  FAILED  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+[  FAILED  ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+[  FAILED  ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes
+[  FAILED  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes
+[  FAILED  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada
+[  FAILED  ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis
+[  FAILED  ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo
+[  FAILED  ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes
+[  FAILED  ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas
+[  FAILED  ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada
+[  FAILED  ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados
+
+13 FAILED TESTS

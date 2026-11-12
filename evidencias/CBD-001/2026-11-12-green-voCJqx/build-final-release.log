@@ -1,0 +1,8 @@
+[  4%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/bplus.cpp.o
+[  9%] Linking CXX static library libcbd_motor.a
+[ 68%] Built target cbd_motor
+[ 72%] Linking CXX executable bancada
+[ 77%] Building CXX object CMakeFiles/testes.dir/tests/test_bplus_bulk_load_integration.cpp.o
+[ 81%] Built target bancada
+[ 86%] Linking CXX executable testes
+[100%] Built target testes

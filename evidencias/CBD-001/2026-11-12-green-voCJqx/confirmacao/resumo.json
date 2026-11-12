@@ -1,0 +1,1388 @@
+{
+  "22-fixed": {
+    "baseline": {
+      "valid": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "height": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 20.441000000000003,
+        "min": 19.347,
+        "max": 26.675,
+        "cv_percent": 9.919238594667044
+      },
+      "load_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 5.0,
+        "min": 5.0,
+        "max": 5.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 1008.0550000000001,
+        "min": 999.798,
+        "max": 1049.09,
+        "cv_percent": 1.4588852519609672
+      },
+      "points_requests": {
+        "median": 3045.0,
+        "min": 3045.0,
+        "max": 3045.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 7.1745,
+        "min": 5.934,
+        "max": 7.842,
+        "cv_percent": 8.140185737982689
+      },
+      "scan_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    },
+    "correcao": {
+      "valid": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "height": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "load_us": {
+        "median": 13.405999999999999,
+        "min": 12.736,
+        "max": 15.564,
+        "cv_percent": 7.956654985051694
+      },
+      "load_requests": {
+        "median": 10.0,
+        "min": 10.0,
+        "max": 10.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 903.0609999999999,
+        "min": 892.393,
+        "max": 974.553,
+        "cv_percent": 2.519129400237933
+      },
+      "points_requests": {
+        "median": 2000.0,
+        "min": 2000.0,
+        "max": 2000.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 6.1165,
+        "min": 4.651,
+        "max": 14.788,
+        "cv_percent": 39.46722370329431
+      },
+      "scan_requests": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    }
+  },
+  "32-fixed": {
+    "baseline": {
+      "valid": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "height": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 20.5575,
+        "min": 19.823,
+        "max": 25.415,
+        "cv_percent": 8.170988886016016
+      },
+      "load_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 5.0,
+        "min": 5.0,
+        "max": 5.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 927.8875,
+        "min": 923.888,
+        "max": 1046.67,
+        "cv_percent": 3.8200555583990066
+      },
+      "points_requests": {
+        "median": 3032.0,
+        "min": 3032.0,
+        "max": 3032.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 8.279,
+        "min": 8.115,
+        "max": 9.234,
+        "cv_percent": 3.933179320857356
+      },
+      "scan_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    },
+    "correcao": {
+      "valid": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "height": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 34.960499999999996,
+        "min": 33.197,
+        "max": 43.366,
+        "cv_percent": 8.034649516060252
+      },
+      "load_requests": {
+        "median": 32.0,
+        "min": 32.0,
+        "max": 32.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 5.0,
+        "min": 5.0,
+        "max": 5.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 975.5699999999999,
+        "min": 971.119,
+        "max": 1016.49,
+        "cv_percent": 1.6076509032636062
+      },
+      "points_requests": {
+        "median": 3031.0,
+        "min": 3031.0,
+        "max": 3031.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 8.3695,
+        "min": 6.962,
+        "max": 12.146,
+        "cv_percent": 14.761540572022207
+      },
+      "scan_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    }
+  },
+  "7518-fixed": {
+    "baseline": {
+      "valid": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "height": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 358.0,
+        "min": 358.0,
+        "max": 358.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 1913.2649999999999,
+        "min": 1878.61,
+        "max": 1961.68,
+        "cv_percent": 1.2395203414816462
+      },
+      "load_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 363.0,
+        "min": 363.0,
+        "max": 363.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 4251.415,
+        "min": 4201.44,
+        "max": 4740.15,
+        "cv_percent": 3.4918989541653107
+      },
+      "points_requests": {
+        "median": 4048.0,
+        "min": 4048.0,
+        "max": 4048.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 1051.0,
+        "min": 1051.0,
+        "max": 1051.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 1438.28,
+        "min": 1404.39,
+        "max": 1506.93,
+        "cv_percent": 2.001365180725439
+      },
+      "scan_requests": {
+        "median": 358.0,
+        "min": 358.0,
+        "max": 358.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 358.0,
+        "min": 358.0,
+        "max": 358.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    },
+    "correcao": {
+      "valid": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "height": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 358.0,
+        "min": 358.0,
+        "max": 358.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 1908.645,
+        "min": 1894.21,
+        "max": 2090.51,
+        "cv_percent": 3.0912630565259933
+      },
+      "load_requests": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 361.0,
+        "min": 361.0,
+        "max": 361.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 5861.18,
+        "min": 5756.97,
+        "max": 6549.21,
+        "cv_percent": 3.8631670228593786
+      },
+      "points_requests": {
+        "median": 3048.0,
+        "min": 3048.0,
+        "max": 3048.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 1049.0,
+        "min": 1049.0,
+        "max": 1049.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 1415.8,
+        "min": 1397.64,
+        "max": 1459.94,
+        "cv_percent": 1.496523447214901
+      },
+      "scan_requests": {
+        "median": 358.0,
+        "min": 358.0,
+        "max": 358.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 358.0,
+        "min": 358.0,
+        "max": 358.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    }
+  },
+  "20000-fixed": {
+    "baseline": {
+      "valid": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "height": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 953.0,
+        "min": 953.0,
+        "max": 953.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 5304.985,
+        "min": 5204.02,
+        "max": 6196.01,
+        "cv_percent": 5.080843667768648
+      },
+      "load_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 959.0,
+        "min": 959.0,
+        "max": 959.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 5711.975,
+        "min": 5599.64,
+        "max": 5906.49,
+        "cv_percent": 1.6549327058552505
+      },
+      "points_requests": {
+        "median": 4048.0,
+        "min": 4048.0,
+        "max": 4048.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 1052.0,
+        "min": 1052.0,
+        "max": 1052.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 3782.06,
+        "min": 3752.68,
+        "max": 3864.89,
+        "cv_percent": 0.8975567746380048
+      },
+      "scan_requests": {
+        "median": 953.0,
+        "min": 953.0,
+        "max": 953.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 953.0,
+        "min": 953.0,
+        "max": 953.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    },
+    "correcao": {
+      "valid": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "height": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 952.0,
+        "min": 952.0,
+        "max": 952.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 5269.6849999999995,
+        "min": 5173.37,
+        "max": 5794.15,
+        "cv_percent": 3.2400236674835408
+      },
+      "load_requests": {
+        "median": 24.0,
+        "min": 24.0,
+        "max": 24.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 958.0,
+        "min": 958.0,
+        "max": 958.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 5969.0599999999995,
+        "min": 5836.45,
+        "max": 6422.89,
+        "cv_percent": 2.7937494677350108
+      },
+      "points_requests": {
+        "median": 4048.0,
+        "min": 4048.0,
+        "max": 4048.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 1052.0,
+        "min": 1052.0,
+        "max": 1052.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 3801.115,
+        "min": 3743.3,
+        "max": 3997.23,
+        "cv_percent": 1.7901472789369595
+      },
+      "scan_requests": {
+        "median": 952.0,
+        "min": 952.0,
+        "max": 952.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 952.0,
+        "min": 952.0,
+        "max": 952.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    }
+  },
+  "64-variable": {
+    "baseline": {
+      "valid": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "height": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 34.199,
+        "min": 33.092,
+        "max": 36.183,
+        "cv_percent": 2.4305147990723928
+      },
+      "load_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 6.0,
+        "min": 6.0,
+        "max": 6.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 1143.43,
+        "min": 1137.86,
+        "max": 1203.67,
+        "cv_percent": 1.738407460980011
+      },
+      "points_requests": {
+        "median": 3030.0,
+        "min": 3030.0,
+        "max": 3030.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 19.628,
+        "min": 18.25,
+        "max": 27.82,
+        "cv_percent": 12.750782459893943
+      },
+      "scan_requests": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    },
+    "correcao": {
+      "valid": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "height": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 67.0795,
+        "min": 64.353,
+        "max": 80.899,
+        "cv_percent": 6.916589459126432
+      },
+      "load_requests": {
+        "median": 71.0,
+        "min": 71.0,
+        "max": 71.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 5.0,
+        "min": 5.0,
+        "max": 5.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 1426.7,
+        "min": 1422.77,
+        "max": 1461.47,
+        "cv_percent": 0.8013787810838225
+      },
+      "points_requests": {
+        "median": 3016.0,
+        "min": 3016.0,
+        "max": 3016.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 18.686999999999998,
+        "min": 17.981,
+        "max": 28.854,
+        "cv_percent": 19.748964771119383
+      },
+      "scan_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    }
+  },
+  "5-variable": {
+    "baseline": {
+      "valid": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "height": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 25.5045,
+        "min": 24.578,
+        "max": 30.613,
+        "cv_percent": 6.725361578917329
+      },
+      "load_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 6.0,
+        "min": 6.0,
+        "max": 6.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 691.9705,
+        "min": 684.566,
+        "max": 1595.31,
+        "cv_percent": 34.32416044040164
+      },
+      "points_requests": {
+        "median": 3400.0,
+        "min": 3400.0,
+        "max": 3400.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 12.1425,
+        "min": 11.422,
+        "max": 16.96,
+        "cv_percent": 12.581159274818758
+      },
+      "scan_requests": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    },
+    "correcao": {
+      "valid": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "height": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 31.29,
+        "min": 29.474,
+        "max": 34.758,
+        "cv_percent": 5.065851031094971
+      },
+      "load_requests": {
+        "median": 10.0,
+        "min": 10.0,
+        "max": 10.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 5.0,
+        "min": 5.0,
+        "max": 5.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 614.359,
+        "min": 609.801,
+        "max": 653.87,
+        "cv_percent": 2.0067837722305035
+      },
+      "points_requests": {
+        "median": 3200.0,
+        "min": 3200.0,
+        "max": 3200.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 9.382,
+        "min": 8.27,
+        "max": 12.833,
+        "cv_percent": 14.646114274055721
+      },
+      "scan_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    }
+  },
+  "20000-variable": {
+    "baseline": {
+      "valid": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "height": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 953.0,
+        "min": 953.0,
+        "max": 953.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 6781.585,
+        "min": 6672.32,
+        "max": 6855.52,
+        "cv_percent": 1.0295480495363118
+      },
+      "load_requests": {
+        "median": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 959.0,
+        "min": 959.0,
+        "max": 959.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 5772.1,
+        "min": 5606.95,
+        "max": 6547.34,
+        "cv_percent": 4.293830280703306
+      },
+      "points_requests": {
+        "median": 4048.0,
+        "min": 4048.0,
+        "max": 4048.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 1052.0,
+        "min": 1052.0,
+        "max": 1052.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 5220.12,
+        "min": 5146.32,
+        "max": 6574.21,
+        "cv_percent": 7.669752507368386
+      },
+      "scan_requests": {
+        "median": 953.0,
+        "min": 953.0,
+        "max": 953.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 953.0,
+        "min": 953.0,
+        "max": 953.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    },
+    "correcao": {
+      "valid": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "height": {
+        "median": 3.0,
+        "min": 3.0,
+        "max": 3.0,
+        "cv_percent": 0.0
+      },
+      "leaves": {
+        "median": 952.0,
+        "min": 952.0,
+        "max": 952.0,
+        "cv_percent": 0.0
+      },
+      "internal_blocks": {
+        "median": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "cv_percent": 0.0
+      },
+      "load_us": {
+        "median": 6765.33,
+        "min": 6572.29,
+        "max": 6905.72,
+        "cv_percent": 1.466965470675224
+      },
+      "load_requests": {
+        "median": 34.0,
+        "min": 34.0,
+        "max": 34.0,
+        "cv_percent": 0.0
+      },
+      "load_reads": {
+        "median": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "cv_percent": 0.0
+      },
+      "load_writes": {
+        "median": 958.0,
+        "min": 958.0,
+        "max": 958.0,
+        "cv_percent": 0.0
+      },
+      "points_us": {
+        "median": 5955.594999999999,
+        "min": 5809.78,
+        "max": 6177.6,
+        "cv_percent": 2.242747558403336
+      },
+      "points_requests": {
+        "median": 4048.0,
+        "min": 4048.0,
+        "max": 4048.0,
+        "cv_percent": 0.0
+      },
+      "points_reads": {
+        "median": 1052.0,
+        "min": 1052.0,
+        "max": 1052.0,
+        "cv_percent": 0.0
+      },
+      "points_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      },
+      "scan_us": {
+        "median": 5156.89,
+        "min": 5105.11,
+        "max": 5456.48,
+        "cv_percent": 1.9649120613566986
+      },
+      "scan_requests": {
+        "median": 952.0,
+        "min": 952.0,
+        "max": 952.0,
+        "cv_percent": 0.0
+      },
+      "scan_reads": {
+        "median": 952.0,
+        "min": 952.0,
+        "max": 952.0,
+        "cv_percent": 0.0
+      },
+      "scan_writes": {
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "cv_percent": 0
+      }
+    }
+  }
+}

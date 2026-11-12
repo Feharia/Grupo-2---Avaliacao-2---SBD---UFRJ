@@ -1,0 +1,30 @@
+[  9%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer2/algorithms.cpp.o
+[  9%] Building CXX object CMakeFiles/cbd_motor.dir/src/common/common.cpp.o
+[ 13%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer2/monitor.cpp.o
+[ 18%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/bplus.cpp.o
+[ 22%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/catalog.cpp.o
+[ 27%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/handles.cpp.o
+[ 31%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/page.cpp.o
+[ 36%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/record.cpp.o
+[ 40%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/storage_manager.cpp.o
+[ 45%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/structures.cpp.o
+[ 50%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/buffer_pool.cpp.o
+[ 54%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/file_manager.cpp.o
+[ 59%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/posix_io.cpp.o
+[ 63%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/replacement_policy.cpp.o
+[ 68%] Linking CXX static library libcbd_motor.a
+[ 68%] Built target cbd_motor
+[ 77%] Building CXX object CMakeFiles/bancada.dir/src/layer1/bench.cpp.o
+[ 77%] Building CXX object CMakeFiles/testes.dir/tests/test_bplus_bulk_load_integration.cpp.o
+[ 81%] Building CXX object CMakeFiles/testes.dir/tests/test_layer2.cpp.o
+[ 86%] Linking CXX executable bancada
+[ 86%] Built target bancada
+[ 90%] Building CXX object CMakeFiles/testes.dir/tests/test_layer3.cpp.o
+[ 95%] Building CXX object CMakeFiles/testes.dir/tests/test_layer4.cpp.o
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_layer3.cpp: In member function ‘virtual void StorageManager_BPlusUnicaContraOraculo_Test::TestBody()’:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_layer3.cpp:118:56: warning: missing initializer for member ‘cbd::KeyRange::lo’ [-Wmissing-field-initializers]
+  118 |     const auto got = keys_in_order(sm, t, 0, KeyRange{0}, PathKind::PrimaryBTree);
+      |                                                        ^
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/test_layer3.cpp:118:56: warning: missing initializer for member ‘cbd::KeyRange::hi’ [-Wmissing-field-initializers]
+[100%] Linking CXX executable testes
+[100%] Built target testes

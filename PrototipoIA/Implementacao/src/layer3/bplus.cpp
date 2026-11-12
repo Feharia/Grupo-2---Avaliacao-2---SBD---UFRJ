@@ -2,8 +2,104 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
+#include <stdexcept>
 
 namespace cbd {
+
+namespace {
+// Só é necessário para páginas variáveis subocupadas: uma fronteira pode
+// precisar recuar mais de uma folha por causa de registros indivisíveis.
+// Guarda RIDs/tamanhos, não cópias dos payloads; lê/grava pelo BufferPool.
+void repair_variable_bulk(BufferPool& pool, FileId file, PageType type,
+                          const BPlusEngine::KeyOf& key_of,
+                          std::vector<std::pair<Key, std::uint32_t>>& level, double fill, std::size_t bad) {
+    const std::uint32_t capacity = pool.block_size() - kPageHeader;
+    const std::uint32_t minimum = (capacity + 1) / 2;
+    const auto unreachable = std::numeric_limits<std::uint64_t>::max();
+    const auto target = std::max(minimum, static_cast<std::uint32_t>(fill * capacity));
+    std::size_t start = bad == 0 ? 0 : bad - 1;
+    std::vector<RID> records;
+    std::vector<std::size_t> previous;
+    std::vector<std::size_t> ends;
+    for (;;) {
+        records.clear();
+        std::vector<std::uint64_t> prefix{0};
+        for (std::size_t i = start; i < level.size(); ++i) {
+            auto page = pool.fetch({file, level[i].second}, kSeqOnce, kNoReservation);
+            for (const auto& entry : sorted_slots(page.read(), key_of)) {
+                const auto bytes = static_cast<std::uint32_t>(sp_record(page.read(), entry.second).size()) + kSlotEntry;
+                records.push_back(RID{level[i].second, entry.second});
+                prefix.push_back(prefix.back() + bytes);
+            }
+        }
+        // Partição ordenada por bytes. Atingibilidade impede declarar
+        // "indivisível" quando há solução com outras fronteiras de página.
+        std::vector<std::uint64_t> cost(records.size() + 1, unreachable);
+        previous.assign(records.size() + 1, 0);
+        cost[0] = 0;
+        for (std::size_t end = 1; end <= records.size(); ++end) {
+            for (std::size_t begin = end; begin > 0;) {
+                --begin;
+                const auto bytes = prefix[end] - prefix[begin];
+                if (bytes > capacity) break;
+                const bool root_leaf = start == 0 && begin == 0 && end == records.size();
+                if ((bytes < minimum && !root_leaf) || cost[begin] == unreachable) continue;
+                const auto deviation = bytes > target ? bytes - target : target - bytes;
+                if (cost[begin] + deviation < cost[end]) {
+                    cost[end] = cost[begin] + deviation;
+                    previous[end] = begin;
+                }
+            }
+        }
+        if (cost.back() != unreachable) {
+            for (auto end = records.size(); end != 0; end = previous[end]) ends.push_back(end);
+            std::reverse(ends.begin(), ends.end());
+            break;
+        }
+        if (start == 0)
+            throw std::runtime_error("bulk_load: registros indivisíveis impedem a ocupação mínima");
+        --start;
+    }
+
+    std::vector<std::pair<Key, std::uint32_t>> replacement;
+    std::optional<PageGuard> output;
+    std::uint32_t prev = start == 0 ? 0 : level[start - 1].second;
+    std::size_t begin = 0;
+    for (const auto end : ends) {
+        auto [id, page] = pool.allocate(file, kNoReservation);
+        sp_init(page.write(), type);
+        auto header = read_header(page.read());
+        header.prev = prev;
+        write_header(page.write(), header);
+        if (output) {
+            auto old_header = read_header(output->read());
+            old_header.next = id.block;
+            write_header(output->write(), old_header);
+        }
+        output.emplace(std::move(page));
+        for (std::size_t i = begin; i < end; ++i) {
+            auto source = pool.fetch({file, records[i].block}, kSeqOnce, kNoReservation);
+            const auto record = sp_record(source.read(), records[i].slot);
+            if (i == begin) replacement.emplace_back(key_of(record), id.block);
+            if (!sp_insert(output->write(), record))
+                throw std::logic_error("bulk_load: partição variável excedeu a página");
+        }
+        prev = id.block;
+        begin = end;
+    }
+    output.reset();
+    if (start != 0) {
+        auto page = pool.fetch({file, level[start - 1].second}, kRandomReuse, kNoReservation);
+        auto header = read_header(page.read());
+        header.next = replacement.front().second;
+        write_header(page.write(), header);
+    }
+    for (std::size_t i = start; i < level.size(); ++i) pool.free_block({file, level[i].second});
+    level.resize(start);
+    level.insert(level.end(), replacement.begin(), replacement.end());
+}
+}  // namespace
 
 BPlusEngine::BPlusEngine(BufferPool& pool, FileId leaf_file, FileId node_file, KeyCodec kc, KeyOf key_of,
                          bool unique, PageType leaf_type, std::uint32_t fixed_record)
@@ -465,8 +561,11 @@ void BPlusEngine::fix_internal(std::uint32_t nb, Path path) {
 void BPlusEngine::bulk_load(RecordStream& sorted, double fill) {
     if (fill <= 0 || fill > 1) throw std::invalid_argument("fill fora de (0, 1]");
     const std::uint32_t bs = pool_.block_size();
-    const std::uint32_t target_count = fixed_ ? std::max<std::uint32_t>(1, static_cast<std::uint32_t>(fill * leaf_cap_)) : 0;
-    const std::uint32_t target_bytes = static_cast<std::uint32_t>(fill * (bs - kPageHeader));
+    const std::uint32_t min_bytes = (bs - kPageHeader + 1) / 2;
+    const std::uint32_t target_count = fixed_
+        ? std::max((leaf_cap_ + 1) / 2, static_cast<std::uint32_t>(fill * leaf_cap_)) : 0;
+    const std::uint32_t target_bytes =
+        std::max(min_bytes, static_cast<std::uint32_t>(fill * (bs - kPageHeader)));
 
     std::vector<std::pair<Key, std::uint32_t>> level;   // (1ª chave, bloco): uma entrada por folha
     std::uint32_t cur = meta_.first_leaf;
@@ -476,6 +575,7 @@ void BPlusEngine::bulk_load(RecordStream& sorted, double fill) {
     }
     std::optional<PageGuard> g{leaf(cur)};
     std::uint32_t count = 0, bytes = 0;
+    std::optional<std::size_t> first_underfull;
     std::optional<Key> prev;
     while (auto rec = sorted.next()) {
         const Key k = key_of_(*rec);
@@ -486,8 +586,11 @@ void BPlusEngine::bulk_load(RecordStream& sorted, double fill) {
         }
         prev = k;
         const std::uint32_t len = static_cast<std::uint32_t>(rec->size()) + kSlotEntry;
-        const bool full = count > 0 && (fixed_ ? count >= target_count : bytes + len > target_bytes);
+        const bool full = count > 0 && (fixed_ ? count >= target_count
+            : bytes >= min_bytes && bytes + len > target_bytes);
         if (full || !sp_fits(g->read(), rec->size())) {
+            if (!fixed_ && count > 0 && bytes < min_bytes && !first_underfull)
+                first_underfull = level.size() - 1;
             auto [nbid, ng] = pool_.allocate(leaf_file_, kNoReservation);
             sp_init(ng.write(), leaf_type_);
             PageHeader oh = read_header(g->read());
@@ -507,13 +610,72 @@ void BPlusEngine::bulk_load(RecordStream& sorted, double fill) {
         bytes += len;
     }
     g.reset();
+
+    // A meta de fill não permite deixar a cauda abaixo do mínimo. RIDs da
+    // carga ainda não foram publicados: índices são construídos após a carga
+    // (StorageManager::bulk_load/reorganize), sem callbacks de manutenção.
+    if (!fixed_ && level.size() > 1) {
+        if (bytes < min_bytes && !first_underfull) first_underfull = level.size() - 1;
+        if (first_underfull)
+            repair_variable_bulk(pool_, leaf_file_, leaf_type_, key_of_, level, fill, *first_underfull);
+        meta_.first_leaf = meta_.root = level.front().second;
+    } else if (level.size() > 1 && !leaf_ok(level.back().second)) {
+        const auto right = level.back().second;
+        const auto left = level[level.size() - 2].second;
+        std::uint32_t used;
+        {
+            auto lg = leaf(left);
+            auto rg = leaf(right);
+            used = sp_used_bytes(lg.read()) + sp_used_bytes(rg.read());
+        }
+        auto transfer = [&](std::uint32_t from, std::uint16_t slot, std::uint32_t to) {
+            auto src = leaf(from);
+            auto dst = leaf(to);
+            const auto rec = sp_record(src.read(), slot);
+            if (!sp_insert(dst.write(), rec))
+                throw std::runtime_error("bulk_load: cauda não cabe na folha de destino");
+            sp_erase(src.write(), slot);
+        };
+        if (used <= bs - kPageHeader) {
+            std::vector<std::pair<Key, std::uint16_t>> order;
+            {
+                auto rg = leaf(right);
+                order = sorted_slots(rg.read(), key_of_);
+            }
+            for (const auto& entry : order) transfer(right, entry.second, left);
+            unlink_leaf(right);
+            level.pop_back();
+        } else {
+            while (!leaf_ok(right)) {
+                std::uint16_t slot;
+                std::size_t len;
+                {
+                    auto lg = leaf(left);
+                    const auto order = sorted_slots(lg.read(), key_of_);
+                    if (order.empty()) throw std::runtime_error("bulk_load: folha doadora vazia");
+                    slot = order.back().second;
+                    len = sp_record(lg.read(), slot).size();
+                }
+                if (!leaf_ok_after_removing(left, len))
+                    throw std::runtime_error("bulk_load: registros indivisíveis impedem a ocupação mínima");
+                transfer(left, slot, right);
+            }
+            level.back().first = min_key(right);
+        }
+    }
     if (level.size() <= 1) return;   // árvore de uma folha: a raiz continua sendo a folha
 
     std::uint16_t lvl = 1;
-    const std::size_t target_children =
-        std::max<std::size_t>(2, static_cast<std::size_t>(fill * static_cast<double>(int_cap_ + 1)));
+    const std::size_t max_children = int_cap_ + 1;
+    const std::size_t min_children = min_int_ + 1;
+    const std::size_t target_children = std::clamp(
+        static_cast<std::size_t>(fill * static_cast<double>(max_children)), min_children, max_children);
     while (level.size() > 1) {
-        const std::size_t nodes = (level.size() + target_children - 1) / target_children;
+        // Se os filhos cabem numa raiz, ela pode exceder a meta de fill.
+        // Nos outros níveis, cada grupo precisa respeitar mínimo e máximo.
+        const std::size_t nodes = level.size() <= max_children ? 1 : std::clamp(
+            (level.size() + target_children - 1) / target_children,
+            (level.size() + max_children - 1) / max_children, level.size() / min_children);
         const std::size_t base = level.size() / nodes, extra = level.size() % nodes;
         std::vector<std::pair<Key, std::uint32_t>> up;
         std::size_t pos = 0;
@@ -584,7 +746,7 @@ std::string BPlusEngine::verify(bool check_occupancy) const {
             if (last && unique_ && compare_keys(*last, k) == 0) return "chave repetida em árvore única";
             last = k;
         }
-        if (check_occupancy && !meta_.root_is_leaf && h.next != 0 && !leaf_ok(b))
+        if (check_occupancy && !meta_.root_is_leaf && !leaf_ok(b))
             return "folha " + std::to_string(b) + " abaixo da ocupação mínima";
         prev = b;
         b = h.next;
