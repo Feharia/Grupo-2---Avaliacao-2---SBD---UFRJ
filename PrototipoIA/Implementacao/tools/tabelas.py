@@ -158,6 +158,8 @@ class Base:
         self.fases = ler_csv(os.path.join(saida, "fases.csv"))
         self.stats = ler_csv(os.path.join(saida, "estatisticas.csv"))
         self.ocup = ler_csv(os.path.join(saida, "ocupacao.csv"))
+        self.convergencia = ler_csv(os.path.join(saida, "convergencia.csv"))
+        self.caminhos = ler_csv(os.path.join(saida, "caminhos.csv"))
         self.manifesto = ler_manifesto(os.path.join(saida, "manifesto.txt"))
         conf = os.path.join(saida, "conferencia.txt")
         self.conferencia = open(conf, encoding="utf-8").read().strip() if os.path.exists(conf) else ""
@@ -645,8 +647,63 @@ def t_nao_executadas(b):
         ["status", "caso", "linhas", "operacoes", "motivo"])
 
 
+def t_acesso(b):
+    """P09: o acesso que cada algoritmo executa em cada configuração."""
+    rs = [r for r in b.caminhos if r["politica"] == b.politica and r["operacao"].startswith("j_")
+          and not r["variante"].endswith("(papeis trocados)")]
+    if not rs:
+        return Tabela("14_acesso_executado", "Acesso executado nas junções", "Sem caminhos.csv nesta saída.", [], [])
+    tipos = {c["operacao"]: c["tipo"] for c in b.combos}
+    grupos = OrderedDict()
+    for r in rs:
+        grupos.setdefault((r["operacao"], r["config"], r["variante"]), {})[r["algoritmo"]] = r
+    linhas, brutas = [], []
+    for (op, cfg, var), d in grupos.items():
+        lin = [b.rotulo_op(op, tipos.get(op, "")), cfg, var.replace(" x ", " × ")]
+        for a in ALG_ORDEM:
+            r = d.get(a)
+            lin.append(f"{r['acesso_externa']} · {r['acesso_interna']}" if r else "—")
+            brutas.append([op, cfg, var, a, r["acesso_externa"] if r else "", r["acesso_interna"] if r else ""])
+        linhas.append(lin)
+    return Tabela(
+        "14_acesso_executado", "Acesso executado nas junções",
+        "O que cada algoritmo lê de fato em cada entrada (externa · interna), tirado do plano. BNL, sort-merge e "
+        "partition-hash leem a organização primária: um índice secundário não clustering nunca é usado, então as "
+        "configurações que diferem só por ele medem o mesmo acesso (P09).",
+        ["Junção", "Config.", "Entradas", "BNL", "Sort-merge", "Hash"], linhas, brutas,
+        ["operacao", "config", "variante", "algoritmo", "acesso_externa", "acesso_interna"])
+
+
+def t_convergencia(b):
+    """P07: grupos que pararam no teto de repetições sem convergir."""
+    rs = [r for r in b.convergencia if r["parada"] != "nao_executada"]
+    if not rs:
+        return Tabela("15_convergencia", "Convergência das repetições", "Sem convergencia.csv nesta saída.", [], [])
+    tol = b.manifesto.get("tolerancia", "?")
+    teto = [r for r in rs if r["parada"] == "teto"]
+    so_tempo = sum(1 for r in teto if r["convergiu_io"] == "sim")
+    linhas = [[r["politica"], b.rotulo_op(r["operacao"], next((c["tipo"] for c in b.combos
+                                                               if c["operacao"] == r["operacao"]), "")),
+               r["variante"], ALG.get(r["algoritmo"], r["algoritmo"] or "seleção"), r["n_repeticoes"],
+               fmt_pct(100 * float(r["dispersao_io"]), False), fmt_pct(100 * float(r["dispersao_tempo"]), False),
+               r["convergiu_io"], r["convergiu_tempo"]] for r in teto]
+    brutas = [[r[k] for k in ("politica", "operacao", "variante", "algoritmo", "n_repeticoes", "dispersao_io",
+                              "dispersao_tempo", "convergiu_io", "convergiu_tempo")] for r in teto]
+    return Tabela(
+        "15_convergencia", "Convergência das repetições",
+        f"{len(rs)} grupos executados: {len(rs) - len(teto)} convergiram (E/S e tempo abaixo de {tol}) e "
+        f"{len(teto)} {'parou' if len(teto) == 1 else 'pararam'} no teto de repetições sem convergir "
+        f"({so_tempo} só no tempo, com a E/S estável). "
+        "A dispersão é (máx − mín)/média das últimas repetições. Na seleção pontual, o lote muda a cada repetição, "
+        "então a E/S também varia. Só os grupos que não convergiram aparecem abaixo.",
+        ["Política", "Consulta", "Variante", "Algoritmo", "Repetições", "Dispersão E/S", "Dispersão tempo",
+         "Convergiu E/S", "Convergiu tempo"], linhas, brutas,
+        ["politica", "operacao", "variante", "algoritmo", "n_repeticoes", "dispersao_io", "dispersao_tempo",
+         "convergiu_io", "convergiu_tempo"])
+
+
 GERADORES = (t_resumo, t_igualdade, t_faixa, t_organizacoes, t_juncoes, t_vencedor, t_ordem, t_politicas,
-             t_estimativa, t_fases, t_estruturas, t_ocupacao, t_nao_executadas)
+             t_estimativa, t_fases, t_estruturas, t_ocupacao, t_nao_executadas, t_acesso, t_convergencia)
 
 
 def main():

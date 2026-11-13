@@ -503,24 +503,88 @@ std::vector<std::string> result_row(const std::string& pol, const std::string& o
     return c;
 }
 
+// Resumo da convergência de uma combinação (P07): quantas repetições rodaram, a dispersão das
+// últimas min_reps e se cada critério ficou abaixo da tolerância. Parar no teto não é convergir.
+struct Convergence {
+    bool executed = false;
+    int reps = 0;
+    double io_spread = 0, time_spread = 0;
+    bool io_ok = false, time_ok = false;
+    const char* stop() const {
+        if (!executed) return "nao_executada";
+        return io_ok && time_ok ? "convergiu" : "teto";
+    }
+};
+
 // repete até a variação ficar abaixo da tolerância (mín. min_reps, máx. max_reps) (132, emendada):
 // as contagens de blocos são determinísticas fora dos lotes, então a regra vale também para o tempo
-void repeat(const Spec& spec, const std::function<Measured(int rep)>& once,
-            const std::function<void(int, const Measured&)>& record) {
+Convergence repeat(const Spec& spec, const std::function<Measured(int rep)>& once,
+                   const std::function<void(int, const Measured&)>& record) {
     std::vector<double> io, ms;
     auto spread = [&](const std::vector<double>& v) {
         const auto [mn, mx] = std::minmax_element(v.end() - spec.min_reps, v.end());
         const double mean = std::accumulate(v.end() - spec.min_reps, v.end(), 0.0) / spec.min_reps;
         return mean == 0 ? 0.0 : (*mx - *mn) / mean;
     };
+    Convergence c;
     for (int rep = 1; rep <= spec.max_reps; ++rep) {
         const Measured m = once(rep);
         record(rep, m);
-        if (!m.ok) return;
+        c.reps = rep;
+        if (!m.ok) return c;
+        c.executed = true;
         io.push_back(static_cast<double>(m.r.delta.global.reads() + m.r.delta.global.writes()));
         ms.push_back(static_cast<double>(m.r.wall_time.count()));
-        if (rep >= spec.min_reps && spread(io) < spec.tolerance && spread(ms) < spec.tolerance) return;
+        if (rep >= spec.min_reps) {
+            c.io_spread = spread(io);
+            c.time_spread = spread(ms);
+            c.io_ok = c.io_spread < spec.tolerance;
+            c.time_ok = c.time_spread < spec.tolerance;
+            if (c.io_ok && c.time_ok) return c;
+        }
     }
+    return c;
+}
+
+std::vector<std::string> convergence_row(const std::string& pol, const std::string& op, const std::string& variant,
+                                         const std::string& alg, const Convergence& c) {
+    auto flag = [&](bool ok) { return c.executed ? (ok ? "sim" : "nao") : ""; };
+    return {pol, op, variant, alg, std::to_string(c.reps), c.executed ? fmt(c.io_spread, 4) : "",
+            c.executed ? fmt(c.time_spread, 4) : "", flag(c.io_ok), flag(c.time_ok), c.stop()};
+}
+
+// Acesso que cada algoritmo realmente executa sobre cada entrada (P09). BNL, sort-merge e
+// partition-hash leem a organização primária; um índice secundário não clustering nunca é lido.
+std::string executed_access(const AccessPath& p, JoinAlgorithm alg, bool sorts, bool prepartitioned, bool partitions) {
+    std::string base;
+    switch (p.kind) {
+        case PathKind::PrimaryBTree: base = "folhas da B+"; break;
+        case PathKind::PrimaryHash: base = "buckets do hash"; break;
+        case PathKind::Scan: base = "varredura do heap"; break;
+        case PathKind::SecondaryBTreeClustering:
+            base = "varredura da organização primária (índice clustering não usado)"; break;
+        default: base = "varredura do heap (índice secundário não usado)"; break;   // §4.2: só sobre heap
+    }
+    switch (alg) {
+        case JoinAlgorithm::Bnl: return base;
+        case JoinAlgorithm::SortMerge: return base + (sorts ? " + ordenação em runs" : " lidas em ordem (sem ordenar)");
+        case JoinAlgorithm::Hash:
+            if (prepartitioned) return base + " usados como partições (sem particionar)";
+            return base + (partitions ? " + particionamento" : ", sem particionar (cabe em memória)");
+    }
+    return base;
+}
+
+std::string executed_access(const AccessPath& p) {   // seleção: o caminho pedido é o executado
+    switch (p.kind) {
+        case PathKind::Scan: return "varredura do heap com filtro";
+        case PathKind::PrimaryBTree: return "descida na B+ primária e leitura das folhas";
+        case PathKind::PrimaryHash: return "bucket do hash primário e overflow";
+        case PathKind::SecondaryHash: return "probe no hash secundário + fetch por RID";
+        case PathKind::SecondaryBTreeNonClustering: return "probe na B+ secundária + fetch por RID";
+        case PathKind::SecondaryBTreeClustering: return "B+ clustering + leitura dos blocos da organização";
+    }
+    return "?";
 }
 
 void write_occupancy(Monitor& mon, const Built& b, Csv& out, const std::string& pol, const std::string& when) {
@@ -677,6 +741,11 @@ int main(int argc, char** argv) {
                "distintos", "buckets", "overflow", "fator_carga", "cadeia_media", "cadeia_max"});
     Csv phases(out_dir / "fases.csv");
     phases.row({"politica", "operacao", "variante", "algoritmo", "rep", "fase", "leituras", "gravacoes", "requisicoes"});
+    Csv conv(out_dir / "convergencia.csv");   // P07
+    conv.row({"politica", "operacao", "variante", "algoritmo", "n_repeticoes", "dispersao_io", "dispersao_tempo",
+              "convergiu_io", "convergiu_tempo", "parada"});
+    Csv access(out_dir / "caminhos.csv");     // P09
+    access.row({"politica", "operacao", "config", "variante", "algoritmo", "acesso_externa", "acesso_interna"});
 
     for (Policy pol : spec.policies) {
         const std::string pname = to_string(pol);
@@ -721,7 +790,8 @@ int main(int argc, char** argv) {
                     const Cell cell{op.tipo, op.tamanho, ref.config, op.seletividade};
                     SelectParams sp;
                     sp.m = spec.m_select;
-                    repeat(spec,
+                    access.row({pname, op.id, ref.config, variant, "", executed_access(path), ""});
+                    const Convergence cv = repeat(spec,
                            [&](int rep) {
                                prepare();
                                if (op.kind == OpKind::Points) {
@@ -744,6 +814,7 @@ int main(int argc, char** argv) {
                                                    std::to_string(ph.delta.global.writes()),
                                                    std::to_string(ph.delta.global.requests)});
                            });
+                    conv.row(convergence_row(pname, op.id, variant, "", cv));
                 }
                 continue;
             }
@@ -776,7 +847,16 @@ int main(int argc, char** argv) {
                         const JoinInput& outer = fo ? in0 : in1;
                         const JoinInput& inner = fo ? in1 : in0;
                         const std::string vname = variant + (fo == first_outer ? "" : " (papeis trocados)");
-                        repeat(spec,
+                        {   // acesso executado, lido do plano (sem E/S, decisão 160)
+                            const auto planned = mon.plan_join(alg, outer, inner, spec.m_join, JoinParams{});
+                            std::string ae = "não executada", ai = "não executada";
+                            if (const auto* p = std::get_if<JoinPlan>(&planned)) {
+                                ae = executed_access(outer.path, alg, p->sort_outer, p->prepartitioned_outer, p->partitions > 1);
+                                ai = executed_access(inner.path, alg, p->sort_inner, p->prepartitioned_inner, p->partitions > 1);
+                            }
+                            access.row({pname, op.id, jc.config, vname, to_string(alg), ae, ai});
+                        }
+                        const Convergence cv = repeat(spec,
                                [&](int rep) {
                                    prepare();
                                    const ResultShape sh = shape_for(op.id, vname, to_string(alg), rep);
@@ -793,10 +873,13 @@ int main(int argc, char** argv) {
                                                        std::to_string(ph.delta.global.writes()),
                                                        std::to_string(ph.delta.global.requests)});
                                });
+                        conv.row(convergence_row(pname, op.id, vname, to_string(alg), cv));
                     }
                 }
             }
             results.flush();
+            conv.flush();
+            access.flush();
         }
 
         // carga de manutenção (131): 5% de inserções e 1% de remoções nas variantes de aluno
