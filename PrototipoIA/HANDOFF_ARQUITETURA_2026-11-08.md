@@ -314,10 +314,11 @@ Toda operação medida usa uma reserva de m molduras. O plano calcula cada parce
 
 **BNL**
 - chunk = b da externa quando ela é menor (b ≤ m − 2), e o BNL faz uma passada só. Senão, chunk = ⌊m/2⌋: o que sobra fica para a interna, e é aí que a política de substituição faz diferença (§3.1.1 das conclusões).
-- Uso simultâneo: chunk páginas da externa + 1 da interna + as páginas da interna guardadas pela política, limitado a m.
+- Diretório do chunk (173): um RecordView por registro, nas dir_frames = m − 1 − chunk molduras restantes. Se chunk × registros por página não couber, o chunk diminui; na execução, o excesso vira inviável.
+- Uso simultâneo: chunk páginas da externa + 1 da interna + dir_frames = m.
 
 **Sort-merge**
-- Geração de runs: run_pages = m − 2 páginas de ScratchSpace, mais 1 página de entrada e 1 página de saída = m. Número de runs de cada entrada: ⌈d / run_pages⌉, com d = ⌈n/bfr⌉ (143).
+- Geração de runs: run_pages = m − 2 páginas de ScratchSpace, mais 1 página de entrada e 1 página de saída = m. Número de runs de cada entrada: ⌈n / capacity_for(run_pages)⌉, com o diretório cobrado das páginas (173).
 - Passes intermediários: fan_in = m − 1 runs de entrada mais 1 página de saída = m. Cada passe divide o número de runs por fan_in.
 - Intercalação final, que é a própria junção: group_pages páginas de ScratchSpace para o grupo de duplicatas da interna (0 se o campo da interna for unique no esquema, decisão 157). final_fan_in = m − group_pages. Os passes intermediários continuam até que runs da externa + runs da interna ≤ final_fan_in.
 - Uma entrada já ordenada pelo campo da junção (ordered_by, nas condições da 164) conta como uma única run na intercalação final.
@@ -326,8 +327,8 @@ Toda operação medida usa uma reserva de m molduras. O plano calcula cada parce
 **Hash join (externa = build)**
 - Partição: 1 página de entrada + partitions páginas de saída ≤ m, logo partitions ≤ m − 1.
 - Build e probe: build_pages = m − 1 páginas de ScratchSpace + 1 página do probe = m.
-- Sem particionamento quando d_build ≤ m − 1: os registros cabem densos no ScratchSpace, e o diretório do hash fica fora das molduras (140).
-- Senão, partitions = min(m − 1, ⌈d_build × f / build_pages⌉), com fator de folga f = 1,2 declarado.
+- Sem particionamento quando n_build ≤ capacity_for(build_pages): os registros e o diretório da tabela hash cabem nas m − 1 páginas (173, que altera a 140).
+- Senão, partitions = min(m − 1, ⌈n_build × f / capacity_for(build_pages)⌉), com fator de folga f = 1,2 declarado.
 - **Recursão (171):** uma partição que não cabe é particionada de novo, com as mesmas parcelas de molduras. O nº de passes previsto pela fórmula do livro é L = ⌈log_{m−1}(d_build) − 1⌉, no mínimo 1. A execução decide pelo tamanho real das partições.
 - **Bailout (171):** m − 2 páginas de build + 1 do build em leitura + 1 do probe = m.
 - Entrada já organizada por hash, nas condições da 164: cada partição é um grupo de ⌈nbuckets / partitions⌉ buckets, lido por scan_buckets.
