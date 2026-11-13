@@ -171,8 +171,11 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
             p.group_pages = p.inner_unique ? 0 : params.group_pages;
             if (p.group_pages + 2 > m) return NotApplicable{"group_pages não deixa espaço para a intercalação", NotApplicable::Kind::Inviavel};
             p.final_fan_in = m - p.group_pages;
-            std::size_t ro = p.sort_outer ? std::max<std::size_t>(1, ceil_div(p.d_outer, p.run_pages)) : 1;   // runs densas
-            std::size_t ri = p.sort_inner ? std::max<std::size_t>(1, ceil_div(p.d_inner, p.run_pages)) : 1;
+            // runs: quantos registros cabem em m − 2 páginas de rascunho com o diretório cobrado (173)
+            const std::size_t cap_o = ScratchSpace::capacity_for(so, p.run_pages, storage_.block_size());
+            const std::size_t cap_i = ScratchSpace::capacity_for(si, p.run_pages, storage_.block_size());
+            std::size_t ro = p.sort_outer ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(to.n), cap_o)) : 1;
+            std::size_t ri = p.sort_inner ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(ti.n), cap_i)) : 1;
             p.runs_outer = ro;
             p.runs_inner = ri;
             while (ro + ri > p.final_fan_in) {
@@ -185,16 +188,17 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
         case JoinAlgorithm::Hash: {
             const double f = 1.2;   // fator de folga declarado
             p.build_pages = m - 1;
-            // os registros cabem densos no ScratchSpace e o diretório do hash fica fora das molduras (140),
-            // então a folga f só entra na contagem de partições (emenda da 108)
-            if (params.partitions == 0 && p.d_outer <= p.build_pages) {
+            // o build cabe se os registros e o diretório da tabela hash couberem em m − 1 páginas (173);
+            // a folga f só entra na contagem de partições (emenda da 108)
+            const std::size_t cap_build = ScratchSpace::capacity_for(so, p.build_pages, storage_.block_size());
+            if (params.partitions == 0 && to.n <= cap_build) {
                 p.partitions = 1;   // o build cabe: sem particionamento
                 break;
             }
             // 1º passe com até m − 1 partições; o que não couber é particionado de novo (171)
             p.partitions = params.partitions
                                ? params.partitions
-                               : std::min<std::size_t>(m - 1, ceil_div(static_cast<std::size_t>(std::ceil(p.d_outer * f)), p.build_pages));
+                               : std::min<std::size_t>(m - 1, ceil_div(static_cast<std::size_t>(std::ceil(to.n * f)), cap_build));
             if (p.partitions > m - 1)
                 return NotApplicable{"partições pedidas excedem m − 1", NotApplicable::Kind::Inviavel};
             auto prepart = [](const JoinInput& in) {   // (164)

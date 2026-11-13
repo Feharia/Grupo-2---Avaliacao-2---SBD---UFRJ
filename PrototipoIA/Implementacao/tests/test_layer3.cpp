@@ -330,6 +330,49 @@ TEST(ScratchSpace, OrdenaEMontaHash) {
     EXPECT_THROW(sm.create_scratch(s, r, 3), std::runtime_error);   // 2 + 3 > 4 molduras da reserva
 }
 
+// P01 da auditoria de 10/11 (E03): com 2 páginas e registros de um Int32, o espaço aceitava 1364
+// registros e a ordenação alocava 54.560 B fora das molduras. O diretório (slot, chain e head,
+// 12 B por registro) passa a ser cobrado das mesmas 2 páginas (decisão 173).
+TEST(ScratchSpace, DiretorioCabeNasPaginasDaReserva) {
+    StorageManager sm(test_config("sm_scratch_e03"));
+    const Schema s = make_schema({{"k", FieldType::Int32}});
+    auto r = sm.reserve(2);
+    ScratchSpace sc = sm.create_scratch(s, r, 2);
+    const std::size_t orcamento = 2 * sm.block_size();
+    std::uint64_t seed = 11;
+    while (sc.add(detail::make_view(encode_record(s, {std::int64_t(lcg(seed) % 1000)}), &s))) {}
+    const std::size_t por_registro = s.record_size + 2 + 12;   // prefixo de tamanho + diretório
+    EXPECT_LE(sc.size() * por_registro, orcamento);            // antes: 1364 × 18 B = 24.552 B > 8.192 B
+    EXPECT_GT(sc.size(), 0u);
+    EXPECT_EQ(sc.size(), ScratchSpace::capacity_for(s, 2, sm.block_size()));
+    EXPECT_LE(sc.record_bytes() + sc.aux_bytes(), orcamento);
+    const std::size_t aux = sc.aux_bytes();
+    sc.sort_by(0);
+    EXPECT_EQ(sc.aux_bytes(), aux);                            // ordena no lugar, sem vetores novos
+    for (std::size_t i = 1; i < sc.size(); ++i) EXPECT_LE(sc.at(i - 1).get<std::int32_t>(0), sc.at(i).get<std::int32_t>(0));
+    sc.build_hash(0, 3);
+    EXPECT_LE(sc.record_bytes() + sc.aux_bytes(), orcamento);
+    int achados = 0;
+    for (auto m = sc.probe(Key{sc.at(0).get<std::int32_t>(0)}); m.next();) ++achados;
+    EXPECT_GE(achados, 1);
+}
+
+TEST(ScratchSpace, OrdenarRidsNaoAlocaFora) {
+    StorageManager sm(test_config("sm_scratch_rids"));
+    auto r = sm.reserve(1);
+    ScratchSpace sc = sm.create_rid_scratch(r, 1);
+    std::uint64_t seed = 3;
+    while (sc.add(RID{static_cast<std::uint32_t>(1 + lcg(seed) % 500), static_cast<std::uint16_t>(lcg(seed) % 30)})) {}
+    EXPECT_LE(sc.record_bytes() + sc.aux_bytes(), sm.block_size());
+    const std::size_t aux = sc.aux_bytes();
+    sc.sort_rids();
+    EXPECT_EQ(sc.aux_bytes(), aux);
+    for (std::size_t i = 1; i < sc.size(); ++i) {
+        const RID a = sc.rid_at(i - 1), b = sc.rid_at(i);
+        EXPECT_TRUE(a.block < b.block || (a.block == b.block && a.slot <= b.slot));
+    }
+}
+
 TEST(StorageManager, ClusteringSobreHashEBPlus) {
     StorageManager sm(test_config("sm_clust"));
     const TableId th = sm.create_table("th", kv_schema(false), PrimarySpec{StructureKind::Hash, 0, 0.7, 7});
