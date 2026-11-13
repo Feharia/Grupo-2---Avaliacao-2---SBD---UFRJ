@@ -185,6 +185,7 @@ PageGuard BufferPool::fetch(BlockId b, Intent intent, ReservationId res) {
     check_reservation(res);
     if (b.block == 0) throw std::logic_error("fetch do bloco 0 (cabeçalho)");
     if (b.block >= files_.blocks(b.file)) throw std::out_of_range("fetch: bloco fora do arquivo");
+    if (files_.is_free(b.file, b.block)) throw std::logic_error("fetch de bloco livre no bitmap");   // P06
     const FileKind kind = files_.kind(b.file);
     Region& target = region_for(res, kind);
     bump(b.file, &IoCounts::requests);
