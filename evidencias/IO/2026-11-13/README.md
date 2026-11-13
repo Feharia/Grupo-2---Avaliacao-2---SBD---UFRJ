@@ -70,8 +70,11 @@ nenhum novo defeito concreto foi encontrado na revisão final. GitHub hosted,
 checkout via rede e upload não foram executados localmente. `actionlint` não
 está instalado; YAML/bash não substituem execução no serviço.
 
-Conferir os arquivos atuais, da raiz do repositório:
+O workflow e `docs/CI.md` foram corrigidos depois desta medição. Suas versões
+exatas desta etapa foram preservadas em `fontes/` e conferidas contra os
+hashes originais, sem alterar `FONTES.sha256`. Conferir o conjunto histórico,
+da raiz do repositório:
 
 ```bash
-sha256sum -c evidencias/IO/2026-11-13/FONTES.sha256
+sha256sum -c evidencias/IO/2026-11-13/FONTES_PRESERVADAS.sha256
 ```

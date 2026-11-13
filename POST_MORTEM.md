@@ -655,3 +655,43 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   Assim, o envio e a conferência hosted permanecem pendentes, sem merge.
   Este resultado é registrado em commit documental separado para manter a
   árvore limpa sem reescrever o commit já criado.
+
+## 2026-11-13 — Primeiro push e falha hospedada de contexto no workflow
+
+- O usuário executou o push de `ci/gate-correcao` com exit 0. HEAD e
+  `origin/ci/gate-correcao` em `50d4278`, árvore inicialmente limpa. A
+  conferência local repetiu 28 testes Python e 59 GoogleTest aprovados,
+  validou hashes e as 108 medições preservadas, sem aumentos de I/O.
+- A consulta do agente ao GitHub continuou indisponível por rede. O usuário
+  forneceu a execução `43456714396`, concluída com `failure`, o resumo
+  indicando problema de workflow, ausência de logs e as anotações exatas:
+  cinco `Unrecognized named-value: 'runner'` nas linhas 37–41 de job.env.
+  Portanto a falha ocorreu antes de compilar ou executar testes hospedados.
+- Causa: o workflow criado pelo agente usava `${{ runner.temp }}` no `env`
+  do job, onde o GitHub não admite o contexto runner. A validação local
+  anterior de YAML/Bash não verificava essa restrição. Não foi um defeito
+  reproduzido no motor ou uma reprovação dos 59 casos C++.
+- Corrigidas as cinco definições em um step que usa `$RUNNER_TEMP` e grava
+  em `$GITHUB_ENV`. Preservados caminhos e demais parâmetros. Acrescentada
+  regressão dirigida derivada da regra oficial de disponibilidade de
+  contextos: RED com cinco falhas antes, GREEN depois.
+- Revisão independente encontrou um caminho de falha introduzido pela
+  mudança: upload com `always()` e checkout falho poderia expandir caminho
+  vazio em `/`. Corrigido para exigir sucesso do step `diretorios`, com
+  teste RED/GREEN adicional. Revisão final sem novo defeito concreto.
+- Validação final: 30 testes Python aprovados; step real de inicialização
+  executado em Bash nos dois modos com os cinco caminhos corretos; YAML e
+  sintaxe de todos os scripts conferidos. Motor/medição inalterados; os
+  testes C++ e ASan anteriores permanecem vinculados aos mesmos fontes.
+- Evidências em `evidencias/CI/2026-11-13-contextos/`, incluindo metadados,
+  anotações fornecidas pelo usuário, RED/GREEN e validação local. Preservados
+  snapshots exatos de workflow/docs anteriores em `evidencias/IO/.../fontes`
+  e adicionado manifesto histórico sem reescrever os hashes originais.
+- O log RED preserva o espaço final emitido pelo progresso de unittest
+  antes dos subtests; exceção de whitespace limitada a esse arquivo em
+  `.gitattributes`, sem alterar a saída bruta nem as verificações do código.
+- Correção preparada para novo commit no mesmo branch, dentro da conclusão
+  do CI autorizado; sem merge. Nova execução no GitHub ainda pendente de
+  envio/consulta: não foi declarada aprovação hospedada após a correção.
+- Referência normativa desta correção:
+  https://docs.github.com/en/actions/reference/workflows-and-actions/contexts.

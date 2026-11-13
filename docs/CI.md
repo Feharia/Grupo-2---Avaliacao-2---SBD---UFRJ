@@ -18,9 +18,15 @@ fluxo local anterior; o gate não muda o CMake nem o motor.
 
 O CTest registra um executável (`testes`), que atualmente contém **59 casos
 GoogleTest**. O XML `gtest.xml` permite consultar cada caso. O outro XML,
-`ctest.xml`, representa o executável registrado no CTest. Há também 28 testes
+`ctest.xml`, representa o executável registrado no CTest. Há também 30 testes
 Python do guard de cobertura e das ferramentas de comparação de I/O,
-sem dependências externas.
+mais regressões dirigidas do workflow, sem dependências externas.
+
+Os cinco diretórios de build/testes/evidências são inicializados em um step,
+usando `RUNNER_TEMP` e `GITHUB_ENV`. O contexto `runner` não é permitido no
+`env` do job; usá-lo nesse ponto fez a primeira execução ser rejeitada antes
+de iniciar jobs. O upload exige que a inicialização tenha terminado com
+sucesso, para não expandir variáveis ausentes em caminhos da raiz do runner.
 
 Nos sanitizers, `halt_on_error=1` torna os diagnósticos fatais; UBSan imprime
 a pilha. `detect_leaks=0` mantém o protocolo já usado pelo projeto: esta rodada
@@ -108,3 +114,4 @@ versões deve ser explícita.
 Documentação oficial: [status checks](https://docs.github.com/en/pull-requests/reference/status-checks),
 [eventos](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
 e [artifacts](https://docs.github.com/en/actions/tutorials/store-and-share-data).
+Ver também a [disponibilidade dos contextos](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts).

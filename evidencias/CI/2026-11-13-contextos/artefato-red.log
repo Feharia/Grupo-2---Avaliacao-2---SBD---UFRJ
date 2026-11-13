@@ -1,0 +1,15 @@
+test_artifacts_require_successful_path_initialization (test_workflow_ci.WorkflowContextsTest.test_artifacts_require_successful_path_initialization) ... FAIL
+test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) ... ok
+
+======================================================================
+FAIL: test_artifacts_require_successful_path_initialization (test_workflow_ci.WorkflowContextsTest.test_artifacts_require_successful_path_initialization)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/python/test_workflow_ci.py", line 17, in test_artifacts_require_successful_path_initialization
+    self.assertRegex(initialization, r"(?m)^        id: diretorios$")
+AssertionError: Regex didn't match: '(?m)^        id: diretorios$' not found in '        env:\n          MODE: ${{ matrix.mode }}\n        run: |\n          base="$RUNNER_TEMP/cbd-$MODE"\n          {\n            echo "BUILD_DIR=$base/build"\n            echo "EVIDENCE_DIR=$base/evidencias"\n            echo "SMOKE_DIR=$base/smoke"\n            echo "CBD_TEST_DIR=$base/dados-testes"\n            echo "IO_DIR=$base/io"\n          } >> "$GITHUB_ENV"\n'
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.001s
+
+FAILED (failures=1)

@@ -2,3 +2,5 @@
 evidencias/**/*.csv -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Logs de ferramentas podem terminar com uma linha vazia; preservar o original.
 evidencias/**/*.log -text whitespace=blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol
+# O progresso bruto de unittest antes dos subtests termina com espaço.
+evidencias/CI/2026-11-13-contextos/contexto-red.log whitespace=-blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol

@@ -1,0 +1,35 @@
+test_changed_csv_after_validation_rejected (test_comparar_io.IoComparisonTest.test_changed_csv_after_validation_rejected) ... ok
+test_cli_warns_without_failing_and_never_overwrites (test_comparar_io.IoComparisonTest.test_cli_warns_without_failing_and_never_overwrites) ... ok
+test_different_commit_is_expected (test_comparar_io.IoComparisonTest.test_different_commit_is_expected) ... ok
+test_different_input_configuration_or_tool_rejected (test_comparar_io.IoComparisonTest.test_different_input_configuration_or_tool_rejected) ... ok
+test_duplicates_rejected_on_either_side (test_comparar_io.IoComparisonTest.test_duplicates_rejected_on_either_side) ... ok
+test_empty_success_set_rejected (test_comparar_io.IoComparisonTest.test_empty_success_set_rejected) ... ok
+test_identical_has_zero_deltas (test_comparar_io.IoComparisonTest.test_identical_has_zero_deltas) ... ok
+test_increase_warns_and_decrease_remains_visible (test_comparar_io.IoComparisonTest.test_increase_warns_and_decrease_remains_visible) ... ok
+test_inventory_rejects_same_variant_missing_on_both_sides (test_comparar_io.IoComparisonTest.test_inventory_rejects_same_variant_missing_on_both_sides) ... ok
+test_large_integers_are_exact (test_comparar_io.IoComparisonTest.test_large_integers_are_exact) ... ok
+test_missing_column_rejected (test_comparar_io.IoComparisonTest.test_missing_column_rejected) ... ok
+test_missing_or_extra_scenario_rejected (test_comparar_io.IoComparisonTest.test_missing_or_extra_scenario_rejected) ... ok
+test_negative_or_noninteger_counter_rejected (test_comparar_io.IoComparisonTest.test_negative_or_noninteger_counter_rejected) ... ok
+test_real_compile_options_normalize_paths_but_preserve_flags (test_comparar_io.IoComparisonTest.test_real_compile_options_normalize_paths_but_preserve_flags) ... ok
+test_skipped_scenario_and_status_changes_rejected (test_comparar_io.IoComparisonTest.test_skipped_scenario_and_status_changes_rejected) ... ok
+test_unvalidated_or_unknown_protocol_rejected (test_comparar_io.IoComparisonTest.test_unvalidated_or_unknown_protocol_rejected) ... ok
+test_versioned_inventory_rejects_same_omission_on_both_sides (test_comparar_io.IoComparisonTest.test_versioned_inventory_rejects_same_omission_on_both_sides) ... ok
+test_wrong_results_or_m_rejected (test_comparar_io.IoComparisonTest.test_wrong_results_or_m_rejected) ... ok
+test_all_skipped_is_rejected (test_smoke_ci.SmokeCoverageTest.test_all_skipped_is_rejected) ... ok
+test_bad_repetition_is_rejected (test_smoke_ci.SmokeCoverageTest.test_bad_repetition_is_rejected) ... ok
+test_complete_profile_passes (test_smoke_ci.SmokeCoverageTest.test_complete_profile_passes) ... ok
+test_duplicate_execution_is_rejected (test_smoke_ci.SmokeCoverageTest.test_duplicate_execution_is_rejected) ... ok
+test_empty_results_are_rejected (test_smoke_ci.SmokeCoverageTest.test_empty_results_are_rejected) ... ok
+test_every_required_scenario_is_required (test_smoke_ci.SmokeCoverageTest.test_every_required_scenario_is_required) ... ok
+test_missing_dump_is_rejected (test_smoke_ci.SmokeCoverageTest.test_missing_dump_is_rejected) ... ok
+test_missing_fields_are_rejected (test_smoke_ci.SmokeCoverageTest.test_missing_fields_are_rejected) ... ok
+test_optional_unexecuted_rows_are_allowed (test_smoke_ci.SmokeCoverageTest.test_optional_unexecuted_rows_are_allowed) ... ok
+test_unknown_status_is_rejected (test_smoke_ci.SmokeCoverageTest.test_unknown_status_is_rejected) ... ok
+test_artifacts_require_successful_path_initialization (test_workflow_ci.WorkflowContextsTest.test_artifacts_require_successful_path_initialization) ... ok
+test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 0.167s
+
+OK

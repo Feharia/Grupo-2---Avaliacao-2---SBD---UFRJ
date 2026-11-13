@@ -34,11 +34,6 @@ jobs:
             sanitize: 'ON'
     env:
       CXX: g++
-      BUILD_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/build
-      EVIDENCE_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/evidencias
-      SMOKE_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/smoke
-      CBD_TEST_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/dados-testes
-      IO_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/io
       ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
       UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
     defaults:
@@ -51,6 +46,20 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 2
+
+      - name: Inicializar diretórios do runner
+        id: diretorios
+        env:
+          MODE: ${{ matrix.mode }}
+        run: |
+          base="$RUNNER_TEMP/cbd-$MODE"
+          {
+            echo "BUILD_DIR=$base/build"
+            echo "EVIDENCE_DIR=$base/evidencias"
+            echo "SMOKE_DIR=$base/smoke"
+            echo "CBD_TEST_DIR=$base/dados-testes"
+            echo "IO_DIR=$base/io"
+          } >> "$GITHUB_ENV"
 
       - name: Instalar GoogleTest
         run: |
@@ -159,7 +168,7 @@ jobs:
           PY
 
       - name: Preservar evidências
-        if: always()
+        if: ${{ always() && steps.diretorios.outcome == 'success' }}
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: correcao-${{ matrix.mode }}-${{ github.run_attempt }}

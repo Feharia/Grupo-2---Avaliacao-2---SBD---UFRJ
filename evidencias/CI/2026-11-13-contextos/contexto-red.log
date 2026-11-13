@@ -1,0 +1,51 @@
+test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) ... 
+  test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ') ... FAIL
+  test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ') ... FAIL
+  test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ') ... FAIL
+  test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ') ... FAIL
+  test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ') ... FAIL
+
+======================================================================
+FAIL: test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/python/test_workflow_ci.py", line 21, in test_job_env_does_not_reference_runtime_contexts
+    self.assertNotRegex(expression, r"\b(?:runner|env|steps|job)\s*\.")
+AssertionError: Regex matched: 'runner.' matches '\\b(?:runner|env|steps|job)\\s*\\.' in ' runner.temp '
+
+======================================================================
+FAIL: test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/python/test_workflow_ci.py", line 21, in test_job_env_does_not_reference_runtime_contexts
+    self.assertNotRegex(expression, r"\b(?:runner|env|steps|job)\s*\.")
+AssertionError: Regex matched: 'runner.' matches '\\b(?:runner|env|steps|job)\\s*\\.' in ' runner.temp '
+
+======================================================================
+FAIL: test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/python/test_workflow_ci.py", line 21, in test_job_env_does_not_reference_runtime_contexts
+    self.assertNotRegex(expression, r"\b(?:runner|env|steps|job)\s*\.")
+AssertionError: Regex matched: 'runner.' matches '\\b(?:runner|env|steps|job)\\s*\\.' in ' runner.temp '
+
+======================================================================
+FAIL: test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/python/test_workflow_ci.py", line 21, in test_job_env_does_not_reference_runtime_contexts
+    self.assertNotRegex(expression, r"\b(?:runner|env|steps|job)\s*\.")
+AssertionError: Regex matched: 'runner.' matches '\\b(?:runner|env|steps|job)\\s*\\.' in ' runner.temp '
+
+======================================================================
+FAIL: test_job_env_does_not_reference_runtime_contexts (test_workflow_ci.WorkflowContextsTest.test_job_env_does_not_reference_runtime_contexts) (expression=' runner.temp ')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/python/test_workflow_ci.py", line 21, in test_job_env_does_not_reference_runtime_contexts
+    self.assertNotRegex(expression, r"\b(?:runner|env|steps|job)\s*\.")
+AssertionError: Regex matched: 'runner.' matches '\\b(?:runner|env|steps|job)\\s*\\.' in ' runner.temp '
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=5)

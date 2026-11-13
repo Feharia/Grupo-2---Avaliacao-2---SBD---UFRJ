@@ -13,8 +13,10 @@ para esse snapshot, permitindo conferir as evidências desta etapa da raiz:
 sha256sum -c evidencias/CI/2026-11-13/FONTES_PRESERVADAS.sha256
 ```
 
-Para os fontes e workflow atuais, usar o manifesto da entrega posterior:
-`evidencias/IO/2026-11-13/FONTES.sha256`.
+O manifesto da entrega posterior de I/O está em
+`evidencias/IO/2026-11-13/FONTES_PRESERVADAS.sha256`; o workflow corrigido
+após a primeira execução hospedada está identificado em
+`evidencias/CI/2026-11-13-contextos/FONTES.sha256`.
 
 | Verificação | Resultado |
 |---|---|
