@@ -373,6 +373,57 @@ TEST(ScratchSpace, OrdenarRidsNaoAlocaFora) {
     }
 }
 
+// P10 da auditoria de 10/11: clustering B+ sobre hash com chaves colidindo no mesmo bucket e
+// registros intercalados. Compara os registros exatos (k, u) com um oráculo de varredura completa,
+// antes e depois de remoções que abrem espaço no começo das cadeias, de inserções que podem cair
+// nesse espaço (antes da 1ª ocorrência antiga) e do reorganize.
+TEST(StorageManager, ClusteringSobreHashComColisoesContraOraculo) {
+    StorageManager sm(test_config("sm_clust_oraculo"));
+    const TableId t = sm.create_table("th", kv_schema(false, 40), PrimarySpec{StructureKind::Hash, 0, 0.7, 3});
+    sm.create_index(t, IndexSpec{StructureKind::SecBTree, 0, true});
+    std::vector<std::vector<std::byte>> rows;
+    for (int i = 0; i < 900; ++i) rows.push_back(kv(sm, t, (i * 7) % 30, 0, i));   // 30 chaves em 3 buckets, intercaladas
+    VecStream vs(std::move(rows));
+    sm.bulk_load(t, vs);
+    using Par = std::pair<std::int32_t, std::int32_t>;
+    auto pelo_indice = [&](const KeyRange& r) {
+        auto res = sm.reserve(2);
+        SearchCursor c = sm.find(path_of(sm, t, PathKind::SecondaryBTreeClustering), r, kSeqOnce, res);
+        std::vector<Par> out;
+        while (auto rec = c.next()) out.push_back({rec->get<std::int32_t>(0), rec->get<std::int32_t>(2)});
+        std::sort(out.begin(), out.end());
+        return out;
+    };
+    auto oraculo = [&](const KeyRange& r) {
+        auto res = sm.reserve(1);
+        std::vector<Par> out;
+        BlockScan scan = sm.scan_blocks(t, kSeqOnce, res);
+        while (auto c = scan.next())
+            while (auto rec = c->next()) {
+                const Key k = rec->key(0);
+                if (r.contains(k)) out.push_back({rec->get<std::int32_t>(0), rec->get<std::int32_t>(2)});
+            }
+        std::sort(out.begin(), out.end());
+        return out;
+    };
+    auto confere = [&](const char* fase) {
+        for (std::int32_t a = 0; a < 30; a += 3)
+            for (std::int32_t w : {0, 1, 4}) {
+                const KeyRange r{0, Key{a}, Key{std::int32_t(a + w)}};
+                const auto got = pelo_indice(r), want = oraculo(r);
+                EXPECT_EQ(got.size(), want.size());
+                EXPECT_TRUE(got == want);
+                if (got != want) std::fprintf(stderr, "  divergência em %s, faixa [%d, %d]\n", fase, a, a + w);
+            }
+    };
+    confere("carga");
+    for (std::int32_t k : {0, 3, 9, 21}) sm.erase_key(t, 0, Key{k});   // libera espaço no começo das cadeias
+    for (int i = 0; i < 60; ++i) sm.insert(t, kv(sm, t, (i * 11) % 30, 0, 5000 + i));
+    confere("manutenção");
+    sm.reorganize(t);
+    confere("reorganize");
+}
+
 TEST(StorageManager, ClusteringSobreHashEBPlus) {
     StorageManager sm(test_config("sm_clust"));
     const TableId th = sm.create_table("th", kv_schema(false), PrimarySpec{StructureKind::Hash, 0, 0.7, 7});

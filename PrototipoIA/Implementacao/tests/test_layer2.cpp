@@ -141,6 +141,36 @@ TEST(Monitor, DiretorioDoBnlCabeEmM) {
     EXPECT_EQ(r.rows, 40000u * 80u);          // 500 grupos de 80 registros: 80 × 80 pares por grupo
 }
 
+// P12 da auditoria de 10/11: com M pequeno, o sort-merge grava runs e o hash grava partições, e
+// páginas sujas de temporários são expulsas durante a operação. Toda essa E/S precisa cair dentro
+// do delta medido: o delta é a soma das fases, nada fica sujo depois (flush final grava 0), e as
+// expulsões sujas e as gravações de temporários estão contadas nas gravações do operador.
+TEST(Monitor, EsDosTemporariosFicaDentroDaMedicao) {
+    Monitor m(test_config("mon_fronteira"));
+    Db db = build(m);
+    std::uint64_t expulsoes = 0;
+    for (auto alg : {JoinAlgorithm::SortMerge, JoinAlgorithm::Hash}) {
+        const OpResult r = ok(join(m, db, alg, "a_heap", PathKind::Scan, "b_heap", PathKind::Scan, 4));
+        expulsoes += r.delta.global.dirty_evictions;
+        EXPECT_EQ(r.rows, 1200u);
+        const auto& g = r.delta.global;
+        const auto& tmp = r.delta.per_kind[static_cast<std::size_t>(FileKind::Temp)];
+        std::uint64_t fases_l = 0, fases_g = 0;
+        for (const auto& ph : r.phases) {
+            fases_l += ph.delta.global.reads();
+            fases_g += ph.delta.global.writes();
+        }
+        EXPECT_GT(tmp.writes(), 0u);                    // houve runs ou partições gravadas
+        EXPECT_EQ(g.writes(), tmp.writes());            // só temporários são gravados numa junção
+        EXPECT_LE(g.dirty_evictions, g.writes());       // expulsões sujas já estão nas gravações
+        EXPECT_EQ(fases_l, g.reads());
+        EXPECT_EQ(fases_g, g.writes());
+        EXPECT_EQ(r.flush_writes, 0u);
+        EXPECT_EQ(m.flush_all(), 0u);                   // nada do operador ficou para depois
+    }
+    EXPECT_GT(expulsoes, 0u);                           // o cenário força expulsões de páginas sujas
+}
+
 TEST(Monitor, MruLeMenosQueLruNoBnlComVariasPassadas) {
     std::map<Policy, std::uint64_t> reads;
     for (Policy p : {Policy::Lru, Policy::Mru}) {
