@@ -695,3 +695,41 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   envio/consulta: não foi declarada aprovação hospedada após a correção.
 - Referência normativa desta correção:
   https://docs.github.com/en/actions/reference/workflows-and-actions/contexts.
+
+## 2026-11-13 — Integração na main autorizada
+
+- O usuário informou que enviou `6ef8fbe6791025406750c2c351a75baddfda7185`
+  e conferiu o Actions aprovado. As referências locais confirmaram o mesmo
+  SHA em `ci/gate-correcao` e `origin/ci/gate-correcao`, com árvore limpa.
+  A aprovação hospedada é informação do usuário; o agente não conseguiu
+  consultá-la diretamente por rede.
+- O usuário autorizou integrar na main, registrar esta conclusão, enviar
+  a main, conferir seu Actions e tornar `gate-correcao` obrigatório.
+- Antes da integração: 30 testes Python aprovados novamente e 59 GoogleTest
+  via CTest Release (1,06 s), manifestos atuais e históricos íntegros.
+  Revisão independente do diff completo `b61b87b..6ef8fbe` sem achados
+  bloqueantes, incluindo consumidores da B+ e a configuração final do CI.
+- Merge local concluído por fast-forward de `main` (`b61b87b`) para
+  `ci/gate-correcao` (`6ef8fbe`), sem conflitos nem reescrita de histórico.
+  Este registro acompanha um commit documental na main, após a integração;
+  a nova revisão documental ainda precisa de validação hospedada.
+- SSH e API pelo ambiente do agente continuam indisponíveis: fetch retorna
+  falha de resolução de github.com, e gh não conecta a api.github.com.
+  Não foi presumido que main remota ou proteção já estejam atualizadas.
+  Existe plugin GitHub disponível, mas não está conectado nesta sessão.
+- Preparado `/tmp/concluir-integracao-github.sh` para o terminal do usuário:
+  exige a main limpa no SHA preparado, refaz fetch e confere ancestralidade,
+  verifica o gate aprovado do branch, faz push sem force, aguarda o workflow
+  da main no SHA exato e só então exige o check com a origem GitHub App
+  observada. Se já houver proteção, altera apenas status checks, preservando
+  os demais checks, app IDs e regras. Se não houver, cria proteção mínima
+  de status checks com strict e enforce_admins, sem introduzir revisores.
+- O helper guarda backup das regras anteriores e lê novamente a proteção
+  para confirmar o gate e os checks herdados. Operações administrativas
+  dependem dos privilégios já existentes da conta; o script não concede
+  acesso nem remove regras para contornar rejeições. Sintaxe e três cenários
+  de payload conferidos localmente, com revisão independente sem bloqueios.
+- Permanecem pendentes até confirmação remota: envio da main, execução
+  hospedada do commit documental final e ativação de status obrigatório.
+  O helper foi preparado para executar essas etapas em sequência; este
+  registro não declara que já ocorreram.
