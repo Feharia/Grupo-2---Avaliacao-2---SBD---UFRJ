@@ -484,8 +484,19 @@ Cost estimate_select(const SelectPlan& p, const TableStats& t, const StructureSt
             break;
         case PathKind::PrimaryBTree:
         case PathKind::SecondaryBTreeClustering: {
-            const double leaves = std::max(1.0, std::ceil(per_key / bfr));
-            const double one = h_int + (p.unique_field && !p.range ? 1 : leaves);
+            // P08: a faixa lê a sua fração dos blocos de dados reais (t.b: folhas da B+ com o fill da
+            // carga, ou buckets + overflow do hash), e não ⌈linhas/bfr⌉ de blocos cheios. Sobre hash, o
+            // clustering lê a cadeia do bucket de cada valor da faixa a partir do 1º registro
+            // (ClusteringHashSearch): nº de valores × cadeia média.
+            const StructureStats* prim = t.structures.empty() ? nullptr : &t.structures.front();
+            const double frac = t.n ? std::min(1.0, per_key / static_cast<double>(t.n)) : 0.0;
+            double data = std::max(1.0, std::ceil(frac * t.b));
+            if (p.path == PathKind::SecondaryBTreeClustering && prim && prim->kind == StructureKind::Hash) {
+                const double keys = std::max(1.0, std::ceil(frac * (s && s->distinct ? *s->distinct : 1)));
+                data = keys * (prim->chain_avg ? *prim->chain_avg : 1.0);
+            }
+            (void)bfr;
+            const double one = h_int + (p.unique_field && !p.range ? 1 : data);
             c.transfers = p.range ? one : B * one;
             c.seeks = p.range ? h_int + 1 : B * (h_int + 1);
             break;

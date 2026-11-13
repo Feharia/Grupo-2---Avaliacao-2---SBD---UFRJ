@@ -199,6 +199,7 @@ struct StructureStats {
 struct TableStats {
     std::uint64_t n = 0;
     std::uint32_t r = 0, bfr = 0;
+    std::uint32_t bfr_medio = 0;   // registros por bloco pelo tamanho médio real dos registros (P08)
     std::uint32_t b = 0;   // heap: todos; B+: folhas; hash: buckets + overflow (119)
     std::vector<StructureStats> structures;
 };
