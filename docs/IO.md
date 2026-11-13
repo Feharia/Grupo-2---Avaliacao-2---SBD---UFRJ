@@ -13,6 +13,13 @@ passou de 0,1% para 1% (enunciado v2). Nenhuma identidade antiga mudou, e
 os dois lados continuam rodando o mesmo driver, então a comparação segue
 válida sem nova versão do perfil.
 
+**Alertas esperados nessa revisão.** Na comparação local contra `4091762`, os
+168 cenários foram pareados, e 22 tiveram aumento: 20 de sort-merge e 2 de
+hash join, de +0,2% a +1,1%. Nenhum cenário diminuiu. A causa é a decisão
+173: o diretório do ScratchSpace passou a ser cobrado das páginas da reserva,
+então as runs ficam um pouco menores e as partições do hash, um pouco mais
+numerosas.
+
 ## Protocolo
 
 - Escala 0,1; semente 20261122; uma repetição; lote de 100 chaves;

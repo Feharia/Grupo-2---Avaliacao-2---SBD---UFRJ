@@ -10,7 +10,7 @@ Este documento é a referência única. Ele substitui ARQUITETURA_V2.md e ARQUIT
 
 - Seções 1 a 3: contexto do trabalho, arquivos existentes e princípios da arquitetura.
 - Seção 4: decisões de parâmetros (1 a 45), com os valores atuais.
-- Seção 5: decisões de interface (100 a 171), com o texto final.
+- Seção 5: decisões de interface (100 a 175), com o texto final.
 - Seções 6 a 10: arquitetura completa — camadas e interfaces, orçamento de molduras, entidades com declarações e métodos, limites a declarar no relatório e testes.
 - Seções 11 a 14: acoplamentos que não podem ser esquecidos, questões abertas, pendências e o que não rediscutir.
 
@@ -40,10 +40,10 @@ Regras para quem continuar:
   - heap: direto, sem índice; índice secundário hash para campo UNIQUE; índice secundário B+ sem repetição de chave nas folhas para campo NOT UNIQUE;
   - B+: direto pelo índice primário; índice secundário clustering, só para NOT UNIQUE, em B+;
   - hash: direto por UNIQUE; direto por NOT UNIQUE; índice secundário clustering para NOT UNIQUE, em B+.
-- Junções (§5.1): três tipos (natural mestre-detalhe por PK e FK; equijoin em campos UNIQUE que não ditam a organização; equijoin em campos NOT UNIQUE que não ditam a organização), três algoritmos (nested-loop em blocos, sort-merge, partition-hash), cinco configurações de índice (a a e) e três combinações de tamanho (menor com menor, menor com maior, maior com maior; a menor é a que cabe na área reservada). A seletividade da junção não varia, e a escolha entre externa e interna deve ser considerada.
-- Seleções (§5.2): igualdade em UNIQUE; faixa em UNIQUE; faixa em NOT UNIQUE. Três configurações (sem índice, campo da organização primária, índice secundário) e duas seletividades (0,1% e 50%).
+- Junções (§5.1, enunciado de 04/11): o NATURAL JOIN mestre-detalhe por PK e FK é obrigatório; os equijoins em campos UNIQUE e NOT UNIQUE que não ditam a organização são opcionais (a bancada os mantém). Para cada tipo: três algoritmos (nested-loop em blocos, sort-merge, partition-hash), cinco configurações de índice (a a e) e três combinações de tamanho (menor com menor, menor com maior, maior com maior; a menor é a que cabe na área reservada). A seletividade da junção não varia, e a escolha entre externa e interna deve ser considerada.
+- Seleções (§5.2, enunciado de 04/11): igualdade em UNIQUE e faixa em NOT UNIQUE (obrigatórias); faixa em UNIQUE (opcional). Três configurações (sem índice, campo da organização primária, índice secundário) e duas seletividades (1% e 50%; a versão de 02/11 dizia 0,1%).
 - Metodologia (§6): variar um fator por vez em torno de uma configuração-base declarada, repetindo cada medida até a variação ficar abaixo de 5%, com no mínimo três repetições. Indicadores: ocupação em blocos antes e depois da manutenção; acessos a blocos por operação (leituras, gravações, requisições, acertos, taxa, seeks se modelados); custo estimado pelas fórmulas dos livros ao lado do medido.
-- Fatores (§6.2): política de substituição (duas entre LRU, MRU, FIFO e Clock), tamanho das tabelas, seletividade.
+- Fatores (§6.2): política de substituição (no enunciado de 04/11, a mais apropriada a cada teste, entre LRU, MRU, FIFO e Clock), tamanho das tabelas, seletividade (cerca de 1% e 50%). O relatório deve justificar todas as opções, comparando com as preteridas (§7).
 - Base (§6.4): esquema de universidade com Aluno, Curso, Disciplina, Turma, Inscrição_Aluno_Turma e Detalhes_do_Aluno; volumes e atributos a critério do grupo.
 - Conferir cada primitiva contra uma implementação de referência (SQLite ou PostgreSQL).
 - Uso de IA e entrega (§7): procurar ativamente os defeitos listados em §7.1; entregar repositório, relatório técnico (todas as opções, tabelas e gráficos de medido × estimado, conclusões e recomendações por carga de trabalho), relatório de IA (log de prompts e código bruto, code review, testes de estresse, análise crítica e POST_MORTEM.md na raiz, que é o principal critério de avaliação da autoria), folha de rosto, apresentação com slides e postagem no AVA.
@@ -52,7 +52,8 @@ Regras para quem continuar:
 
 ## 2. Arquivos na pasta do trabalho
 
-- **Avaliacao_2_Indexacao_e_Processamento_de_Consultas.pdf** — o enunciado.
+- **Avaliacao_2_v2_Indexacao_e_Processamento_de_Consultas.pdf** — o enunciado vigente, de 04/11/2026.
+- **Avaliacao_2_v1_Indexacao_e_Processamento_de_Consultas.pdf** — a versão de 02/11, mantida para referência.
 - **CONCLUSOES_SESSAO_2026-11-06.md** — análise de fundo: erros aritméticos, acoplamentos entre decisões, contratos entre camadas. Resumida na seção 11.
 - **HANDOFF_ARQUITETURA_2026-11-08.md** — este documento.
 - **revisao_interfaces_claude_cbd_2026-11-06.md** — revisão de um colega, feita sobre uma versão anterior das interfaces (provavelmente a V2). O que ainda era válido virou as decisões 157 a 169; o resto já estava resolvido aqui.
@@ -139,7 +140,7 @@ Proposta vigente para a tabela do grupo, cuja coluna "valor decidido" ainda prec
 
 ---
 
-## 5. Decisões de interface (100 a 171)
+## 5. Decisões de interface (100 a 175)
 
 Texto final, já com todas as revisões. A camada ou fronteira está entre colchetes.
 
@@ -227,7 +228,7 @@ Acrescentadas depois de conferir a revisão de um colega (revisao_interfaces_cla
 
   No resultados.csv, o status é `ok`, `nao_aplicavel` ou `inviavel`, e cada linha traz a posição na matriz do enunciado (tipo, tamanho, configuração e seletividade). Os casos 1 a 3 são declarados pela bancada sem executar; o caso 4 vem do plano.
 
-  A igualdade em UNIQUE é medida num nível próprio, "pontual", como faz o §6.4 do enunciado e como faz o benchmark Wisconsin. Os níveis de 0,1% e 50% valem como "cerca de" (§6.2 do enunciado) para as seleções por faixa.
+  A igualdade em UNIQUE é medida num nível próprio, "pontual", como faz o §6.4 do enunciado e como faz o benchmark Wisconsin. Os níveis de 1% e 50% (0,1% e 50% no enunciado de 02/11; decisão 174) valem como "cerca de" (§6.2 do enunciado) para as seleções por faixa.
 
   Motivo: o enunciado pede células que contradizem as próprias definições. O resultado precisa mostrá-las com o motivo, sem confundi-las com limites do protótipo.
 
@@ -256,11 +257,37 @@ A reavaliação da arquitetura não criou decisões: corrigiu as existentes e ti
 - **Emendadas por inconsistência do documento:** 18 e 41 (bfr medido), 33 (fan-out 510), 122 (regra do sort-merge), 129 (especificação no código), 154 (limite do cabeçalho).
 - **Mantidas, mas fora da bancada:** veja "Decisões que a bancada não exercita", na §9.
 
+### Decisões 172 a 175 (13/11/2026, auditoria de 10/11)
+
+Origem: `PROBLEMAS_IDENTIFICADOS_CBD_2026-11-10.md` (P01 a P15), conferido contra o código do commit `4091762` e contra o enunciado de 04/11. Cada item foi corrigido num commit próprio, com teste de regressão quando se aplica.
+
+- **172. (reservada)** — Contrato de M com as páginas de índice (P02). Fica num commit isolado, que pode ser revertido sem afetar as demais.
+- **173. Estruturas auxiliares dentro de M** [P01, P03] — Altera 140 e a §7. As estruturas auxiliares do operador passam a ser cobradas das molduras da reserva: frames_used = páginas fixadas + ⌈bytes auxiliares / bloco⌉ ≤ m.
+  - **ScratchSpace:** o diretório (slot, chain e head, 12 B por registro, mais a folga do vetor de slots) é cobrado das próprias páginas. A ordenação é no lugar, e a tabela hash tem n cabeças. `capacity_for` aplica a mesma regra, e o plano a usa para contar runs e decidir se o build cabe.
+  - **BNL:** o diretório do chunk guarda só RecordView, nas m − 1 − chunk molduras restantes. O plano reduz o chunk quando ele não cabe; na execução, o excesso vira `inviavel` em vez de passar de M. Com M = 32, as tabelas da base mantêm chunk de 16 páginas.
+  - **Overhead declarado, fora de M:** descritores de tamanho O(m), como a lista de runs, as fontes do merge e o vetor de partições, e o lote de chaves da seleção pontual, que é entrada da consulta.
+  - **Motivo:** o §7.1 do enunciado chama atenção para estruturas auxiliares não contabilizadas. No E03 da auditoria, a ordenação de 2 páginas alocava 54.560 B fora das 8.192 B da reserva.
+- **174. Seletividade baixa de 1%, com faixas feitas de grupos de valores** [P04] — Altera 130 e os níveis da 170.
+  - O enunciado de 04/11 pede 1% e 50%.
+  - A faixa é feita de grupos inteiros de valores iguais, e o nº de grupos é o que deixa a contagem mais perto do alvo. Num campo discreto como curso (200 valores), 1% são dois valores (1,03%).
+  - O `constantes.csv` grava a seletividade pedida e a efetiva.
+  - Os ids `*_baixa` não mudam, porque o inventário do CI usa esses nomes.
+- **175. Matriz completa do NATURAL JOIN** [P05] — Altera a especificação padrão (129). O NATURAL JOIN passa a ter as 15 células obrigatórias (3 tamanhos × 5 configurações). Os itens seguem as regras do §4.2: no heap, secundário de UNIQUE é hash e de NOT UNIQUE é B+; buckets do hash NOT UNIQUE pelos distintos (163).
+  - **Variantes novas:** Curso por B+ e por hash (codigo); Disciplina por B+ e por hash (curso).
+  - **Índices secundários novos:** hash em `curso.codigo` e `aluno.dre`; B+ em `disciplina.curso` e `aluno.curso`.
+  - **Tamanhos:** continuam calculados pelo b real de cada variante (b ≤ M − 2).
+- **Emendas e registros desta revisão:**
+  - **143** (blocos densos): a blocagem é a do tamanho médio real dos registros (`TableStats.bfr_medio`), e não a do R máximo. Em Detalhes, com VarChar, o máximo supunha 1.334 blocos contra 542 reais (P08).
+  - **Estimativas de seleção** (P08): a faixa na B+ e no clustering usa a fração dos blocos de dados reais. O clustering sobre hash usa o nº de valores da faixa × a cadeia média do bucket.
+  - **132** (repetições): a parada pelo teto deixa de passar por convergência e fica registrada em `convergencia.csv` (P07).
+  - **168** (blocos livres): `BufferPool::fetch` passa a recusar bloco marcado como livre no bitmap (P06).
+  - **Registros novos:** `caminhos.csv` guarda o acesso que cada algoritmo executou (P09). A tabela "Cobertura da matriz" do `tabelas.py` mostra cada célula do enunciado; as opcionais ausentes aparecem como "não implementada" (P15).
+
 ---
 
 ## 6. Camadas e interfaces
 
-O diagrama vigente é o diagrama_camadas_v5.png, com as decisões até a 171 e as emendas de 08/11. Em relação ao v4, ele acrescenta: os repasses encode, suggest_buckets, erase_key e access_paths; o NotApplicable, que distingue não aplicável de inviável (170); e o BPlusEngine. Em texto:
+O diagrama vigente é o diagrama_camadas_v5.png, com as decisões até a 171 e as emendas de 08/11. As decisões 173 a 175 não mudam as entidades; a 173 acrescenta ao ScratchSpace os métodos capacity_for, record_bytes e aux_bytes, ainda não desenhados. Em relação ao v4, ele acrescenta: os repasses encode, suggest_buckets, erase_key e access_paths; o NotApplicable, que distingue não aplicável de inviável (170); e o BPlusEngine. Em texto:
 
 **Camada 1 — Bancada de teste.** Funções do roteiro (main, geração de dados, constantes, lotes, manifesto, execução) e os scripts tools/reference.py e tools/compare.py.
 - Chama a camada 2: as primitivas medidas (join, select_points, select_range), que devolvem OpResult ou NotApplicable, e os repasses (definição, carga, manutenção, stats, occupancy, access_paths, encode, suggest_buckets, erase_key, flush_all, invalidate_all).
@@ -452,26 +479,34 @@ public:
                           const ResultShape&, const SelectParams& = {});
 
     // repasses da camada 3 (não medidos)
-    TableId     create_table(std::string name, Schema, PrimarySpec);
-    StructureId create_index(TableId, IndexSpec);
-    std::vector<AccessPath> access_paths(TableId) const;
-    TableStats  stats(TableId) const;
-    Occupancy   occupancy(StructureId) const;
-    void bulk_load(TableId, RecordStream& sorted);
-    RID  insert(TableId, std::span<const std::byte> record);
-    void erase(TableId, RID);
-    void reorganize(TableId);
-    std::size_t erase_key(TableId, FieldId, const Key&);          // manutenção por chave
-    std::vector<std::byte> encode(TableId, const std::vector<Value>&) const;   // formato do registro (158)
-    std::uint32_t suggest_buckets(const Schema&, std::uint64_t n, std::uint64_t distinct, double alpha) const;   // (39, 163)
-    std::uint64_t flush_all();
-    void          invalidate_all();
+    TableId     create_table(std::string name, Schema s, PrimarySpec p) { return storage_.create_table(std::move(name), std::move(s), p); }
+    StructureId create_index(TableId t, IndexSpec s) { return storage_.create_index(t, s); }
+    std::vector<AccessPath> access_paths(TableId t) const { return storage_.access_paths(t); }
+    const Schema& schema(TableId t) const { return storage_.schema(t); }
+    TableStats  stats(TableId t) const { return storage_.stats(t); }
+    Occupancy   occupancy(StructureId s) { return storage_.occupancy(s); }
+    std::vector<StructureId> structures(TableId t) const { return storage_.structures(t); }
+    std::string structure_name(StructureId s) const { return storage_.structure_name(s); }
+    void bulk_load(TableId t, RecordStream& sorted) { storage_.bulk_load(t, sorted); }
+    RID  insert(TableId t, std::span<const std::byte> rec) { return storage_.insert(t, rec); }
+    void erase(TableId t, RID rid) { storage_.erase(t, rid); }
+    std::size_t erase_key(TableId t, FieldId f, const Key& k) { return storage_.erase_key(t, f, k); }
+    void reorganize(TableId t) { storage_.reorganize(t); }
+    std::vector<std::byte> encode(TableId t, const std::vector<Value>& v) const { return storage_.encode(t, v); }
+    std::uint32_t suggest_buckets(const Schema& s, std::uint64_t n, std::uint64_t d, double a) const {
+        return storage_.suggest_buckets(s, n, d, a);
+    }
+    std::string verify(TableId t) const { return storage_.verify(t); }
+    std::uint64_t flush_all() { return storage_.flush_all(); }
+    void          invalidate_all() { storage_.invalidate_all(); }
+
+    // planos (públicos para teste e para a estimativa)
+    std::variant<JoinPlan, NotApplicable> plan_join(JoinAlgorithm, const JoinInput&, const JoinInput&,
+                                                    std::size_t m, const JoinParams&) const;
+    std::variant<SelectPlan, NotApplicable> plan_select(const AccessPath&, bool range, std::size_t batch,
+                                                        const SelectParams&) const;
 private:
-    std::optional<JoinPlan>   plan_join(JoinAlgorithm, const JoinInput&, const JoinInput&,
-                                        std::size_t m, const JoinParams&) const;
-    std::optional<SelectPlan> plan_select(const AccessPath&, std::size_t batch,
-                                          const SelectParams&) const;
-    StorageManager storage_;
+    StorageManager storage_;   // e o template measured(), que segue os passos abaixo
 };
 ```
 
@@ -479,11 +514,11 @@ private:
 - **join(alg, externa, interna, m, shape, params)** — Executa uma junção medida, seguindo os passos abaixo. No hash join, a externa é o build (152).
 - **select_points(caminho, lote, shape, params)** — Busca cada chave do lote e soma tudo numa medida. Caminho Scan: uma varredura com filtro por chave, na camada 2. B+ primária, hash primário ou índice clustering: find. Hash secundário ou B+ não-clustering: probe e depois fetch.
 - **select_range(caminho, faixa, shape, params)** — Uma busca por faixa pelas mesmas regras. O caminho Scan sempre executa. Hash primário e hash secundário devolvem NotApplicable com o motivo (128).
-- **create_table, create_index, access_paths, stats, occupancy, bulk_load, insert, erase, erase_key, reorganize, encode, suggest_buckets, flush_all, invalidate_all** — Repasses da camada 3, sem lógica e sem medição. erase_key, encode e suggest_buckets existem porque a camada 1 não acompanha RIDs que mudam, não conhece o formato do registro e não sabe a capacidade do bucket.
-- **plan_join e plan_select** (privados) — Resolvem o plano completo, com o orçamento de molduras da seção 7. Devolvem vazio se a combinação for impossível ou inviável em m.
+- **create_table, create_index, access_paths, schema, stats, occupancy, structures, structure_name, bulk_load, insert, erase, erase_key, reorganize, encode, suggest_buckets, verify, flush_all, invalidate_all** — Repasses da camada 3, sem lógica e sem medição. erase_key, encode e suggest_buckets existem porque a camada 1 não acompanha RIDs que mudam, não conhece o formato do registro e não sabe a capacidade do bucket.
+- **plan_join e plan_select** (públicos; a camada 1 usa plan_join para registrar o acesso executado, P09) — Resolvem o plano completo, com o orçamento de molduras da seção 7, sem E/S (160). Devolvem `variant<JoinPlan, NotApplicable>` e `variant<SelectPlan, NotApplicable>`: NotApplicable, com o motivo e o tipo (170), quando a combinação não se aplica ou não cabe em m.
 
 Passos das primitivas medidas:
-1. Resolve o plano. Se for vazio, devolve NotApplicable sem executar nada. O plano só lê estatísticas do catálogo e não faz E/S (160).
+1. Resolve o plano. Se for NotApplicable, devolve-o sem executar nada. O plano só lê estatísticas do catálogo e não faz E/S (160).
 2. Verifica plan.frames_used() ≤ m.
 3. Reserva m molduras.
 4. Tira o snapshot inicial e cria o PhaseRecorder.
@@ -505,6 +540,8 @@ struct JoinPlan {
     bool          swapped = false;                      // externa é o operando 1
     // BNL
     std::size_t   chunk = 0;
+    std::size_t   dir_frames = 0;                       // diretório do chunk: as m − 1 − chunk molduras restantes (173)
+    std::size_t   dir_entries = 0;                      // RecordViews que cabem nessas molduras
     // sort-merge
     bool          sort_outer = true, sort_inner = true;
     std::size_t   run_pages = 0;                        // m − 2
@@ -625,12 +662,13 @@ public:
     TableId       create_table(std::string name, Schema, PrimarySpec);
     StructureId   create_index(TableId, IndexSpec);
     const Schema& schema(TableId) const;
+    std::size_t   tables() const;
+    const std::string& table_name(TableId) const;
 
     // acesso
     std::vector<AccessPath> access_paths(TableId) const;
     BlockScan     scan_blocks(TableId, Intent, const Reservation&);
-    BlockScan     scan_buckets(const AccessPath&, std::uint32_t first, std::uint32_t last,
-                               Intent, const Reservation&);
+    BlockScan     scan_buckets(const AccessPath&, std::uint32_t first, std::uint32_t last, Intent, const Reservation&);
     std::uint32_t bucket_of(const AccessPath&, const Key&) const;
     SearchCursor  find(const AccessPath&, const Predicate&, Intent, const Reservation&);
     RidCursor     probe(const AccessPath&, const Predicate&, Intent);
@@ -642,26 +680,53 @@ public:
     ScratchSpace  create_rid_scratch(const Reservation&, std::size_t pages);
 
     // estatística e ocupação
-    TableStats stats(TableId) const;
-    Occupancy  occupancy(StructureId) const;
+    TableStats    stats(TableId) const;                 // só lê o catálogo, sem E/S (160)
+    Occupancy     occupancy(StructureId);
+    std::vector<StructureId> structures(TableId) const;
+    std::string   structure_name(StructureId) const;
 
     // carga e manutenção
     void bulk_load(TableId, RecordStream& sorted);
     RID  insert(TableId, std::span<const std::byte> record);
     void erase(TableId, RID);
+    std::size_t erase_key(TableId, FieldId, const Key&);   // manutenção: apaga todos com a chave
     void reorganize(TableId);
+    std::vector<std::byte> encode(TableId, const std::vector<Value>&) const;
+    std::uint32_t suggest_buckets(const Schema&, std::uint64_t n, std::uint64_t distinct, double alpha) const;
+    std::uint32_t block_size() const { return pool_.block_size(); }
+    std::string   verify(TableId) const;   // invariantes das estruturas (testes)
 
     // repasses da camada 4
     Reservation   reserve(std::size_t frames);
     Counters      snapshot() const;
     std::uint64_t flush_all();
     void          invalidate_all();
+
 private:
-    BufferPool      pool_;          // declarado primeiro: destruído por último
-    Catalog         catalog_;
-    std::unordered_map<TableId, std::unique_ptr<PrimaryFile>>        tables_;
-    std::unordered_map<StructureId, std::unique_ptr<SecondaryIndex>> indexes_;
-    IndexMaintainer maintainer_;    // MoveListener que atualiza os índices
+    struct TableRt {
+        std::unique_ptr<PrimaryFile> primary;
+    };
+    struct IndexRt {
+        TableId   table = 0;
+        IndexSpec spec;
+        std::unique_ptr<SecondaryIndex> idx;
+    };
+    std::unique_ptr<PrimaryFile> make_primary(TableId);
+    void build_indexes(TableId);
+    void build_index(StructureId);
+    void on_moved(TableId, RID from, RID to, std::span<const std::byte> rec);
+    void refresh_stats(TableId);
+    void invalidate_stats(TableId);
+    std::string next_name(const std::string& base, const char* ext);
+    std::shared_ptr<const Schema> schema_ptr(TableId) const;
+
+    BufferPool               pool_;          // declarado primeiro: destruído por último
+    std::unique_ptr<Catalog> catalog_;
+    std::vector<TableRt>     tables_;
+    std::unordered_map<StructureId, IndexRt> indexes_;
+    std::unordered_map<StructureId, TableId> primary_of_;
+    StructureId              next_id_ = 1;
+    std::uint32_t            seq_ = 0;
 };
 ```
 
@@ -927,7 +992,7 @@ private:
 #### ScratchSpace
 Memória de trabalho do operador, em molduras da reserva: guarda registros ou RIDs, ordena, monta hash e responde sondagens.
 
-Tipo: handle RAII, só move. As molduras são anônimas, nunca vão ao disco e não são contadas. Os diretórios internos são estruturas da linguagem limitadas pela capacidade (cerca de 4 B por registro).
+Tipo: handle RAII, só move. As molduras são anônimas, nunca vão ao disco e não são contadas. O diretório (slot, chain e head, 12 B por registro) é cobrado das mesmas molduras, como se ocupasse o fim delas: vale sempre record_bytes() + aux_bytes() ≤ páginas × bloco (decisão 173).
 
 ```cpp
 class ScratchSpace {
@@ -947,9 +1012,14 @@ public:
     void           build_hash(FieldId, std::uint64_t seed);
     ScratchMatches probe(const Key&) const;
     void           clear();
+    std::size_t    pages() const;
+    // orçamento de memória (173)
+    std::size_t    record_bytes() const;                  // fim do último registro gravado
+    std::size_t    aux_bytes() const;                     // bytes reservados pelos vetores do diretório
+    static std::size_t capacity_for(const Schema&, std::size_t pages, std::uint32_t block_size);
 private:
     friend class StorageManager;
-    ScratchSpace(std::vector<PageGuard> pages, std::shared_ptr<const Schema>);
+    ScratchSpace(std::vector<PageGuard> pages, std::shared_ptr<const Schema>, std::uint32_t block_size);
     std::vector<PageGuard>        pages_;
     std::shared_ptr<const Schema> schema_;                // cópia própria (165); sintético no espaço de RIDs
     std::vector<std::uint32_t> slots_;
@@ -968,10 +1038,11 @@ public:
 - **add(RID)** — Guarda o RID como chave Int64 = bloco << 16 | slot.
 - **size() e capacity()** — Itens guardados e quantos cabem.
 - **at(i) e rid_at(i)** — O i-ésimo item na ordem atual.
-- **sort_by(campo) e sort_rids()** — Ordenam o diretório; os itens não mudam de lugar.
-- **build_hash(campo, semente)** — Monta a tabela de hash com FNV-1a semeado, diferente da semente do particionamento.
+- **sort_by(campo) e sort_rids()** — Ordenam o diretório no lugar, sem alocar: a chave é lida da página a cada comparação, e o empate se desfaz pelo slot (resultado estável). Os itens não mudam de lugar.
+- **build_hash(campo, semente)** — Monta a tabela de hash com FNV-1a semeado, diferente da semente do particionamento, com n cabeças (módulo n).
 - **probe(chave)** — Registros com a chave, depois do build_hash.
-- **clear()** — Esvazia sem soltar as molduras.
+- **clear()** — Esvazia sem soltar as molduras e devolve a memória do diretório.
+- **record_bytes(), aux_bytes() e capacity_for(esquema, páginas, bloco)** — O orçamento da decisão 173. capacity_for aplica a mesma regra da inserção a registros do tamanho máximo do esquema; o plano a usa para contar runs e decidir se o build do hash cabe.
 - **destrutor** — Devolve as molduras ao subpool. Não lança.
 
 ### Camada 4 — Gerente de arquivos e buffer pool
@@ -1322,6 +1393,7 @@ struct StructureStats {
 struct TableStats {
     std::uint64_t n;
     std::uint32_t r, bfr;
+    std::uint32_t bfr_medio;   // registros por bloco pelo tamanho médio real (P08 da auditoria de 10/11)
     std::uint32_t b;     // heap: todos; B+: folhas; hash: buckets + overflow (119)
     std::vector<StructureStats> structures;
 };
@@ -1466,10 +1538,11 @@ public:
 - Cada arquivo tem no máximo 32.576 blocos, cerca de 127 MiB (154). Com os volumes atuais, Inscrição chegaria a esse limite perto da escala 19.
 - O grupo de duplicatas do sort-merge tem de caber em group_pages; se não couber, a célula é inviável (151).
 - O hash join faz até 6 passes de particionamento. Depois disso, ou quando uma partição não diminui (grupo de chaves iguais maior que m − 1 páginas), ele usa o bailout em blocos, cujo custo é o de um BNL dentro da partição (171).
-- Nós internos da B+, páginas de índice e catálogo ficam fora de M, nas próprias áreas.
+- Nós internos da B+, páginas de índice e catálogo ficam fora de M, nas próprias áreas (145). As estruturas auxiliares do operador ficam dentro de M (173).
 - Com prefetch ligado, a leitura antecipada expulsa páginas não fixadas do subpool.
 - Página pedida pela reserva que esteja em outra região migra para o subpool e conta como acerto.
-- Os diretórios do ScratchSpace são estruturas da linguagem, limitadas a 8 a 16 B por item que cabe nas molduras reservadas (posição, cabeças e cadeia do hash).
+- Os diretórios do ScratchSpace e do BNL são cobrados das molduras da reserva (173). Descritores de controle de tamanho O(m), como a lista de runs e as fontes do merge, ficam fora, como overhead declarado de menos de 1 moldura. O lote de chaves da seleção pontual é parâmetro de entrada da consulta (a tabela "lote" do SQL de referência), não memória de trabalho.
+- O LeakSanitizer não foi validado: o CI e o `make asan` rodam com `detect_leaks=0` (P13 da auditoria de 10/11).
 - Temporários são gravados e retirados do pool no seal, então a releitura é sempre física.
 - A área de dados só é usada fora das operações medidas.
 - O flush antes de cada repetição e o flush de fim devem gravar zero; são verificações, não medidas.
@@ -1487,16 +1560,16 @@ As quatro situações abaixo aparecem no resultados.csv com status `nao_aplicave
 - **Leitura alternativa:** "não ditam a organização" significaria "não é a chave primária lógica". Nesse caso, as células existiriam com tabelas organizadas pelo campo da junção, por exemplo Detalhes por CPF.
 - **Tratamento atual:** a bancada declara as 18 células, com os 3 algoritmos, como `nao_aplicavel`. A célula tipo 2 × d que rodava antes (Detalhes em hash por CPF) saiu da execução.
 
-**Caso 2 — Faixa em campo UNIQUE pelo índice secundário.** São 2 células: 0,1% e 50%.
+**Caso 2 — Faixa em campo UNIQUE pelo índice secundário.** São 2 células: 1% e 50%. A faixa em UNIQUE é opcional no enunciado de 04/11.
 - **Contradição:** o §5.2 pede a configuração c (índice secundário) para faixa em UNIQUE. Mas o §4.2 diz que o secundário de campo UNIQUE no heap "deve ser um Hash", e que a B+ só admite secundário clustering "somente para campo NOT UNIQUE". Hash não responde a faixa.
 - **Ressalva:** no hash primário, o §4.2 cita só o secundário clustering NOT UNIQUE, sem dizer "somente". Se a lista não for exaustiva, uma B+ secundária sobre campo UNIQUE num arquivo hash faria a célula existir.
 - **Tratamento atual:** `nao_aplicavel` em todas as organizações.
 
-**Caso 3 — Igualdade em campo UNIQUE com 0,1% e 50%.** São 6 células: configurações a, b e c × 2 seletividades.
+**Caso 3 — Igualdade em campo UNIQUE com 1% e 50%.** São 6 células: configurações a, b e c × 2 seletividades.
 - **Contradição:** o §5.2 pede as duas seletividades para cada tipo de seleção, mas uma igualdade em UNIQUE devolve uma única linha. A seletividade é s = 1/N, ou 0,005% com N = 20.000.
 - **Tratamento atual:** a igualdade é medida num nível próprio, "pontual". É assim que o §6.4 do enunciado a apresenta, separada das seletividades, e assim que o benchmark Wisconsin (Bitton, DeWitt e Turbyfill, 1983) mede a busca de uma tupla, à parte dos percentuais.
 - **Leitura do lote:** as 1.000 chaves são 1.000 consultas de um registro. O custo por consulta é o total dividido por 1.000, já com o cache de índice aquecido.
-- As 6 células de 0,1% e 50% saem como `nao_aplicavel`, e as medidas ficam nas linhas com seletividade "pontual".
+- As 6 células de 1% e 50% saem como `nao_aplicavel`, e as medidas ficam nas linhas com seletividade "pontual".
 
 **Caso 4 — Faixa pela organização primária quando ela é hash** (UNIQUE e NOT UNIQUE).
 - **Não é contradição:** o hash não preserva a ordem das chaves e não responde a faixa. A célula "faixa × configuração b" existe pela B+; só a variante hash não roda.
@@ -1581,7 +1654,7 @@ Todos superestimavam a capacidade, por ignorar cabeçalhos:
 ### Viabilidade das estruturas
 - A cardinalidade do campo decide se hash NOT UNIQUE e posting lists são viáveis (decisão 44). Exemplo: professor_orientador, com 500 valores e 40 RIDs por valor, cabe; sexo não.
 - Volumes das tabelas e M precisam ser dimensionados juntos, para que b/M atravesse regimes diferentes.
-- As seletividades de 0,1% e 50% são propriedades dos dados: as constantes saem dos quantis da base gerada (decisão 130).
+- As seletividades de 1% e 50% são propriedades dos dados: as constantes saem da base gerada (decisão 130), com faixas feitas de grupos inteiros de valores iguais (decisão 174).
 
 ### Semântica do índice clustering
 Índice esparso, com uma entrada por valor distinto apontando para o início do grupo, e permitido só no campo que dita a organização primária. Sobre a B+ por curso, uma faixa lê blocos sequenciais. Sobre o hash por curso, lê o mesmo número de blocos, todos aleatórios. Esse contraste é um dos melhores resultados da bancada.
@@ -1608,9 +1681,9 @@ A ocupação é reportada por estrutura, porque inclui índices que uma dada con
   - **Tratamento atual (170):** as células são `nao_aplicavel`, e a matriz cai de 45 para 27 células (de 135 para 81 execuções por política).
   - **Se o professor adotar a outra leitura:** basta criar tabelas organizadas pelo campo da junção, como Detalhes_do_Aluno por CPF.
   - Perguntar ao professor.
-- **Seletividade da igualdade em UNIQUE (caso 3, §9).** Adotado (170): a igualdade é um nível "pontual" à parte, e 0,1% e 50% valem como "cerca de" para as faixas. Confirmar com o professor.
+- **Seletividade da igualdade em UNIQUE (caso 3, §9).** Adotado (170): a igualdade é um nível "pontual" à parte, e 1% e 50% valem como "cerca de" para as faixas. Confirmar com o professor.
 - **Volumes e M (resolvido no protótipo):** entrada de slot de 4 B. Volumes: Aluno 20.000, Inscrição 100.000, Turma 6.000, Disciplina 800, Curso 200 e Detalhes 20.000. M = 32 nas junções e 2 nas seleções. Revisar se o professor pedir outra escala.
-- **Versão do enunciado e cortes.** O PDF não tem as seções 3.3, 4.1 e 6.3, e o §6.1.1 cita uma "matriz do grid file" que não aparece em mais nenhum lugar. Isso sugere seções cortadas. Confirmar se há versão posterior a 02/11 e se houve cortes comentados em aula.
+- **Versão do enunciado e cortes.** O PDF não tem as seções 3.3, 4.1 e 6.3, e o §6.1.1 cita uma "matriz do grid file" que não aparece em mais nenhum lugar. Isso sugere seções cortadas. Há versão posterior: a de 04/11 (seletividade de 1%, NATURAL JOIN obrigatório, equijoins e faixa em UNIQUE opcionais, política escolhida por teste). Confirmar se houve cortes comentados em aula.
 - **Prazo:** 22/11 no PDF, 29/11 segundo o grupo.
 - **macOS:** o protótipo foi desenvolvido e testado no macOS (Apple clang). O CI continua previsto para Linux, onde o build com CMake ainda não foi testado.
 

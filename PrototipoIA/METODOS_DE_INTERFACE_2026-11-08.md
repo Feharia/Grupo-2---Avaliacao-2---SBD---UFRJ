@@ -1,6 +1,6 @@
 # Métodos das interfaces entre camadas
 
-Estado em 08/11/2026. Este arquivo lista os métodos implementados no protótipo (`Implementacao/src`) que uma camada chama em outra. Uma interface **X ↔ Y** é uma fronteira entre duas camadas: a camada de cima chama e a de baixo implementa. A única exceção é o callback `RecordStream`, em que a camada 3 chama de volta um objeto da camada 1. Os números entre parênteses são as decisões do `HANDOFF_ARQUITETURA_2026-11-08.md`.
+Estado em 13/11/2026 (com as correções da auditoria de 10/11). Este arquivo lista os métodos implementados no protótipo (`Implementacao/src`) que uma camada chama em outra. Uma interface **X ↔ Y** é uma fronteira entre duas camadas: a camada de cima chama e a de baixo implementa. A única exceção é o callback `RecordStream`, em que a camada 3 chama de volta um objeto da camada 1. Os números entre parênteses são as decisões do `HANDOFF_ARQUITETURA_2026-11-08.md`.
 
 **O que entra**
 - Os métodos públicos que a camada vizinha chama.
@@ -21,7 +21,7 @@ Estado em 08/11/2026. Este arquivo lista os métodos implementados no protótipo
 | Interface | Classes | Métodos |
 |---|---|---|
 | 1 ↔ 2 | `Monitor`, e o callback `RecordStream` (common, implementado na 1) | 24 |
-| 2 ↔ 3 | `StorageManager`, `BlockScan`, `BlockCursor`, `SearchCursor`, `RidCursor`, `RecordView`, `TempFile`, `ScratchSpace` e `ScratchMatches` | 65 |
+| 2 ↔ 3 | `StorageManager`, `BlockScan`, `BlockCursor`, `SearchCursor`, `RidCursor`, `RecordView`, `TempFile`, `ScratchSpace` e `ScratchMatches` | 68 |
 | 3 ↔ 4 | `BufferPool`, `PageGuard` e `Reservation` | 29 |
 
 ---
@@ -37,7 +37,7 @@ A camada 1 só enxerga o `Monitor`. Ele mede as operações (join, select_points
 | `join` — `Monitor` | 1 ↔ 2 | Executa uma junção medida. Primeiro planeja (`plan_join`, sem E/S). Se a combinação não se aplica, devolve `NotApplicable` sem tocar no disco (170). Se o plano usar mais que m molduras, lança erro (148). Senão: reserva m molduras; tira um snapshot dos contadores; roda o algoritmo (BNL, sort-merge ou hash); tira outro snapshot; exige zero pedidos de página de dados sem reserva (159); faz o flush de verificação; calcula a estimativa analítica. Se o hash join não couber em M mesmo com recursão, devolve `NotApplicable` do tipo `Inviavel` (151, 171). | `JoinAlgorithm alg`; `JoinInput outer, inner` (caminho de acesso, campo da junção, operando 0 ou 1); `size_t m` (molduras da operação); `ResultShape` (campos de cada operando que entram no checksum e arquivo de dump opcional); `JoinParams` (chunk do BNL, nº de partições do hash, páginas de grupo do merge) | `Outcome`, que é um `OpResult` (linhas, checksum, delta dos contadores, gravações do flush final, estimativa, fases e tempo) ou um `NotApplicable` (motivo e tipo, `NaoAplicavel` ou `Inviavel`) |
 | `select_points` — `Monitor` | 1 ↔ 2 | Seleção por igualdade, medida, com um lote de um ou mais valores do mesmo campo. O caminho decide a rotina: no Scan, a varredura filtra na camada 2; no índice secundário não clustering (hash ou B+), `probe` + `fetch`; na B+ primária, no hash primário e na B+ clustering, `find`. Devolve `NotApplicable` se o campo do predicado não for o do caminho. Mesmo protocolo de medida do `join`. | `AccessPath`; `span<const Point> batch` (todos no mesmo campo); `ResultShape`; `SelectParams` (m, linhas esperadas, ordenar RIDs antes do fetch) | `Outcome` |
 | `select_range` — `Monitor` | 1 ↔ 2 | Seleção por faixa, medida. No Scan, varredura com filtro; na B+ secundária não clustering, `probe` + `fetch`, com ordenação opcional dos RIDs; na B+ primária e na clustering, `find` sequencial. Num caminho sem suporte a faixa, como o hash, devolve `NotApplicable` pelo `plan_select`. | `AccessPath`; `KeyRange` (campo e limites `lo` e `hi` opcionais, inclusivos ou não); `ResultShape`; `SelectParams` | `Outcome` |
-| `plan_join` † — `Monitor` | 1 ↔ 2 | Monta o plano da junção sem E/S. Decide os papéis (troca externa e interna; no hash, a menor vira a build), o chunk do BNL, as runs e os passes do merge, as partições e os níveis do hash (171) e os blocos densos ⌈n/bfr⌉ (emenda da 143). Devolve `NotApplicable` nas células sem sentido (170). É chamado pelo `join`; a camada 1 não chama. | `alg`, `outer`, `inner`, `m`, `JoinParams` | `variant<JoinPlan, NotApplicable>` |
+| `plan_join` — `Monitor` | 1 ↔ 2 | Monta o plano da junção sem E/S. Decide os papéis (troca externa e interna; no hash, a menor vira a build), o chunk do BNL e as molduras do seu diretório (173), as runs e os passes do merge, as partições e os níveis do hash (171) e os blocos densos pela blocagem média (emenda da 143). Devolve `NotApplicable` nas células sem sentido (170). É chamado pelo `join`, e a camada 1 o usa para gravar o acesso executado em `caminhos.csv` (P09). | `alg`, `outer`, `inner`, `m`, `JoinParams` | `variant<JoinPlan, NotApplicable>` |
 | `plan_select` † — `Monitor` | 1 ↔ 2 | Monta o plano da seleção sem E/S: caminho, filtro na camada 2, tamanho do lote, molduras, páginas de rascunho para RIDs (117) e linhas esperadas. Devolve `NotApplicable` quando o caminho não suporta o predicado. | `AccessPath`, `bool range`, `size_t batch`, `SelectParams` | `variant<SelectPlan, NotApplicable>` |
 
 ### Repasses à camada 3
@@ -172,11 +172,14 @@ A camada 2 não vê páginas nem arquivos. Ela pede varreduras, buscas e memóri
 | `size` — `ScratchSpace` | 2 ↔ 3 | Nº de itens guardados. | — | `size_t` |
 | `at` — `ScratchSpace` | 2 ↔ 3 | Item i, na ordem atual (após o `sort_by`, ordenado). | `size_t i` | `RecordView` |
 | `rid_at` — `ScratchSpace` | 2 ↔ 3 | RID na posição i do espaço de RIDs. | `size_t i` | `RID` |
-| `sort_by` — `ScratchSpace` | 2 ↔ 3 | Ordena os itens pelo campo, de forma estável e em memória, sem E/S. Gera as runs do sort-merge. | `FieldId` | — |
+| `sort_by` — `ScratchSpace` | 2 ↔ 3 | Ordena os itens pelo campo, de forma estável e no lugar (sem alocar além do diretório já cobrado, 173), sem E/S. Gera as runs do sort-merge. | `FieldId` | — |
 | `sort_rids` — `ScratchSpace` | 2 ↔ 3 | Ordena os RIDs por (bloco, slot), para o `fetch` seguir a ordem física (117). | — | — |
 | `build_hash` — `ScratchSpace` | 2 ↔ 3 | Monta uma tabela hash em memória sobre o campo, com semente própria, independente da semente do particionamento (153). Chave NULL nunca entra (158). | `FieldId`, `uint64 seed` | — |
 | `probe` — `ScratchSpace` | 2 ↔ 3 | Procura uma chave na tabela hash montada. | `const Key&` | `ScratchMatches` |
-| `clear` — `ScratchSpace` | 2 ↔ 3 | Esvazia o rascunho e mantém as páginas, para reusar em outro bloco ou partição. | — | — |
+| `clear` — `ScratchSpace` | 2 ↔ 3 | Esvazia o rascunho, mantém as páginas e devolve a memória do diretório, para reusar em outro bloco ou partição. | — | — |
+| `capacity_for` — `ScratchSpace` (estático) | 2 ↔ 3 | Quantos registros do tamanho máximo do esquema cabem em `pages` páginas, com o diretório cobrado (173). O plano da camada 2 usa para contar runs e decidir se o build do hash cabe. | `const Schema&`, `size_t pages`, `uint32 block_size` | `size_t` |
+| `record_bytes` † — `ScratchSpace` | 2 ↔ 3 | Fim do último registro gravado nas páginas, contando as sobras de página. Só os testes chamam. | — | `size_t` |
+| `aux_bytes` † — `ScratchSpace` | 2 ↔ 3 | Bytes reservados pelos vetores do diretório; com `record_bytes`, prova o orçamento de M. Só os testes chamam. | — | `size_t` |
 | `~ScratchSpace` — `ScratchSpace` | 2 ↔ 3 | Solta as molduras anônimas, que voltam ao subpool. | — | — |
 | `capacity` † — `ScratchSpace` | 2 ↔ 3 | Nº máximo de itens. Ninguém chama fora da camada 3. | — | `size_t` |
 | `pages` † — `ScratchSpace` | 2 ↔ 3 | Nº de páginas fixadas. Ninguém chama. | — | `size_t` |
@@ -262,8 +265,9 @@ Todos ficam em `common/common.hpp`, exceto os marcados.
 ## Métodos públicos sem chamador na camada de cima (†)
 
 - **Só os testes chamam:**
-  - `Monitor`: `plan_join` (o próprio `join` também chama), `erase` e `reorganize`;
+  - `Monitor`: `erase` e `reorganize`;
   - `StorageManager`: `block_size`;
+  - `ScratchSpace`: `record_bytes` e `aux_bytes`;
   - `RecordView`: `get<T>` e `get_var` (a camada 3 também usa);
   - `BufferPool`: `open`;
   - `Reservation`: `capacity`, `pinned` e `peak_pinned`.

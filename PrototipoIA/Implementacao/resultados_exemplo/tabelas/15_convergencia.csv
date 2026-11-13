@@ -1,0 +1,3 @@
+politica,operacao,variante,algoritmo,n_repeticoes,dispersao_io,dispersao_tempo,convergiu_io,convergiu_tempo
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,10,0.0000,0.0995,sim,nao
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,10,0.0000,0.0541,sim,nao
