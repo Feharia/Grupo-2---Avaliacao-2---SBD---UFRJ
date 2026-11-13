@@ -257,11 +257,11 @@ struct OpDef {
     OpKind kind;
     std::string tipo;                      // tipo do §5.1/§5.2 (natural_join, igualdade_unique...)
     std::string tamanho;                   // junção: menor_menor, menor_maior, maior_maior
-    std::string seletividade;              // seleção: pontual, 0,1%, 50%
+    std::string seletividade;              // seleção: pontual, 1%, 50% (enunciado v2, decisão 174)
     std::vector<PathRef> paths;            // seleção: um caminho por variante
     std::string field;                     // seleção: campo do predicado
     double selectivity = 0;                // faixa
-    std::string range_mode;                // "meio", "topo", "base", "valor"
+    std::string range_mode;                // "meio", "topo" ou "base" (decisão 174)
     // junção
     std::vector<JoinCase> join_inputs;
     std::string field0, field1;
@@ -308,26 +308,28 @@ Spec spec_padrao() {
         return o;
     };
     const std::string pts = "SELECT a.* FROM lote l JOIN aluno a ON a.{f} = l.k";
-    // igualdade em UNIQUE: nível próprio ("pontual"); 0,1% e 50% são o caso 3 (170)
+    // igualdade em UNIQUE: nível próprio ("pontual"); 1% e 50% são o caso 3 (170)
     s.ops.push_back(sel("sel_pt_dre", "igualdade_unique", "pontual", OpKind::Points, "dre", pts,
                         {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
                          {"aluno_h_dre", PK::PrimaryHash, "dre", "b"}}));
     s.ops.push_back(sel("sel_pt_cpf", "igualdade_unique", "pontual", OpKind::Points, "cpf", pts,
                         {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryHash, "cpf", "c"}}));
     const std::string rg = "SELECT a.* FROM aluno a WHERE a.{f} >= {lo} AND a.{f} <= {hi}";
-    for (auto [suf, sv, lbl] : {std::tuple{"baixa", 0.001, "0,1%"}, std::tuple{"alta", 0.5, "50%"}}) {
+    // seletividade baixa de 1% (enunciado v2, §5.2 e §6.2; decisão 174); os ids *_baixa ficam, pelo CI
+    for (auto [suf, sv, lbl] : {std::tuple{"baixa", 0.01, "1%"}, std::tuple{"alta", 0.5, "50%"}}) {
+        const bool baixa = sv < 0.1;
         // faixa em UNIQUE: o hash primário sai como caso 4; o índice secundário (c) é o caso 2 (170)
         s.ops.push_back(sel(std::string("sel_rg_dre_") + suf, "faixa_unique", lbl, OpKind::Range, "dre", rg,
                             {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
                              {"aluno_h_dre", PK::PrimaryHash, "dre", "b"}}, sv, "meio"));
         s.ops.push_back(sel(std::string("sel_rg_cr_") + suf, "faixa_not_unique", lbl, OpKind::Range, "cr", rg,
                             {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "cr", "c"}},
-                            sv, sv < 0.01 ? "topo" : "base"));
+                            sv, baixa ? "topo" : "base"));
         s.ops.push_back(sel(std::string("sel_rg_curso_") + suf, "faixa_not_unique", lbl, OpKind::Range, "curso", rg,
                             {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso", "b"},
                              {"aluno_bt_curso", PK::SecondaryBTreeClustering, "curso", "c"},
                              {"aluno_h_curso", PK::SecondaryBTreeClustering, "curso", "c"},
-                             {"aluno_h_curso", PK::PrimaryHash, "curso", "b"}}, sv, sv < 0.01 ? "valor" : "base"));
+                             {"aluno_h_curso", PK::PrimaryHash, "curso", "b"}}, sv, baixa ? "meio" : "base"));
     }
     auto join = [](std::string id, std::string tipo, std::string tamanho, std::string sql, std::string f0, std::string f1,
                    std::vector<JoinCase> inputs, bool swapped = false) {
@@ -417,23 +419,50 @@ AccessPath resolve(Monitor& mon, const Built& b, const PathRef& ref) {
 }
 
 // ======================================================================= constantes e lotes (125, 130)
-struct RangeConst { Value lo, hi; std::uint64_t expected = 0; };
+struct RangeConst { Value lo, hi; std::uint64_t expected = 0; double target = 0, effective = 0; };
 
+// Faixa com seletividade "cerca de" sel (§6.2, decisão 174). A faixa é feita de grupos inteiros de
+// valores iguais (num campo discreto não dá para cortar no meio de um valor), e o nº de grupos é o que
+// deixa a contagem mais perto do alvo. "base" cresce a partir do menor valor, "topo" a partir do maior,
+// e "meio" a partir do valor do meio, para a direita.
 RangeConst resolve_range(const BaseTable& t, const std::string& field, double sel, const std::string& mode) {
     const std::size_t col = t.col(field);
     std::vector<Value> v;
     for (const auto& r : t.rows)
         if (!std::holds_alternative<std::monostate>(r[col])) v.push_back(r[col]);
     std::sort(v.begin(), v.end(), [](const Value& a, const Value& c) { return value_cmp(a, c) < 0; });
-    const std::size_t n = v.size();
-    const std::size_t k = std::max<std::size_t>(1, static_cast<std::size_t>(std::llround(sel * static_cast<double>(n))));
+    std::vector<std::pair<Value, std::uint64_t>> groups;   // valor e nº de linhas, em ordem
+    for (const auto& x : v) {
+        if (groups.empty() || value_cmp(groups.back().first, x) != 0) groups.push_back({x, 0});
+        ++groups.back().second;
+    }
+    const double target = sel * static_cast<double>(t.rows.size());
+    const std::size_t g = groups.size();
+    std::size_t first = 0;
+    int dir = 1;
+    if (mode == "topo") { first = g - 1; dir = -1; }
+    else if (mode == "meio") {   // grupo do valor que fica no meio da faixa desejada
+        const std::size_t pos = v.size() / 2 - std::min(v.size() / 2, static_cast<std::size_t>(target / 2));
+        first = static_cast<std::size_t>(std::lower_bound(groups.begin(), groups.end(), v[pos],
+                    [](const auto& e, const Value& x) { return value_cmp(e.first, x) < 0; }) - groups.begin());
+    }
+    std::size_t best_len = 1, len = 0;
+    std::uint64_t sum = 0, best_sum = 0;
+    double best_err = -1;
+    for (std::size_t i = first; i < g; i = dir > 0 ? i + 1 : i - 1) {
+        sum += groups[i].second;
+        ++len;
+        const double err = std::abs(static_cast<double>(sum) - target);
+        if (best_err < 0 || err < best_err) { best_err = err; best_len = len; best_sum = sum; }
+        if (static_cast<double>(sum) >= target || (dir < 0 && i == 0)) break;
+    }
+    const std::size_t last = dir > 0 ? first + best_len - 1 : first - (best_len - 1);
     RangeConst rc;
-    if (mode == "meio") { rc.lo = v[n / 2 - k / 2]; rc.hi = v[std::min(n - 1, n / 2 - k / 2 + k - 1)]; }
-    else if (mode == "topo") { rc.lo = v[n - k]; rc.hi = v[n - 1]; }
-    else if (mode == "base") { rc.lo = v[0]; rc.hi = v[k - 1]; }
-    else { rc.lo = v[n / 2]; rc.hi = v[n / 2]; }   // "valor": um único valor (≈ 1/d)
-    for (const auto& x : v)
-        if (value_cmp(x, rc.lo) >= 0 && value_cmp(x, rc.hi) <= 0) ++rc.expected;
+    rc.lo = groups[std::min(first, last)].first;
+    rc.hi = groups[std::max(first, last)].first;
+    rc.expected = best_sum;
+    rc.target = sel;
+    rc.effective = static_cast<double>(best_sum) / static_cast<double>(t.rows.size());
     return rc;
 }
 
@@ -632,11 +661,11 @@ void declare_not_applicable(Csv& out, const std::string& pol, const Spec& spec) 
         for (const char* tam : {"menor_menor", "menor_maior", "maior_maior"})
             for (const char* cfg : {"b", "c", "d"})
                 for (const char* alg : algs) row(op, Cell{tipo, tam, cfg, ""}, alg, caso1);
-    for (auto [op, lbl] : {std::pair{"sel_rg_dre_baixa", "0,1%"}, std::pair{"sel_rg_dre_alta", "50%"}})
+    for (auto [op, lbl] : {std::pair{"sel_rg_dre_baixa", "1%"}, std::pair{"sel_rg_dre_alta", "50%"}})
         row(op, Cell{"faixa_unique", "", "c", lbl}, "",
             "caso 2: o §4.2 só admite hash como secundário de campo UNIQUE (heap) e só clustering NOT UNIQUE "
             "nas outras organizações; hash não responde a faixa (170)");
-    for (const char* lbl : {"0,1%", "50%"})
+    for (const char* lbl : {"1%", "50%"})
         for (const char* cfg : {"a", "b", "c"})
             row("sel_igualdade_unique", Cell{"igualdade_unique", "", cfg, lbl}, "",
                 "caso 3: igualdade em UNIQUE devolve 1 registro (s = 1/N); medida no nível pontual (170)");
@@ -698,7 +727,7 @@ int main(int argc, char** argv) {
     Csv opcsv(out_dir / "operacoes.csv");
     opcsv.row({"operacao", "tipo", "sql", "lote", "tipo_lote"});
     Csv consts(out_dir / "constantes.csv");
-    consts.row({"operacao", "lo", "hi", "linhas_esperadas"});
+    consts.row({"operacao", "lo", "hi", "linhas_esperadas", "seletividade_alvo", "seletividade_efetiva"});
     fs::create_directories(out_dir / "lotes");
     std::map<std::string, RangeConst> ranges;
     std::map<std::pair<std::string, int>, std::vector<Value>> batches;
@@ -712,7 +741,8 @@ int main(int argc, char** argv) {
             sql = replace_all(sql, "{lo}", sql_literal(rc.lo));
             sql = replace_all(sql, "{hi}", sql_literal(rc.hi));
             opcsv.row({op.id, "faixa", sql, "", ""});
-            consts.row({op.id, value_text(rc.lo), value_text(rc.hi), std::to_string(rc.expected)});
+            consts.row({op.id, value_text(rc.lo), value_text(rc.hi), std::to_string(rc.expected), fmt(rc.target, 4),
+                        fmt(rc.effective, 4)});
         } else {
             const BaseTable& a = db.at("aluno");
             const std::size_t col = a.col(op.field);

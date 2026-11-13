@@ -75,13 +75,13 @@ cmake -S . -B build-cmake && cmake --build build-cmake && ctest --test-dir build
 
 | Arquivo | Conteúdo |
 |---|---|
-| `resultados.csv` | uma linha por política, operação, variante, algoritmo e repetição. Traz a posição na matriz do enunciado (`tipo`, `tamanho`, `config` a–e, `seletividade` pontual/0,1%/50%), o `status` (`ok`, `nao_aplicavel` ou `inviavel`, decisão 170) e o `motivo` de cada célula que não roda. Nas células executadas: linhas, checksum, requisições, acertos, faltas, taxa de acerto, leituras e gravações sequenciais/aleatórias, expulsões sujas, gravações forçadas, alocações, leituras de índice, E/S de temporários, custo estimado (transferências e seeks), `flush_writes` (deve ser 0) e tempo |
+| `resultados.csv` | uma linha por política, operação, variante, algoritmo e repetição. Traz a posição na matriz do enunciado (`tipo`, `tamanho`, `config` a–e, `seletividade` pontual/1%/50%), o `status` (`ok`, `nao_aplicavel` ou `inviavel`, decisão 170) e o `motivo` de cada célula que não roda. Nas células executadas: linhas, checksum, requisições, acertos, faltas, taxa de acerto, leituras e gravações sequenciais/aleatórias, expulsões sujas, gravações forçadas, alocações, leituras de índice, E/S de temporários, custo estimado (transferências e seeks), `flush_writes` (deve ser 0) e tempo |
 | `ocupacao.csv` | blocos por estrutura, antes e depois da carga de manutenção (§6.1.1) |
 | `estatisticas.csv` | n, R, bfr, b, altura, nós internos, folhas, distintos, buckets, overflow, fator de carga e cadeias, todos medidos pelo código |
 | `fases.csv` | E/S por fase de cada operação (runs, passes, particionamento, build/probe…) |
 | `convergencia.csv` | uma linha por grupo de repetições: nº de repetições, dispersão de E/S e de tempo, se cada critério convergiu e se a parada foi por convergência ou pelo teto (P07) |
 | `caminhos.csv` | acesso realmente executado em cada entrada, por algoritmo, tirado do plano (P09) |
-| `operacoes.csv`, `constantes.csv`, `lotes/` | SQL equivalente, constantes de faixa pelos quantis e lotes de chaves |
+| `operacoes.csv`, `constantes.csv`, `lotes/` | SQL equivalente, constantes de cada faixa (com a seletividade pedida e a efetiva) e lotes de chaves |
 | `dados/`, `esquema.csv`, `manifesto.txt` | a base gerada, o esquema e o manifesto da execução |
 
 Uma rodada completa está em `resultados_exemplo/` (sem os dados e os arquivos do motor), com as tabelas do `tabelas.py` em `resultados_exemplo/tabelas.md` e `resultados_exemplo/tabelas/`.

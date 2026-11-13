@@ -39,7 +39,7 @@ TAMANHO = {"menor_menor": "menor ⋈ menor", "menor_maior": "menor ⋈ maior", "
 ALG = {"bnl": "BNL", "sort_merge": "sort-merge", "hash": "hash"}
 ALG_ORDEM = ("bnl", "sort_merge", "hash")
 TIPO_ORDEM = ("igualdade_unique", "faixa_unique", "faixa_not_unique")
-SELET_ORDEM = ("pontual", "0,1%", "50%")
+SELET_ORDEM = ("pontual", "0,1%", "1%", "50%")   # 0,1% só em saídas antigas (enunciado v1)
 # colunas da tabela "organização × caminho", na ordem em que aparecem
 CATEGORIAS = OrderedDict([
     (("heap", "scan"), "Heap (varredura)"),
@@ -330,19 +330,22 @@ def t_faixa(b):
         campo = b.campo_selecao(c["operacao"])
         vezes = c.total / melhor[c["operacao"]] if melhor[c["operacao"]] else None
         seq = 100.0 * c.leituras_seq / c.leituras if c.leituras else None
-        linhas.append([b.rotulo_op(c["operacao"], c["tipo"]), c["seletividade"], c["config"],
-                       caminho(c["variante"], campo), fmt_int(c.linhas), fmt_int(c.leituras), fmt_pct(seq, False),
+        efetiva = b.consts.get(c["operacao"], {}).get("seletividade_efetiva")
+        efetiva = float(efetiva) * 100 if efetiva else None
+        linhas.append([b.rotulo_op(c["operacao"], c["tipo"]), c["seletividade"], fmt_num(efetiva, 2) + "%" if efetiva is not None else "—",
+                       c["config"], caminho(c["variante"], campo), fmt_int(c.linhas), fmt_int(c.leituras), fmt_pct(seq, False),
                        fmt_int(c.estimado_transf), fmt_pct(c.erro), fmt_num(c.tempo_ms, 2), fmt_vezes(vezes)])
-        brutas.append([c["operacao"], c["seletividade"], c["config"], c["variante"], c.linhas, c.leituras, seq,
+        brutas.append([c["operacao"], c["seletividade"], efetiva, c["config"], c["variante"], c.linhas, c.leituras, seq,
                        c.estimado_transf, c.erro, c.tempo_ms, vezes])
     return Tabela(
         "03_selecao_faixa", "Seleção por faixa",
-        "“% seq.” é a fração das leituras que foram sequenciais. “× melhor” compara com o caminho de menor custo "
-        "na mesma consulta e seletividade.",
-        ["Consulta", "Selet.", "Config.", "Caminho", "Linhas", "Leituras", "% seq.", "Estimado", "Erro est.",
-         "Tempo (ms)", "× melhor"], linhas, brutas,
-        ["operacao", "seletividade", "config", "variante", "linhas", "leituras", "pct_seq", "estimado_transf",
-         "erro_pct", "tempo_ms", "vezes_melhor"])
+        "“Selet.” é o alvo; “Efetiva” é a fração de linhas que a faixa realmente devolve, feita de grupos inteiros "
+        "de valores iguais (decisão 174). “% seq.” é a fração das leituras que foram sequenciais. “× melhor” "
+        "compara com o caminho de menor custo na mesma consulta e seletividade.",
+        ["Consulta", "Selet.", "Efetiva", "Config.", "Caminho", "Linhas", "Leituras", "% seq.", "Estimado",
+         "Erro est.", "Tempo (ms)", "× melhor"], linhas, brutas,
+        ["operacao", "seletividade", "seletividade_efetiva_pct", "config", "variante", "linhas", "leituras", "pct_seq",
+         "estimado_transf", "erro_pct", "tempo_ms", "vezes_melhor"])
 
 
 def t_organizacoes(b):
