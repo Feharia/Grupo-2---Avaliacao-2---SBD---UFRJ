@@ -137,6 +137,13 @@ void bnl_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inner
               const Reservation& res, ResultSink& sink, PhaseRecorder& ph) {
     ph.begin("bnl");
     BlockScan oscan = sm.scan_blocks(outer.path.table, kSeqOnce, res);
+    // Diretório do chunk (decisão 173): um RecordView por registro, com capacidade fixa nas
+    // m − 1 − chunk molduras que o plano reservou para ele. A chave é lida da página a cada
+    // comparação, para não guardar cópias; ordenar no lugar não aloca.
+    const FieldId of = outer.field;
+    auto key_less = [of](const RecordView& a, const RecordView& b) { return compare_keys(a.key(of), b.key(of)) < 0; };
+    std::vector<RecordView> dir;
+    dir.reserve(plan.dir_entries);
     for (;;) {
         std::vector<BlockCursor> chunk;   // plan.chunk páginas da externa fixadas
         while (chunk.size() < plan.chunk) {
@@ -145,21 +152,22 @@ void bnl_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inner
             chunk.push_back(std::move(*c));
         }
         if (chunk.empty()) break;
-        // diretório das chaves do chunk: limitado aos registros das páginas fixadas (§7.1)
-        std::vector<std::pair<Key, RecordView>> keys;
+        dir.clear();
         for (auto& c : chunk)
-            while (auto r = c.next())
-                if (!r->is_null(outer.field)) keys.emplace_back(r->key(outer.field), *r);
-        std::stable_sort(keys.begin(), keys.end(),
-                         [](const auto& a, const auto& b) { return compare_keys(a.first, b.first) < 0; });
+            while (auto r = c.next()) {
+                if (r->is_null(of)) continue;
+                if (dir.size() == plan.dir_entries) throw DoesNotFit("diretório do BNL excede as molduras reservadas");
+                dir.push_back(*r);
+            }
+        std::sort(dir.begin(), dir.end(), key_less);
         BlockScan iscan = sm.scan_blocks(inner.path.table, kSeqReuse, res);
         while (auto ic = iscan.next()) {
             while (auto r = ic->next()) {
                 if (r->is_null(inner.field)) continue;
                 const Key k = r->key(inner.field);
-                auto lo = std::lower_bound(keys.begin(), keys.end(), k,
-                                           [](const auto& e, const Key& v) { return compare_keys(e.first, v) < 0; });
-                for (auto it = lo; it != keys.end() && compare_keys(it->first, k) == 0; ++it) sink.emit_pair(it->second, *r);
+                auto lo = std::lower_bound(dir.begin(), dir.end(), k,
+                                           [of](const RecordView& e, const Key& v) { return compare_keys(e.key(of), v) < 0; });
+                for (auto it = lo; it != dir.end() && compare_keys(it->key(of), k) == 0; ++it) sink.emit_pair(*it, *r);
             }
         }
     }

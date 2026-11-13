@@ -111,7 +111,8 @@ std::vector<Phase> PhaseRecorder::finish() {
 // ======================================================================= planos
 std::size_t JoinPlan::frames_used() const {
     switch (alg) {
-        case JoinAlgorithm::Bnl: return m;   // chunk + 1 da interna + as guardadas pela política, limitado a m
+        case JoinAlgorithm::Bnl:   // chunk + 1 da interna + as molduras do diretório (173)
+            return chunk + 1 + dir_frames;
         case JoinAlgorithm::SortMerge:
             return std::max({run_pages + 2, fan_in + 1, final_fan_in + group_pages});
         case JoinAlgorithm::Hash:
@@ -157,7 +158,18 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
             if (params.chunk) p.chunk = params.chunk;
             else if (p.b_outer + 2 <= m) p.chunk = std::max<std::size_t>(1, p.b_outer);
             else p.chunk = std::max<std::size_t>(1, m / 2);
-            if (p.chunk > m - 1) return NotApplicable{"chunk > m − 1", NotApplicable::Kind::Inviavel};
+            if (p.chunk > m - 2) return NotApplicable{"chunk > m − 2", NotApplicable::Kind::Inviavel};
+            {   // o diretório do chunk (um RecordView por registro) ocupa as m − 1 − chunk molduras
+                // restantes (decisão 173); com mais registros por página, o chunk diminui
+                const std::size_t bs = storage_.block_size();
+                const std::size_t per_page = to.b ? ceil_div(static_cast<std::size_t>(to.n), to.b) : 1;
+                auto entries = [&](std::size_t c) { return (m - 1 - c) * bs / sizeof(RecordView); };
+                while (p.chunk > 1 && p.chunk * per_page > entries(p.chunk)) --p.chunk;
+                if (p.chunk * per_page > entries(p.chunk))
+                    return NotApplicable{"diretório do BNL não cabe em m", NotApplicable::Kind::Inviavel};
+                p.dir_frames = m - 1 - p.chunk;
+                p.dir_entries = entries(p.chunk);
+            }
             break;
         case JoinAlgorithm::SortMerge: {
             auto ordered = [](const JoinInput& in) {   // (164)

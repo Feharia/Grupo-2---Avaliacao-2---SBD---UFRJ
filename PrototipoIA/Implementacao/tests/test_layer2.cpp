@@ -114,6 +114,33 @@ TEST(Monitor, PapeisTrocadosNaoMudamOChecksum) {   // (152)
     }
 }
 
+// P03 da auditoria de 10/11: com registros pequenos (como Turma, 145 por página), o diretório
+// do BNL com chunk de m/2 páginas guardava cerca de 56 B por registro fora das molduras. Agora
+// ele cabe nas m − 1 − chunk molduras restantes, e o chunk diminui quando não cabe (decisão 173).
+TEST(Monitor, DiretorioDoBnlCabeEmM) {
+    Monitor m(test_config("mon_bnl_dir"));
+    const Schema s = make_schema({{"k", FieldType::Int32}, {"v", FieldType::Int32}});
+    std::vector<std::vector<Value>> rows;
+    for (std::int64_t i = 0; i < 40000; ++i) rows.push_back({i % 500, i});
+    const TableId t = m.create_table("pequenos", s, PrimarySpec{});
+    RowsStream rs(m, t, rows);
+    m.bulk_load(t, rs);
+    const TableStats st = m.stats(t);
+    ASSERT_TRUE(st.b + 2 > 32);   // não cabe em M: o BNL usa chunk
+    const JoinInput in0{path(m, t, PathKind::Scan), 0, 0}, in1{path(m, t, PathKind::Scan), 0, 1};
+    const auto planned = m.plan_join(JoinAlgorithm::Bnl, in0, in1, 32, JoinParams{});
+    const JoinPlan& p = std::get<JoinPlan>(planned);
+    const std::size_t por_pagina = (st.n + st.b - 1) / st.b;
+    EXPECT_LE(p.frames_used(), 32u);
+    EXPECT_LE(p.chunk * por_pagina, p.dir_entries);
+    EXPECT_LE(p.dir_entries * sizeof(RecordView), p.dir_frames * 4096);
+    EXPECT_LT(p.chunk, 16u);                  // m/2 não deixaria espaço para o diretório
+    m.flush_all();
+    m.invalidate_all();
+    const OpResult r = ok(m.join(JoinAlgorithm::Bnl, in0, in1, 32, ResultShape{}));
+    EXPECT_EQ(r.rows, 40000u * 80u);          // 500 grupos de 80 registros: 80 × 80 pares por grupo
+}
+
 TEST(Monitor, MruLeMenosQueLruNoBnlComVariasPassadas) {
     std::map<Policy, std::uint64_t> reads;
     for (Policy p : {Policy::Lru, Policy::Mru}) {

@@ -45,6 +45,8 @@ struct JoinPlan {
     bool          inner_unique = false;                 // (157)
     // BNL
     std::size_t   chunk = 0;
+    std::size_t   dir_frames = 0;                       // diretório do chunk: as m − 1 − chunk molduras restantes (173)
+    std::size_t   dir_entries = 0;                      // RecordViews que cabem nessas molduras
     // sort-merge
     bool          sort_outer = true, sort_inner = true;
     std::size_t   run_pages = 0;                        // m − 2
