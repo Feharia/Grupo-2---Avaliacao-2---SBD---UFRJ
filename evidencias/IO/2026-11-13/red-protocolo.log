@@ -1,0 +1,23 @@
+........E....E...
+======================================================================
+ERROR: test_inventory_rejects_same_variant_missing_on_both_sides (test_comparar_io.IoComparisonTest.test_inventory_rejects_same_variant_missing_on_both_sides)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/python/test_comparar_io.py", line 42, in test_inventory_rejects_same_variant_missing_on_both_sides
+    io.ensure_inventory(rows, required)
+    ^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'comparar_io' has no attribute 'ensure_inventory'
+
+======================================================================
+ERROR: test_real_compile_options_normalize_paths_but_preserve_flags (test_comparar_io.IoComparisonTest.test_real_compile_options_normalize_paths_but_preserve_flags)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tests/python/test_comparar_io.py", line 50, in test_real_compile_options_normalize_paths_but_preserve_flags
+    a = io.compiler_options(entries("/tmp/antes", "-O3"), Path("/tmp/antes"))
+        ^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'comparar_io' has no attribute 'compiler_options'
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.068s
+
+FAILED (errors=2)

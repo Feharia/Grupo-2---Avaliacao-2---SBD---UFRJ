@@ -1,0 +1,13 @@
+cmake -S /tmp/cbd-io-00fhvO/_io_referencia/PrototipoIA/Implementacao -B /tmp/cbd-io-00fhvO/workflow-final/io/referencia/build -DCMAKE_BUILD_TYPE=Release -DCBD_SANITIZE=OFF -DCMAKE_CXX_COMPILER=g++
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Looking for pread
+-- Looking for pread - found
+-- GoogleTest não encontrado: usando o shim tests/mini_test.hpp
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/cbd-io-00fhvO/workflow-final/io/referencia/build

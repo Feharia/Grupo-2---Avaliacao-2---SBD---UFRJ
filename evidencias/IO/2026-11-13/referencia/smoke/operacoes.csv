@@ -1,0 +1,14 @@
+operacao,tipo,sql,lote,tipo_lote
+sel_pt_dre,pontual,SELECT a.* FROM lote l JOIN aluno a ON a.dre = l.k,lotes/sel_pt_dre,int
+sel_pt_cpf,pontual,SELECT a.* FROM lote l JOIN aluno a ON a.cpf = l.k,lotes/sel_pt_cpf,text
+sel_rg_dre_baixa,faixa,SELECT a.* FROM aluno a WHERE a.dre >= 120000999 AND a.dre <= 120001000,,
+sel_rg_cr_baixa,faixa,SELECT a.* FROM aluno a WHERE a.cr >= 932 AND a.cr <= 936,,
+sel_rg_curso_baixa,faixa,SELECT a.* FROM aluno a WHERE a.curso >= 99 AND a.curso <= 99,,
+sel_rg_dre_alta,faixa,SELECT a.* FROM aluno a WHERE a.dre >= 120000500 AND a.dre <= 120001499,,
+sel_rg_cr_alta,faixa,SELECT a.* FROM aluno a WHERE a.cr >= 350 AND a.cr <= 649,,
+sel_rg_curso_alta,faixa,SELECT a.* FROM aluno a WHERE a.curso >= 1 AND a.curso <= 99,,
+j_mestre_detalhe,juncao,"SELECT x.*, y.* FROM aluno x JOIN inscricao y ON x.dre = y.dre",,
+j_pequenas,juncao,"SELECT x.*, y.* FROM curso x JOIN disciplina y ON x.codigo = y.curso",,
+j_grande_pequena,juncao,"SELECT x.*, y.* FROM curso x JOIN aluno y ON x.codigo = y.curso",,
+j_unique,juncao,"SELECT x.*, y.* FROM aluno x JOIN detalhes y ON x.cpf = y.cpf",,
+j_not_unique,juncao,"SELECT x.*, y.* FROM aluno x JOIN turma y ON x.professor_orientador = y.professor",,

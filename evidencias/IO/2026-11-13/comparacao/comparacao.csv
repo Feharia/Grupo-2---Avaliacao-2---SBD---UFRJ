@@ -1,0 +1,109 @@
+politica,operacao,tipo,tamanho,config,seletividade,variante,algoritmo,externa,interna,m,rep,aumento,leituras_antes,leituras_depois,leituras_delta,leituras_percentual,gravacoes_antes,gravacoes_depois,gravacoes_delta,gravacoes_percentual,total_antes,total_depois,total_delta,total_percentual,flush_writes_antes,flush_writes_depois,flush_writes_delta,flush_writes_percentual,total_com_flush_antes,total_com_flush_depois,total_com_flush_delta,total_com_flush_percentual
+LRU,j_grande_pequena,natural_join,menor_maior,a,,curso_heap:scan x aluno_heap:scan,bnl,curso_heap,aluno_heap,32,1,False,72,72,0,0.0,0,0,0,0.0,72,72,0,0.0,0,0,0,0.0,72,72,0,0.0
+LRU,j_grande_pequena,natural_join,menor_maior,a,,curso_heap:scan x aluno_heap:scan,hash,curso_heap,aluno_heap,32,1,False,72,72,0,0.0,0,0,0,0.0,72,72,0,0.0,0,0,0,0.0,72,72,0,0.0
+LRU,j_grande_pequena,natural_join,menor_maior,a,,curso_heap:scan x aluno_heap:scan,sort_merge,aluno_heap,curso_heap,32,1,False,144,144,0,0.0,72,72,0,0.0,216,216,0,0.0,0,0,0,0.0,216,216,0,0.0
+LRU,j_grande_pequena,natural_join,menor_maior,b,,curso_heap:scan x aluno_bt_curso:primary_btree,bnl,curso_heap,aluno_bt_curso,32,1,False,103,102,-1,-0.970873786407767,0,0,0,0.0,103,102,-1,-0.970873786407767,0,0,0,0.0,103,102,-1,-0.970873786407767
+LRU,j_grande_pequena,natural_join,menor_maior,b,,curso_heap:scan x aluno_bt_curso:primary_btree,hash,curso_heap,aluno_bt_curso,32,1,False,103,102,-1,-0.970873786407767,0,0,0,0.0,103,102,-1,-0.970873786407767,0,0,0,0.0,103,102,-1,-0.970873786407767
+LRU,j_grande_pequena,natural_join,menor_maior,b,,curso_heap:scan x aluno_bt_curso:primary_btree,sort_merge,aluno_bt_curso,curso_heap,32,1,False,111,110,-1,-0.9009009009009009,7,7,0,0.0,118,117,-1,-0.847457627118644,0,0,0,0.0,118,117,-1,-0.847457627118644
+LRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan,bnl,aluno_heap,inscricao_heap,32,1,False,915,915,0,0.0,0,0,0,0.0,915,915,0,0.0,0,0,0,0.0,915,915,0,0.0
+LRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan,hash,aluno_heap,inscricao_heap,32,1,False,472,472,0,0.0,237,237,0,0.0,709,709,0,0.0,0,0,0,0.0,709,709,0,0.0
+LRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan,sort_merge,inscricao_heap,aluno_heap,32,1,False,472,472,0,0.0,237,237,0,0.0,709,709,0,0.0,0,0,0,0.0,709,709,0,0.0
+LRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan (papeis trocados),bnl,inscricao_heap,aluno_heap,32,1,False,885,885,0,0.0,0,0,0,0.0,885,885,0,0.0,0,0,0,0.0,885,885,0,0.0
+LRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,inscricao_heap,aluno_heap,32,1,False,477,477,0,0.0,242,242,0,0.0,719,719,0,0.0,0,0,0,0.0,719,719,0,0.0
+LRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,aluno_heap,inscricao_heap,32,1,False,472,472,0,0.0,237,237,0,0.0,709,709,0,0.0,0,0,0,0.0,709,709,0,0.0
+LRU,j_mestre_detalhe,natural_join,maior_maior,b,,aluno_bt_dre:primary_btree x inscricao_heap:scan,bnl,aluno_bt_dre,inscricao_heap,32,1,False,1116,1115,-1,-0.08960573476702509,0,0,0,0.0,1116,1115,-1,-0.08960573476702509,0,0,0,0.0,1116,1115,-1,-0.08960573476702509
+LRU,j_mestre_detalhe,natural_join,maior_maior,b,,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,aluno_bt_dre,inscricao_heap,32,1,False,503,502,-1,-0.1988071570576541,237,237,0,0.0,740,739,-1,-0.13513513513513514,0,0,0,0.0,740,739,-1,-0.13513513513513514
+LRU,j_mestre_detalhe,natural_join,maior_maior,b,,aluno_bt_dre:primary_btree x inscricao_heap:scan,sort_merge,inscricao_heap,aluno_bt_dre,32,1,False,439,438,-1,-0.22779043280182232,172,172,0,0.0,611,610,-1,-0.16366612111292964,0,0,0,0.0,611,610,-1,-0.16366612111292964
+LRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,bnl,aluno_bt_dre,inscricao_bt_dre,32,1,False,1560,1559,-1,-0.0641025641025641,0,0,0,0.0,1560,1559,-1,-0.0641025641025641,0,0,0,0.0,1560,1559,-1,-0.0641025641025641
+LRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,aluno_bt_dre,inscricao_bt_dre,32,1,False,577,576,-1,-0.1733102253032929,237,237,0,0.0,814,813,-1,-0.12285012285012285,0,0,0,0.0,814,813,-1,-0.12285012285012285
+LRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,sort_merge,inscricao_bt_dre,aluno_bt_dre,32,1,False,342,341,-1,-0.29239766081871343,0,0,0,0.0,342,341,-1,-0.29239766081871343,0,0,0,0.0,342,341,-1,-0.29239766081871343
+LRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,bnl,aluno_h_dre,inscricao_h_dre,32,1,False,1691,1691,0,0.0,0,0,0,0.0,1691,1691,0,0.0,0,0,0,0.0,1691,1691,0,0.0
+LRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,hash,aluno_h_dre,inscricao_h_dre,32,1,False,422,422,0,0.0,66,66,0,0.0,488,488,0,0.0,0,0,0,0.0,488,488,0,0.0
+LRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,inscricao_h_dre,aluno_h_dre,32,1,False,593,593,0,0.0,237,237,0,0.0,830,830,0,0.0,0,0,0,0.0,830,830,0,0.0
+LRU,j_mestre_detalhe,natural_join,maior_maior,d,,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,bnl,aluno_bt_dre,inscricao_heap,32,1,False,1116,1115,-1,-0.08960573476702509,0,0,0,0.0,1116,1115,-1,-0.08960573476702509,0,0,0,0.0,1116,1115,-1,-0.08960573476702509
+LRU,j_mestre_detalhe,natural_join,maior_maior,d,,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,aluno_bt_dre,inscricao_heap,32,1,False,503,502,-1,-0.1988071570576541,237,237,0,0.0,740,739,-1,-0.13513513513513514,0,0,0,0.0,740,739,-1,-0.13513513513513514
+LRU,j_mestre_detalhe,natural_join,maior_maior,d,,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,sort_merge,inscricao_heap,aluno_bt_dre,32,1,False,439,438,-1,-0.22779043280182232,172,172,0,0.0,611,610,-1,-0.16366612111292964,0,0,0,0.0,611,610,-1,-0.16366612111292964
+LRU,j_not_unique,equijoin_not_unique,menor_maior,e,,aluno_heap:secondary_btree x turma_heap:secondary_btree,bnl,turma_heap,aluno_heap,32,1,False,70,70,0,0.0,0,0,0,0.0,70,70,0,0.0,0,0,0,0.0,70,70,0,0.0
+LRU,j_not_unique,equijoin_not_unique,menor_maior,e,,aluno_heap:secondary_btree x turma_heap:secondary_btree,hash,turma_heap,aluno_heap,32,1,False,70,70,0,0.0,0,0,0,0.0,70,70,0,0.0,0,0,0,0.0,70,70,0,0.0
+LRU,j_not_unique,equijoin_not_unique,menor_maior,e,,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,turma_heap,aluno_heap,32,1,False,134,134,0,0.0,64,64,0,0.0,198,198,0,0.0,0,0,0,0.0,198,198,0,0.0
+LRU,j_pequenas,natural_join,menor_menor,a,,curso_heap:scan x disciplina_heap:scan,bnl,curso_heap,disciplina_heap,32,1,False,19,19,0,0.0,0,0,0,0.0,19,19,0,0.0,0,0,0,0.0,19,19,0,0.0
+LRU,j_pequenas,natural_join,menor_menor,a,,curso_heap:scan x disciplina_heap:scan,hash,curso_heap,disciplina_heap,32,1,False,19,19,0,0.0,0,0,0,0.0,19,19,0,0.0,0,0,0,0.0,19,19,0,0.0
+LRU,j_pequenas,natural_join,menor_menor,a,,curso_heap:scan x disciplina_heap:scan,sort_merge,disciplina_heap,curso_heap,32,1,False,38,38,0,0.0,19,19,0,0.0,57,57,0,0.0,0,0,0,0.0,57,57,0,0.0
+LRU,j_unique,equijoin_unique,maior_maior,a,,aluno_heap:scan x detalhes_heap:scan,bnl,detalhes_heap,aluno_heap,32,1,False,314,314,0,0.0,0,0,0,0.0,314,314,0,0.0,0,0,0,0.0,314,314,0,0.0
+LRU,j_unique,equijoin_unique,maior_maior,a,,aluno_heap:scan x detalhes_heap:scan,hash,detalhes_heap,aluno_heap,32,1,False,243,243,0,0.0,124,124,0,0.0,367,367,0,0.0,0,0,0,0.0,367,367,0,0.0
+LRU,j_unique,equijoin_unique,maior_maior,a,,aluno_heap:scan x detalhes_heap:scan,sort_merge,detalhes_heap,aluno_heap,32,1,False,238,238,0,0.0,119,119,0,0.0,357,357,0,0.0,0,0,0,0.0,357,357,0,0.0
+LRU,sel_pt_cpf,igualdade_unique,,a,pontual,aluno_heap:scan,,aluno_heap,,2,1,False,3037,3037,0,0.0,0,0,0,0.0,3037,3037,0,0.0,0,0,0,0.0,3037,3037,0,0.0
+LRU,sel_pt_cpf,igualdade_unique,,c,pontual,aluno_heap:secondary_hash,,aluno_heap,,2,1,False,116,116,0,0.0,0,0,0,0.0,116,116,0,0.0,0,0,0,0.0,116,116,0,0.0
+LRU,sel_pt_dre,igualdade_unique,,a,pontual,aluno_heap:scan,,aluno_heap,,2,1,False,3344,3344,0,0.0,0,0,0,0.0,3344,3344,0,0.0,0,0,0,0.0,3344,3344,0,0.0
+LRU,sel_pt_dre,igualdade_unique,,b,pontual,aluno_bt_dre:primary_btree,,aluno_bt_dre,,2,1,False,103,103,0,0.0,0,0,0,0.0,103,103,0,0.0,0,0,0,0.0,103,103,0,0.0
+LRU,sel_pt_dre,igualdade_unique,,b,pontual,aluno_h_dre:primary_hash,,aluno_h_dre,,2,1,False,99,99,0,0.0,0,0,0,0.0,99,99,0,0.0,0,0,0,0.0,99,99,0,0.0
+LRU,sel_rg_cr_alta,faixa_not_unique,,a,50%,aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+LRU,sel_rg_cr_alta,faixa_not_unique,,c,50%,aluno_heap:secondary_btree,,aluno_heap,,2,1,False,960,960,0,0.0,0,0,0,0.0,960,960,0,0.0,0,0,0,0.0,960,960,0,0.0
+LRU,sel_rg_cr_baixa,faixa_not_unique,,a,"0,1%",aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+LRU,sel_rg_cr_baixa,faixa_not_unique,,c,"0,1%",aluno_heap:secondary_btree,,aluno_heap,,2,1,False,4,4,0,0.0,0,0,0,0.0,4,4,0,0.0,0,0,0,0.0,4,4,0,0.0
+LRU,sel_rg_curso_alta,faixa_not_unique,,a,50%,aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+LRU,sel_rg_curso_alta,faixa_not_unique,,b,50%,aluno_bt_curso:primary_btree,,aluno_bt_curso,,2,1,False,49,49,0,0.0,0,0,0,0.0,49,49,0,0.0,0,0,0,0.0,49,49,0,0.0
+LRU,sel_rg_curso_alta,faixa_not_unique,,c,50%,aluno_bt_curso:clustering_btree,,aluno_bt_curso,,2,1,False,50,50,0,0.0,0,0,0,0.0,50,50,0,0.0,0,0,0,0.0,50,50,0,0.0
+LRU,sel_rg_curso_alta,faixa_not_unique,,c,50%,aluno_h_curso:clustering_btree,,aluno_h_curso,,2,1,False,160,160,0,0.0,0,0,0,0.0,160,160,0,0.0,0,0,0,0.0,160,160,0,0.0
+LRU,sel_rg_curso_baixa,faixa_not_unique,,a,"0,1%",aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+LRU,sel_rg_curso_baixa,faixa_not_unique,,b,"0,1%",aluno_bt_curso:primary_btree,,aluno_bt_curso,,2,1,False,2,2,0,0.0,0,0,0,0.0,2,2,0,0.0,0,0,0,0.0,2,2,0,0.0
+LRU,sel_rg_curso_baixa,faixa_not_unique,,c,"0,1%",aluno_bt_curso:clustering_btree,,aluno_bt_curso,,2,1,False,3,3,0,0.0,0,0,0,0.0,3,3,0,0.0,0,0,0,0.0,3,3,0,0.0
+LRU,sel_rg_curso_baixa,faixa_not_unique,,c,"0,1%",aluno_h_curso:clustering_btree,,aluno_h_curso,,2,1,False,4,4,0,0.0,0,0,0,0.0,4,4,0,0.0,0,0,0,0.0,4,4,0,0.0
+LRU,sel_rg_dre_alta,faixa_unique,,a,50%,aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+LRU,sel_rg_dre_alta,faixa_unique,,b,50%,aluno_bt_dre:primary_btree,,aluno_bt_dre,,2,1,False,50,50,0,0.0,0,0,0,0.0,50,50,0,0.0,0,0,0,0.0,50,50,0,0.0
+LRU,sel_rg_dre_baixa,faixa_unique,,a,"0,1%",aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+LRU,sel_rg_dre_baixa,faixa_unique,,b,"0,1%",aluno_bt_dre:primary_btree,,aluno_bt_dre,,2,1,False,2,2,0,0.0,0,0,0,0.0,2,2,0,0.0,0,0,0,0.0,2,2,0,0.0
+MRU,j_grande_pequena,natural_join,menor_maior,a,,curso_heap:scan x aluno_heap:scan,bnl,curso_heap,aluno_heap,32,1,False,72,72,0,0.0,0,0,0,0.0,72,72,0,0.0,0,0,0,0.0,72,72,0,0.0
+MRU,j_grande_pequena,natural_join,menor_maior,a,,curso_heap:scan x aluno_heap:scan,hash,curso_heap,aluno_heap,32,1,False,72,72,0,0.0,0,0,0,0.0,72,72,0,0.0,0,0,0,0.0,72,72,0,0.0
+MRU,j_grande_pequena,natural_join,menor_maior,a,,curso_heap:scan x aluno_heap:scan,sort_merge,aluno_heap,curso_heap,32,1,False,144,144,0,0.0,72,72,0,0.0,216,216,0,0.0,0,0,0,0.0,216,216,0,0.0
+MRU,j_grande_pequena,natural_join,menor_maior,b,,curso_heap:scan x aluno_bt_curso:primary_btree,bnl,curso_heap,aluno_bt_curso,32,1,False,103,102,-1,-0.970873786407767,0,0,0,0.0,103,102,-1,-0.970873786407767,0,0,0,0.0,103,102,-1,-0.970873786407767
+MRU,j_grande_pequena,natural_join,menor_maior,b,,curso_heap:scan x aluno_bt_curso:primary_btree,hash,curso_heap,aluno_bt_curso,32,1,False,103,102,-1,-0.970873786407767,0,0,0,0.0,103,102,-1,-0.970873786407767,0,0,0,0.0,103,102,-1,-0.970873786407767
+MRU,j_grande_pequena,natural_join,menor_maior,b,,curso_heap:scan x aluno_bt_curso:primary_btree,sort_merge,aluno_bt_curso,curso_heap,32,1,False,111,110,-1,-0.9009009009009009,7,7,0,0.0,118,117,-1,-0.847457627118644,0,0,0,0.0,118,117,-1,-0.847457627118644
+MRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan,bnl,aluno_heap,inscricao_heap,32,1,False,851,851,0,0.0,0,0,0,0.0,851,851,0,0.0,0,0,0,0.0,851,851,0,0.0
+MRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan,hash,aluno_heap,inscricao_heap,32,1,False,472,472,0,0.0,237,237,0,0.0,709,709,0,0.0,0,0,0,0.0,709,709,0,0.0
+MRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan,sort_merge,inscricao_heap,aluno_heap,32,1,False,472,472,0,0.0,237,237,0,0.0,709,709,0,0.0,0,0,0,0.0,709,709,0,0.0
+MRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan (papeis trocados),bnl,inscricao_heap,aluno_heap,32,1,False,725,725,0,0.0,0,0,0,0.0,725,725,0,0.0,0,0,0,0.0,725,725,0,0.0
+MRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,inscricao_heap,aluno_heap,32,1,False,477,477,0,0.0,242,242,0,0.0,719,719,0,0.0,0,0,0,0.0,719,719,0,0.0
+MRU,j_mestre_detalhe,natural_join,maior_maior,a,,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,aluno_heap,inscricao_heap,32,1,False,472,472,0,0.0,237,237,0,0.0,709,709,0,0.0,0,0,0,0.0,709,709,0,0.0
+MRU,j_mestre_detalhe,natural_join,maior_maior,b,,aluno_bt_dre:primary_btree x inscricao_heap:scan,bnl,aluno_bt_dre,inscricao_heap,32,1,False,1036,1035,-1,-0.09652509652509653,0,0,0,0.0,1036,1035,-1,-0.09652509652509653,0,0,0,0.0,1036,1035,-1,-0.09652509652509653
+MRU,j_mestre_detalhe,natural_join,maior_maior,b,,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,aluno_bt_dre,inscricao_heap,32,1,False,503,502,-1,-0.1988071570576541,237,237,0,0.0,740,739,-1,-0.13513513513513514,0,0,0,0.0,740,739,-1,-0.13513513513513514
+MRU,j_mestre_detalhe,natural_join,maior_maior,b,,aluno_bt_dre:primary_btree x inscricao_heap:scan,sort_merge,inscricao_heap,aluno_bt_dre,32,1,False,439,438,-1,-0.22779043280182232,172,172,0,0.0,611,610,-1,-0.16366612111292964,0,0,0,0.0,611,610,-1,-0.16366612111292964
+MRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,bnl,aluno_bt_dre,inscricao_bt_dre,32,1,False,1480,1479,-1,-0.06756756756756757,0,0,0,0.0,1480,1479,-1,-0.06756756756756757,0,0,0,0.0,1480,1479,-1,-0.06756756756756757
+MRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,aluno_bt_dre,inscricao_bt_dre,32,1,False,577,576,-1,-0.1733102253032929,237,237,0,0.0,814,813,-1,-0.12285012285012285,0,0,0,0.0,814,813,-1,-0.12285012285012285
+MRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,sort_merge,inscricao_bt_dre,aluno_bt_dre,32,1,False,342,341,-1,-0.29239766081871343,0,0,0,0.0,342,341,-1,-0.29239766081871343,0,0,0,0.0,342,341,-1,-0.29239766081871343
+MRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,bnl,aluno_h_dre,inscricao_h_dre,32,1,False,1611,1611,0,0.0,0,0,0,0.0,1611,1611,0,0.0,0,0,0,0.0,1611,1611,0,0.0
+MRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,hash,aluno_h_dre,inscricao_h_dre,32,1,False,422,422,0,0.0,66,66,0,0.0,488,488,0,0.0,0,0,0,0.0,488,488,0,0.0
+MRU,j_mestre_detalhe,natural_join,maior_maior,c,,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,inscricao_h_dre,aluno_h_dre,32,1,False,593,593,0,0.0,237,237,0,0.0,830,830,0,0.0,0,0,0,0.0,830,830,0,0.0
+MRU,j_mestre_detalhe,natural_join,maior_maior,d,,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,bnl,aluno_bt_dre,inscricao_heap,32,1,False,1036,1035,-1,-0.09652509652509653,0,0,0,0.0,1036,1035,-1,-0.09652509652509653,0,0,0,0.0,1036,1035,-1,-0.09652509652509653
+MRU,j_mestre_detalhe,natural_join,maior_maior,d,,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,aluno_bt_dre,inscricao_heap,32,1,False,503,502,-1,-0.1988071570576541,237,237,0,0.0,740,739,-1,-0.13513513513513514,0,0,0,0.0,740,739,-1,-0.13513513513513514
+MRU,j_mestre_detalhe,natural_join,maior_maior,d,,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,sort_merge,inscricao_heap,aluno_bt_dre,32,1,False,439,438,-1,-0.22779043280182232,172,172,0,0.0,611,610,-1,-0.16366612111292964,0,0,0,0.0,611,610,-1,-0.16366612111292964
+MRU,j_not_unique,equijoin_not_unique,menor_maior,e,,aluno_heap:secondary_btree x turma_heap:secondary_btree,bnl,turma_heap,aluno_heap,32,1,False,70,70,0,0.0,0,0,0,0.0,70,70,0,0.0,0,0,0,0.0,70,70,0,0.0
+MRU,j_not_unique,equijoin_not_unique,menor_maior,e,,aluno_heap:secondary_btree x turma_heap:secondary_btree,hash,turma_heap,aluno_heap,32,1,False,70,70,0,0.0,0,0,0,0.0,70,70,0,0.0,0,0,0,0.0,70,70,0,0.0
+MRU,j_not_unique,equijoin_not_unique,menor_maior,e,,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,turma_heap,aluno_heap,32,1,False,134,134,0,0.0,64,64,0,0.0,198,198,0,0.0,0,0,0,0.0,198,198,0,0.0
+MRU,j_pequenas,natural_join,menor_menor,a,,curso_heap:scan x disciplina_heap:scan,bnl,curso_heap,disciplina_heap,32,1,False,19,19,0,0.0,0,0,0,0.0,19,19,0,0.0,0,0,0,0.0,19,19,0,0.0
+MRU,j_pequenas,natural_join,menor_menor,a,,curso_heap:scan x disciplina_heap:scan,hash,curso_heap,disciplina_heap,32,1,False,19,19,0,0.0,0,0,0,0.0,19,19,0,0.0,0,0,0,0.0,19,19,0,0.0
+MRU,j_pequenas,natural_join,menor_menor,a,,curso_heap:scan x disciplina_heap:scan,sort_merge,disciplina_heap,curso_heap,32,1,False,38,38,0,0.0,19,19,0,0.0,57,57,0,0.0,0,0,0,0.0,57,57,0,0.0
+MRU,j_unique,equijoin_unique,maior_maior,a,,aluno_heap:scan x detalhes_heap:scan,bnl,detalhes_heap,aluno_heap,32,1,False,266,266,0,0.0,0,0,0,0.0,266,266,0,0.0,0,0,0,0.0,266,266,0,0.0
+MRU,j_unique,equijoin_unique,maior_maior,a,,aluno_heap:scan x detalhes_heap:scan,hash,detalhes_heap,aluno_heap,32,1,False,243,243,0,0.0,124,124,0,0.0,367,367,0,0.0,0,0,0,0.0,367,367,0,0.0
+MRU,j_unique,equijoin_unique,maior_maior,a,,aluno_heap:scan x detalhes_heap:scan,sort_merge,detalhes_heap,aluno_heap,32,1,False,238,238,0,0.0,119,119,0,0.0,357,357,0,0.0,0,0,0,0.0,357,357,0,0.0
+MRU,sel_pt_cpf,igualdade_unique,,a,pontual,aluno_heap:scan,,aluno_heap,,2,1,False,2982,2982,0,0.0,0,0,0,0.0,2982,2982,0,0.0,0,0,0,0.0,2982,2982,0,0.0
+MRU,sel_pt_cpf,igualdade_unique,,c,pontual,aluno_heap:secondary_hash,,aluno_heap,,2,1,False,119,119,0,0.0,0,0,0,0.0,119,119,0,0.0,0,0,0,0.0,119,119,0,0.0
+MRU,sel_pt_dre,igualdade_unique,,a,pontual,aluno_heap:scan,,aluno_heap,,2,1,False,3244,3244,0,0.0,0,0,0,0.0,3244,3244,0,0.0,0,0,0,0.0,3244,3244,0,0.0
+MRU,sel_pt_dre,igualdade_unique,,b,pontual,aluno_bt_dre:primary_btree,,aluno_bt_dre,,2,1,False,102,102,0,0.0,0,0,0,0.0,102,102,0,0.0,0,0,0,0.0,102,102,0,0.0
+MRU,sel_pt_dre,igualdade_unique,,b,pontual,aluno_h_dre:primary_hash,,aluno_h_dre,,2,1,False,99,99,0,0.0,0,0,0,0.0,99,99,0,0.0,0,0,0,0.0,99,99,0,0.0
+MRU,sel_rg_cr_alta,faixa_not_unique,,a,50%,aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+MRU,sel_rg_cr_alta,faixa_not_unique,,c,50%,aluno_heap:secondary_btree,,aluno_heap,,2,1,False,951,951,0,0.0,0,0,0,0.0,951,951,0,0.0,0,0,0,0.0,951,951,0,0.0
+MRU,sel_rg_cr_baixa,faixa_not_unique,,a,"0,1%",aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+MRU,sel_rg_cr_baixa,faixa_not_unique,,c,"0,1%",aluno_heap:secondary_btree,,aluno_heap,,2,1,False,4,4,0,0.0,0,0,0,0.0,4,4,0,0.0,0,0,0,0.0,4,4,0,0.0
+MRU,sel_rg_curso_alta,faixa_not_unique,,a,50%,aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+MRU,sel_rg_curso_alta,faixa_not_unique,,b,50%,aluno_bt_curso:primary_btree,,aluno_bt_curso,,2,1,False,49,49,0,0.0,0,0,0,0.0,49,49,0,0.0,0,0,0,0.0,49,49,0,0.0
+MRU,sel_rg_curso_alta,faixa_not_unique,,c,50%,aluno_bt_curso:clustering_btree,,aluno_bt_curso,,2,1,False,50,50,0,0.0,0,0,0,0.0,50,50,0,0.0,0,0,0,0.0,50,50,0,0.0
+MRU,sel_rg_curso_alta,faixa_not_unique,,c,50%,aluno_h_curso:clustering_btree,,aluno_h_curso,,2,1,False,160,160,0,0.0,0,0,0,0.0,160,160,0,0.0,0,0,0,0.0,160,160,0,0.0
+MRU,sel_rg_curso_baixa,faixa_not_unique,,a,"0,1%",aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+MRU,sel_rg_curso_baixa,faixa_not_unique,,b,"0,1%",aluno_bt_curso:primary_btree,,aluno_bt_curso,,2,1,False,2,2,0,0.0,0,0,0,0.0,2,2,0,0.0,0,0,0,0.0,2,2,0,0.0
+MRU,sel_rg_curso_baixa,faixa_not_unique,,c,"0,1%",aluno_bt_curso:clustering_btree,,aluno_bt_curso,,2,1,False,3,3,0,0.0,0,0,0,0.0,3,3,0,0.0,0,0,0,0.0,3,3,0,0.0
+MRU,sel_rg_curso_baixa,faixa_not_unique,,c,"0,1%",aluno_h_curso:clustering_btree,,aluno_h_curso,,2,1,False,4,4,0,0.0,0,0,0,0.0,4,4,0,0.0,0,0,0,0.0,4,4,0,0.0
+MRU,sel_rg_dre_alta,faixa_unique,,a,50%,aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+MRU,sel_rg_dre_alta,faixa_unique,,b,50%,aluno_bt_dre:primary_btree,,aluno_bt_dre,,2,1,False,50,50,0,0.0,0,0,0,0.0,50,50,0,0.0,0,0,0,0.0,50,50,0,0.0
+MRU,sel_rg_dre_baixa,faixa_unique,,a,"0,1%",aluno_heap:scan,,aluno_heap,,2,1,False,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0,0,0,0,0.0,65,65,0,0.0
+MRU,sel_rg_dre_baixa,faixa_unique,,b,"0,1%",aluno_bt_dre:primary_btree,,aluno_bt_dre,,2,1,False,2,2,0,0.0,0,0,0,0.0,2,2,0,0.0,0,0,0,0.0,2,2,0,0.0

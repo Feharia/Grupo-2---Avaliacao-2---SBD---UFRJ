@@ -1,0 +1,4 @@
+# Evidências brutas: manter os bytes produzidos pelas ferramentas.
+evidencias/**/*.csv -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Logs de ferramentas podem terminar com uma linha vazia; preservar o original.
+evidencias/**/*.log -text whitespace=blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol

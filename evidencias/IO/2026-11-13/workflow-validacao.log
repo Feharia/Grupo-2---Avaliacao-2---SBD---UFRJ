@@ -1,0 +1,10 @@
+YAML lido com PyYAML; todos os blocos run aprovados em bash -n.
+Agregador: success -> exit 0
+Agregador: failure -> exit 1
+Agregador: cancelled -> exit 1
+Agregador: skipped -> exit 1
+Seleção de referência: push, manual=False, before=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa -> OK
+Seleção de referência: pull_request, manual=False, before= -> OK
+Seleção de referência: workflow_dispatch, manual=True, before= -> OK
+Seleção de referência: push, manual=False, before=0000000000000000000000000000000000000000 -> OK
+Seleção de referência: workflow_dispatch, manual=False, before= -> OK

@@ -1,0 +1,2 @@
+/home/carlos/.pyenv/versions/3.11.14/bin/python3 -I /home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tools/validar_smoke_ci.py /tmp/cbd-io-00fhvO/workflow-final/io/referencia/smoke
+Smoke: cobertura mínima completa; 108 execuções com dumps presentes

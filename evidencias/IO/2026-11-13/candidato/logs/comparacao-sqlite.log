@@ -1,0 +1,2 @@
+/home/carlos/.pyenv/versions/3.11.14/bin/python3 -I /home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tools/compare.py /tmp/cbd-io-00fhvO/workflow-final/io/candidato/smoke --tuplas
+conferidas: 108 linhas medidas; sem execução: nao_aplicavel: 132; divergências: 0

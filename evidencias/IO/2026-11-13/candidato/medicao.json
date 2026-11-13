@@ -1,0 +1,103 @@
+{
+  "protocolo": "io-rapido-v1",
+  "commit": "edb9c84502bcfbb79b5fb974ee866b46374214f3",
+  "validado_sqlite_tuplas": true,
+  "assinatura": {
+    "manifesto": {
+      "compilador": "13.3.0",
+      "flags": "io-rapido-v1 -O3 -DNDEBUG",
+      "escala": "0.1",
+      "semente": "20261122",
+      "reps": "1..1",
+      "tolerancia": "0.05",
+      "m_juncao": "32",
+      "m_selecao": "2",
+      "lote": "100",
+      "hash_especificacao": "c4dfc85415d9de0d"
+    },
+    "config": {
+      "block_size": 4096,
+      "extent_blocks": 8,
+      "area_frames": [
+        32,
+        16,
+        4,
+        32
+      ],
+      "toss_immediate": false,
+      "prefetch": false
+    },
+    "opcoes_compilacao_motor": [
+      [
+        "/usr/bin/g++",
+        "-I{SOURCE}/src",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Wshadow"
+      ]
+    ],
+    "dados": {
+      "esquema.csv": "c5509d81e1196a86d6795a842f103324c5b02950daa7783bcc454f1f5299e520",
+      "constantes.csv": "51cbd5aeed3fabd22e6862edc77b3ce6af2c5b1c8781fb856edc0ce7f7bf4af4",
+      "operacoes.csv": "4addb24f329708d366b25e454ebe0e73191dd01b8ee4b67ab057d4099b32e6c2",
+      "dados/aluno.csv": "d7dc3782a4d1645a78675ce6053726933c20669734f734f94412b73d17d72be4",
+      "dados/curso.csv": "28f064c9e8fb00856cb27b04fd7c53ca8f0ca795e9c3d74c9f6d61eef2943894",
+      "dados/detalhes.csv": "9bd59a0e18b7832259ae3fee9b7113877c8ca1d1644f8a4fc7b4da379b8cec03",
+      "dados/disciplina.csv": "6bb3bc223a573ffc1e032a96945e9e6c2fcb07e8176153e310d17f6b879791ae",
+      "dados/inscricao.csv": "79b6db9f2d77ea27ed599f0f3d543759f063a8b3f76669a3b34ab8a66bb01929",
+      "dados/turma.csv": "7f805eeb7cae174fe644cdeca9f7d4ebba459950dd2ddd5d05a565e2f74529ca",
+      "lotes/sel_pt_cpf_1.csv": "49c955380829416bf02e9a793adcb684aca2c5cf79579a904099b260c1b70e6c",
+      "lotes/sel_pt_dre_1.csv": "b334de40595ab9a7854f4094343de4faa6b8ddba690ed966aad1dd4ced164ecd"
+    }
+  },
+  "tool_hash": "efcb413299bbd986a43684b8e65d10ce1148aa6c1c5595975a53c118dec644e1",
+  "ferramentas_sha256": {
+    "medir_io.py": "7184aff3d5b8660ae1cf02a206ce5c7d4fffdcd87cdf045993a5119937d15eba",
+    "comparar_io.py": "f151fb9018f5aeff7212e5d0dca4f7bceb3a42c56e35d7ef9059cd1772d46544",
+    "config_io.cpp": "46b48f19fd6240e6b1902f9d2557024e54a62981852a423e6b66d8502bad0489",
+    "io_cenarios_v1.json": "a6333b768b0de56e19fdf7a2c113145eae33c986aa97f95befb523393cee75b8",
+    "validar_smoke_ci.py": "c72328a64a4a58e3026947d159400f466ab92260460a91337fa0689016108c3b",
+    "reference.py": "3452d377b835240e3265de4d8198b6ae16881db3dbd1cceb98600c466b4d924d",
+    "compare.py": "b827c36ad81e2c9e642f35ab4675688bfb8190628b180d726251d408b18ca6a5",
+    "driver_bancada.cpp": "340473f6338eaf26a49a37864ecd8c41d40e4ca24b36b2fdd76b418353070f20"
+  },
+  "resultados_sha256": "cb7a6c419aac1e4800cdb3e2c27f0ae5211cf98104c22066fac6f893c5b79b73",
+  "inventario_sha256": "a6333b768b0de56e19fdf7a2c113145eae33c986aa97f95befb523393cee75b8",
+  "binario_sha256": "6fbb5344880a68c84fe859956c224a220242950f5057554b5c4a66921da48711",
+  "duracao_total_s": 12.912,
+  "fontes_sha256": {
+    "src/common/common.cpp": "1d489c4217c8543e6bb1e8b41493c26754925df43809f97f54e2c077f9f2a6c2",
+    "src/common/common.hpp": "d0475dfaf0d8853a64891502764ac77ff01ea13ac6d9ac451ed3a545b4f17111",
+    "src/layer1/bench.cpp": "340473f6338eaf26a49a37864ecd8c41d40e4ca24b36b2fdd76b418353070f20",
+    "src/layer2/algorithms.cpp": "db5eb97dd9ea90efe5cc021022e71725a268a3d64aab9d3136d27475e3224bee",
+    "src/layer2/algorithms.hpp": "03f5636b9b3230c01672e4897864aa8fee24b6ead5dfbe15f8dcb17182f7bcab",
+    "src/layer2/monitor.cpp": "3690da421d223323115516ecd294a758fbefb54633535fe8ad34ebb25c2924a7",
+    "src/layer2/monitor.hpp": "f8244ad91910cf8a3ad023667a15ce12d0d884ea238b7485f925f41608e6bc5e",
+    "src/layer3/bplus.cpp": "5062b4a34a2e55671b17313f48cff320a83688f88f7d8d9c650de947b4557b53",
+    "src/layer3/bplus.hpp": "8cb3b9060b617d1f599b1205869fa480813544caf1229f9698120645ca4cde17",
+    "src/layer3/catalog.cpp": "5c2b8bd64c03fa3b3d687caa05dc79cf2eb0915e61a1aa7312063f87dc49b301",
+    "src/layer3/catalog.hpp": "c82e96d78dc372cc0c02a5aee11e4254ad932cdaa5531b4a203469a323d43476",
+    "src/layer3/handles.cpp": "5440fce731a06c74e2d2633728a575cfb2c2f6bc33b47b9386b442522e32941a",
+    "src/layer3/handles.hpp": "d236f6ff8604fa35ce8b7ad238ad92eac993fad719b91786d72da0c96f310b65",
+    "src/layer3/page.cpp": "00ba83e03c1c7efa17520b44f35441249dc9e801c18875c94af8c410587b3d97",
+    "src/layer3/page.hpp": "67791ceb9514dc348de46192deb2ae97afcb4943e1e37effa2c383125f9789a0",
+    "src/layer3/record.cpp": "43394274eb46386d0e00cba6e03cc06f1c4610a3f316806faaf0f96b45b6b64a",
+    "src/layer3/record.hpp": "1b1700b17c2d171e37281f593596b369cc86a4567aa1e0fe01be99eb50cdc288",
+    "src/layer3/storage_manager.cpp": "f9396ace0768947a99c486c2652ff5fb3a4fb2aaff4309bfbaa10e5e721bfb4f",
+    "src/layer3/storage_manager.hpp": "c82cb96988976e4d8a9ea2b1132d595197d31a6b11699878fafbbfb8b121f32f",
+    "src/layer3/structures.cpp": "a505905948544fb5c96c8dfbb24109df6b9237724b03d5ecc0ee34248fa96300",
+    "src/layer3/structures.hpp": "4e2d7b66fcf432945bd9a69bc1ff4c580f13dfcb15ac14f8b3e7d5bcabe9ae57",
+    "src/layer4/buffer_pool.cpp": "a15f84eba3544d85f05336e38e4ac517a1f1f077dec470abd48c4fb08583b56b",
+    "src/layer4/buffer_pool.hpp": "73535951cebb35f8319964ff76650c361cd72860b2a01ca553ff48af0421e357",
+    "src/layer4/file_manager.cpp": "27abeaa5a3f355bb5e728c0059b03357e9f4ea176e4cca4dc6673f61c4a29653",
+    "src/layer4/file_manager.hpp": "5810f1ac675540b37025fec1020b021bb6d547a7bfb314c7d301d6cf9f0fecdc",
+    "src/layer4/posix_io.cpp": "8d1b6c1eacc9ae3ecbdadfe720d2dc96e7069cdefdc19eafa7081e5fbd0b1c0f",
+    "src/layer4/posix_io.hpp": "8d97fea6a586265b72dc4802539449460387e21de9542759278e3bccad37145d",
+    "src/layer4/replacement_policy.cpp": "6bd7b4b3129ea456b0e067751af8a54179eb66d1bd7482becbf6f32ffc12a772",
+    "src/layer4/replacement_policy.hpp": "f783be799ccab07d6125e07f18f1571edb95cc04e933c0987be0e21b1551ed5c"
+  }
+}

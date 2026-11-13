@@ -2,6 +2,12 @@
 
 Repositório com o trabalho da Avaliação 2 de Sistemas de Banco de Dados da UFRJ, do professor Milton Cunha: uma bancada de teste que mede quantos blocos cada operação relacional transfere entre o disco e o buffer pool, sob diferentes configurações do gerente de armazenamento.
 
+O [gate de correção](docs/CI.md) verifica builds, testes com GoogleTest,
+ASan/UBSan e uma rodada reduzida conferida com SQLite. A documentação explica
+como torná-lo obrigatório para merges no GitHub.
+Há também uma [suíte pequena de comparação de I/O](docs/IO.md) e uma
+[avaliação do consumo do GitHub Actions](docs/CUSTO_ACTIONS.md).
+
 - [1. Contexto](#1-contexto)
 - [2. Objetivo](#2-objetivo)
 - [3. Como rodar a bancada](#3-como-rodar-a-bancada)
@@ -57,7 +63,7 @@ Células da matriz do enunciado que não fazem sentido, como uma faixa sobre has
 ### Pré-requisitos
 
 - **Sistema POSIX:** macOS, Linux ou WSL2. A E/S usa `pread` e `pwrite`, então não roda no Windows nativo.
-- **Compilador C++20:** testado com Apple clang 21. O alvo do grupo é GCC 12 ou mais novo, no Linux, ainda não testado.
+- **Compilador C++20:** testado com Apple clang 21 e GCC 13 no Linux. O CI usa GCC no Ubuntu 24.04.
 - **Build:** `make`, ou CMake 3.20+.
 - **Python 3:** só a biblioteca padrão, incluindo o módulo `sqlite3`.
 - **Disco:** cerca de 110 MB livres para uma rodada completa. A maior parte é a base gerada e os arquivos do motor.
@@ -77,7 +83,7 @@ Células da matriz do enunciado que não fazem sentido, como uma faixa sobre has
    make -j8
    ```
 
-3. Rode os testes: são 40, das camadas 2, 3 e 4. Para rodar os mesmos testes com AddressSanitizer e UBSan, use `make asan`.
+3. Rode os testes: são 59, das camadas 2, 3 e 4. Para rodar os mesmos testes com AddressSanitizer e UBSan, use `make asan`. O CI exige GoogleTest real; o comando `make test` mantém o shim local.
 
    ```bash
    make test

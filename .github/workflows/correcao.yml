@@ -1,0 +1,192 @@
+name: Correção
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: 'Referência de I/O (SHA ou branch); vazio usa o pai do candidato'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: correcao-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: verificar (${{ matrix.mode }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: normal
+            build_type: Release
+            sanitize: 'OFF'
+          - mode: sanitizers
+            build_type: Debug
+            sanitize: 'ON'
+    env:
+      CXX: g++
+      BUILD_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/build
+      EVIDENCE_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/evidencias
+      SMOKE_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/smoke
+      CBD_TEST_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/dados-testes
+      IO_DIR: ${{ runner.temp }}/cbd-${{ matrix.mode }}/io
+      ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+    defaults:
+      run:
+        shell: bash
+        working-directory: PrototipoIA/Implementacao
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Instalar GoogleTest
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends libgtest-dev
+
+      - name: Configurar (GoogleTest obrigatório)
+        env:
+          BUILD_TYPE: ${{ matrix.build_type }}
+          SANITIZE: ${{ matrix.sanitize }}
+        run: |
+          mkdir -p "$EVIDENCE_DIR"
+          { cmake --version; "$CXX" --version; python3 --version; } > "$EVIDENCE_DIR/ambiente.log"
+          cmake -S . -B "$BUILD_DIR" \
+            -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+            -DCBD_SANITIZE="$SANITIZE" \
+            -DCMAKE_REQUIRE_FIND_PACKAGE_GTest=TRUE \
+            2>&1 | tee "$EVIDENCE_DIR/configure.log"
+
+      - name: Compilar
+        run: cmake --build "$BUILD_DIR" --parallel 2 2>&1 | tee "$EVIDENCE_DIR/build.log"
+
+      - name: Testes C++ (toda a suíte)
+        env:
+          GTEST_OUTPUT: xml:${{ runner.temp }}/cbd-${{ matrix.mode }}/evidencias/gtest.xml
+        run: |
+          ctest --test-dir "$BUILD_DIR" --output-on-failure --no-tests=error \
+            --output-junit "$EVIDENCE_DIR/ctest.xml" \
+            2>&1 | tee "$EVIDENCE_DIR/ctest.log"
+
+      - name: Testar verificador do smoke
+        if: matrix.mode == 'normal'
+        run: |
+          python3 -I -m unittest discover -s tests/python -v \
+            2>&1 | tee "$EVIDENCE_DIR/testes-python.log"
+
+      - name: Bancada reduzida e referência SQLite
+        if: matrix.mode == 'normal'
+        run: |
+          test ! -e "$SMOKE_DIR"
+          "$BUILD_DIR/bancada" --rapido --tuplas --saida "$SMOKE_DIR" \
+            2>&1 | tee "$EVIDENCE_DIR/bancada.log"
+          python3 -I tools/reference.py "$SMOKE_DIR" --tuplas \
+            2>&1 | tee "$EVIDENCE_DIR/sqlite.log"
+          python3 -I tools/validar_smoke_ci.py "$SMOKE_DIR" \
+            2>&1 | tee "$EVIDENCE_DIR/cobertura-smoke.log"
+          python3 -I tools/compare.py "$SMOKE_DIR" --tuplas \
+            2>&1 | tee "$EVIDENCE_DIR/comparacao.log"
+
+      - name: Selecionar referência de I/O
+        if: matrix.mode == 'normal'
+        id: referencia_io
+        env:
+          REF_MANUAL: ${{ inputs.baseline_ref }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
+          kind = os.environ["GITHUB_EVENT_NAME"]
+          if kind == "pull_request":
+              ref = event["pull_request"]["base"]["sha"]
+          elif kind == "push" and event.get("before", "").strip("0"):
+              ref = event["before"]
+          elif kind == "workflow_dispatch" and os.environ.get("REF_MANUAL"):
+              ref = os.environ["REF_MANUAL"]
+          else:
+              parent = subprocess.run(["git", "rev-parse", "--verify", "HEAD^"], text=True, capture_output=True)
+              ref = parent.stdout.strip() if parent.returncode == 0 else os.environ["GITHUB_SHA"]
+          print(f"ref={ref}")
+          PY
+
+      - name: Checkout da referência de I/O
+        if: matrix.mode == 'normal'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ steps.referencia_io.outputs.ref }}
+          path: _io_referencia
+          persist-credentials: false
+
+      - name: Medir e comparar I/O
+        if: matrix.mode == 'normal'
+        run: |
+          referencia_source="$GITHUB_WORKSPACE/_io_referencia/PrototipoIA/Implementacao"
+          referencia_sha=$(git -C "$referencia_source" rev-parse HEAD)
+          python3 -I tools/medir_io.py --source "$referencia_source" \
+            --commit "$referencia_sha" --saida "$IO_DIR/referencia" \
+            2>&1 | tee "$EVIDENCE_DIR/io-referencia.log"
+          python3 -I tools/medir_io.py --source "$PWD" --build-dir "$BUILD_DIR" \
+            --commit "$GITHUB_SHA" --saida "$IO_DIR/candidato" \
+            2>&1 | tee "$EVIDENCE_DIR/io-candidato.log"
+          python3 -I tools/comparar_io.py "$IO_DIR/referencia" "$IO_DIR/candidato" "$IO_DIR/comparacao" \
+            2>&1 | tee "$EVIDENCE_DIR/io-comparacao.log"
+          cat "$IO_DIR/comparacao/resumo.md" >> "$GITHUB_STEP_SUMMARY"
+          python3 - "$IO_DIR/comparacao/comparacao.json" <<'PY'
+          import json
+          from pathlib import Path
+          import sys
+          report = json.loads(Path(sys.argv[1]).read_text())
+          if report["aumentos"]:
+              print(f"::warning::{report['aumentos']} cenários com aumento de I/O; investigar o relatório")
+          if report["referencia"]["commit"] == report["candidato"]["commit"]:
+              print("::notice::Referência e candidato têm o mesmo SHA; comparação de controle")
+          PY
+
+      - name: Preservar evidências
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: correcao-${{ matrix.mode }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ env.EVIDENCE_DIR }}/
+            ${{ env.BUILD_DIR }}/Testing/Temporary/LastTest.log
+            ${{ env.BUILD_DIR }}/CMakeCache.txt
+            ${{ env.SMOKE_DIR }}/*.csv
+            ${{ env.SMOKE_DIR }}/tuplas_motor/
+            ${{ env.SMOKE_DIR }}/tuplas_ref/
+            ${{ env.IO_DIR }}/*/medicao.json
+            ${{ env.IO_DIR }}/*/logs/
+            ${{ env.IO_DIR }}/*/smoke/*.csv
+            ${{ env.IO_DIR }}/*/smoke/manifesto.txt
+            ${{ env.IO_DIR }}/comparacao/
+
+  gate-correcao:
+    name: gate-correcao
+    if: ${{ always() }}
+    needs: verificar
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Exigir sucesso de todas as verificações
+        env:
+          RESULTADO: ${{ needs.verificar.result }}
+        shell: bash
+        run: test "$RESULTADO" = success

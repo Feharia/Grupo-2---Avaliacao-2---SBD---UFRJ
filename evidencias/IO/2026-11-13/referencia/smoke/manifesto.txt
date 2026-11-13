@@ -1,0 +1,13 @@
+data: 2026-11-13 12:14:45
+compilador: 13.3.0
+flags: io-rapido-v1 -O3 -DNDEBUG
+commit: b61b87b4c3363e84eb199a21afaaee063a74e775
+escala: 0.1
+semente: 20261122
+reps: 1..1
+tolerancia: 0.05
+m_juncao: 32
+m_selecao: 2
+lote: 100
+hash_especificacao: c4dfc85415d9de0d
+duracao_s: 3.8

@@ -415,3 +415,236 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   à época de cada execução; esta autorização encerra essa pendência local.
 - Merge com `main`, push e resolução de outros problemas não fazem parte
   desta autorização. Não foram executados.
+
+## 2026-11-13 — Avaliação de melhorias antes do merge, sem implementação
+
+- O usuário pediu avaliar custo/benefício de CI, organização do repositório
+  e acompanhamento de leituras/gravações por push/merge. Não solicitou
+  implementação nem autorizou merge ou configuração remota nesta etapa.
+- Checkout consultado: branch `fix/cbd-001-ocupacao-bplus`, HEAD `edb9c84`.
+  Não há `.github/workflows` neste checkout. Não foi consultada a configuração
+  administrativa remota para afirmar se já existem regras de proteção.
+- Recomendação de alta prioridade: CI CMake com GoogleTest real obrigatório,
+  suíte completa, configuração ASan/UBSan e validação funcional com SQLite;
+  configurar os checks de correção como requisitos de merge da main. A
+  proteção cobre os cenários declarados, não garante ausência de qualquer bug.
+- Recomendação de alta prioridade: relatório de I/O por cenário comparando
+  referência e candidato no mesmo protocolo, com dados/consultas/semente,
+  M, política, fill, início de cache e fronteiras de flush fixados. Guardar
+  leituras, gravações e total separadamente por carga, consulta e manutenção.
+  Resultados incorretos, casos ausentes ou casos que deixam de executar devem
+  ser tratados antes da comparação de desempenho.
+- Começar aumentos de I/O como alertas para investigação, sem bloqueio
+  automático universal. Correções de validade, memória ou contadores podem
+  legitimamente aumentar o custo. Budgets futuros devem ter referência
+  aprovada/versionada e atualização explícita, nunca sobrescrita silenciosa.
+- O driver atual do CBD-001 pode fornecer a mecânica de comparação, mas só
+  cobre B+. Uma suíte de regressão do sistema deve incluir seleções, os três
+  joins e organizações/caminhos representativos, com inventário de cobertura.
+  A rodada reduzida não certifica toda a matriz experimental obrigatória.
+- Usar eventos de pull request para detectar problemas antes do merge e push
+  para conferir novos estados; conservar SHAs comparados, CSV/JSON e resumo
+  legível em artifacts. Retenção deve ser declarada; selecionar marcos para
+  evidências permanentes da entrega, em vez de commitar cada execução de CI.
+- Recomendação de prioridade intermediária: mover código ativo para uma raiz
+  convencional (CMakeLists, src, tests, tools) e documentação histórica para
+  docs, em alteração mecânica separada. Atualizar caminhos, scripts, README
+  e referências históricas, sem reescrever camadas ou apagar a baseline da IA.
+  O Git já preserva o código original. O README ainda cita 40 testes e Linux
+  não testado; essas informações precisam de atualização independentemente
+  de uma mudança de diretórios.
+- Sequência sugerida: estabelecer CI, criar acompanhamento de I/O e realizar
+  reorganização sob essas verificações, em mudanças separadas. Não deixar
+  trabalho cosmético competir com requisitos obrigatórios ainda pendentes.
+- Referências oficiais consultadas: GitHub Docs, Status checks
+  (https://docs.github.com/en/pull-requests/reference/status-checks), eventos
+  (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
+  e artifacts (https://docs.github.com/en/actions/tutorials/store-and-share-data).
+- Esta seção registra propostas, não decisões implementadas. Somente o
+  post-mortem foi atualizado; não houve commit, push, merge ou mudança remota.
+
+## 2026-11-13 — Implementação local do gate de correção autorizada
+
+- Após a avaliação acima, o usuário autorizou implementar a primeira melhoria,
+  o CI de correção. Criado o branch local `ci/gate-correcao` sobre
+  `edb9c84502bcfbb79b5fb974ee866b46374214f3`, preservando a entrega CBD-001.
+  Nenhum commit, push, merge, PR ou ajuste administrativo remoto foi feito.
+- Adicionado `.github/workflows/correcao.yml`: push, pull request e acionamento
+  manual; Ubuntu 24.04/GCC; GoogleTest real obrigatório pelo CMake; suíte CTest
+  Release e Debug ASan/UBSan. O check agregado `gate-correcao` aceita somente
+  sucesso da matriz, também rejeitando falha, cancelamento ou skip. Logs, XML
+  e resultados disponíveis são publicados como artifacts por 14 dias.
+- No job normal, a bancada reduzida é executada em saída nova com `--tuplas`,
+  referência SQLite e comparação de contagens/checksums/multiconjuntos.
+  Não foram alterados o motor, contratos públicos ou contadores de I/O.
+- Falha de validação reproduzida: `compare.py --tuplas` sozinho retorna sucesso
+  com CSVs só de cabeçalhos e nenhum dump (zero linhas conferidas). Criado
+  `tools/validar_smoke_ci.py` para exigir inventário mínimo explícito por
+  política/seleção/join/algoritmo e dump para cada execução ok; o mesmo caso
+  vazio agora termina com exit 1 antes da comparação. O comparador existente
+  foi preservado. Este guard é específico do contrato de cobertura do CI.
+- Os testes Python foram escritos antes do verificador, com inventário e
+  fixtures explícitos, sem importar expectativas do motor ou constantes do
+  verificador. A primeira execução falhou pela ausência do módulo. Na
+  validação com dumps reais, corrigida a convenção das seleções: CSV deixa
+  algoritmo vazio, mas o nome do dump usa `sel`. A fixture corrigida falhou
+  antes do ajuste no verificador e passou depois.
+- Validação fresca, executando os blocos shell extraídos do próprio YAML:
+  Release, 59/59 casos GoogleTest aprovados (CTest 0,77 s); Debug ASan/UBSan,
+  59/59 (65,18 s); 10 testes Python aprovados, incluindo remoção individual
+  dos 34 cenários mínimos; smoke com 108 execuções conferidas, 132 linhas
+  não aplicáveis e zero divergências SQLite, inclusive tuplas. LeakSanitizer
+  permanece desativado (`detect_leaks=0`), conforme o protocolo anterior.
+- Caso negativo adicional: configuração sem GoogleTest disponível falhou
+  com exit 1; não houve fallback para o shim. YAML lido com PyYAML, scripts
+  conferidos por `bash -n` e agregador testado com success/failure/cancelled/
+  skipped. Revisão independente somente leitura sem achados bloqueantes.
+- Evidências permanentes: `evidencias/CI/2026-11-13/`, com logs, XML e hashes
+  dos arquivos usados. Builds/saídas temporários em `/tmp/cbd-ci-kzV5kR/`.
+  Localmente foi usado o GoogleTest já instalado via CMAKE_PREFIX_PATH;
+  checkout, apt e upload de artifacts não foram executados no host.
+- Atualizados README e `docs/CI.md`, incluindo interpretação de 1 executável
+  CTest versus 59 casos GoogleTest e ativação posterior da proteção da main.
+  O YAML local ainda precisa ser enviado e executado no GitHub; depois,
+  configurar `gate-correcao` como status obrigatório na regra da main.
+  Criar o workflow não altera automaticamente essa regra. `actionlint` não
+  está instalado; parsing e bash não substituem execução hospedada.
+- Limites: o gate cobre os cenários declarados e não prova ausência de todo
+  defeito nem certifica a matriz integral. Reorganização de diretórios e
+  regressão de desempenho de I/O continuam fora desta implementação.
+
+## 2026-11-13 — Suíte pequena de comparação de I/O e avaliação de consumo
+
+- O usuário autorizou a suíte pequena de leituras/escritas e a análise do
+  consumo do GitHub Actions. Depois confirmou que o repositório é público.
+  Trabalho mantido no branch `ci/gate-correcao`, HEAD `edb9c84`; alterações
+  anteriores de CI preservadas. Sem commit, push, PR, merge ou alterações
+  administrativas/de cobrança.
+- Adicionados `tools/medir_io.py`, `comparar_io.py`, `config_io.cpp` e
+  `io_cenarios_v1.json`. O perfil usa a rodada reduzida existente, 108
+  execuções com ambas as políticas. São testes de integração das quatro
+  camadas, conferidos por SQLite e multiconjuntos de tuplas. O runner compila
+  o mesmo driver da bancada contra cada biblioteca e seus respectivos
+  headers, fixando fill, entradas e preparação do cache. Não há motor novo.
+- Assinatura exige mesmos dados, lotes, esquema, SQL, constantes, M, semente,
+  escala, repetições, Config e flags reais da biblioteca (compile_commands).
+  O inventário versionado exige todas as 108 variantes. Resultados,
+  status, duplicatas/ausências e integridade do CSV são conferidos antes
+  dos deltas. Contadores e checksums não passam por float; porcentagem de
+  aumento com base zero é indefinida.
+- Leituras, escritas e total têm deltas por cenário; flush final e total com
+  flush ficam separados. Aumentos são alertas sem budget bloqueante. Erro
+  funcional, protocolo incompatível ou infraestrutura falha interrompe o
+  job. A versão mede consultas; carga e manutenção ficam explicitamente fora
+  porque a bancada atual não exporta suas janelas individuais.
+- Testes Python foram escritos antes do comparador, com valores sintéticos
+  independentes dos algoritmos. O inventário inicial foi escolhido a partir
+  das consultas reduzidas já validadas: define casos a medir, não respostas
+  esperadas. O oráculo funcional continua sendo SQLite.
+- A revisão independente reproduziu duas lacunas na primeira versão:
+  remover a mesma variante dos dois lados deixava passar 107 cenários; as
+  flags do manifesto não incluíam todas as opções reais. Novos testes RED
+  foram executados antes das correções. Incluídos inventário estrito e
+  extração das flags reais; corrigida também a ausência de fill no manifesto
+  usando um único driver nos dois lados. A revisão final confirmou a
+  resolução e não encontrou novo defeito concreto.
+- Validação final: 28 testes Python aprovados; CTest Release novamente com
+  59/59 GoogleTest aprovados (0,77 s); bloco de I/O atual do YAML executado
+  localmente com build fresco da biblioteca de referência. ASan/UBSan do
+  motor inalterado permanece documentado na entrega de CI anterior.
+- Comparação real `b61b87b` versus `edb9c84`: 108 consultas em cada lado,
+  zero divergências SQLite, 132 linhas não aplicáveis; leituras totais
+  45.480→45.456 (-24, redução de uma leitura em 24 cenários), escritas
+  5.432→5.432, flush final zero, nenhum aumento. Repetição do candidato em
+  outra saída produziu todos os deltas zero. Isso não mede o efeito da
+  correção sobre carga nem permite generalizar para toda a matriz.
+- Integração apenas no job normal existente: PR compara base SHA com merge
+  testado; push compara before/after; branch nova usa pai; manual permite
+  referência explícita. Sem pai, há comparação de controle com aviso.
+  Resumo no GitHub e CSV/JSON/metadados/logs em artifacts por 14 dias;
+  builds e novos dumps da suíte não são enviados. Biblioteca candidata é
+  reutilizada; somente a biblioteca da referência recebe novo build.
+- Evidências em `evidencias/IO/2026-11-13/`: dados brutos de resultados,
+  relatórios, metadados, hashes, testes e validação do YAML/bash/seleção/gate.
+  Temporários novos em `/tmp/cbd-io-00fhvO/`. O bloco completo de medição
+  levou 30,245 s na referência (inclui build) e 12,912 s no candidato.
+- Documentado em `docs/IO.md`, `CI.md` e `CUSTO_ACTIONS.md`; README atualizado.
+  Segundo fontes oficiais consultadas em 13/11, runners padrão em
+  repositórios públicos não descontam a franquia de computação: portanto
+  não há limite de 1.000 minutos aplicável a este workflow público. A tabela
+  atual do Free expressa US$12/mês de computação incluída para usos elegíveis
+  (equivalente a cerca de 2.000 minutos do Linux de 2 cores a US$0,006).
+  Para cenário privado, estimativa conservadora sem histórico hosted de
+  8–12 minutos somados por execução; push+PR e reexecuções multiplicam isso.
+- Armazenamento avaliado separadamente: aproximação local do artifact normal
+  completo = 15.297.798 bytes ZIP (182 arquivos, nível 6). A maior parte vem
+  dos dumps de correção já existentes. A franquia publicada de artifacts é
+  500 MB, compartilhada com Packages; acompanhar uso e retenção. Retenção
+  permaneceu 14 dias. Não foi consultado faturamento autenticado da conta.
+- Fontes oficiais: https://docs.github.com/en/billing/concepts/product-billing/github-actions,
+  https://docs.github.com/en/billing/reference/product-usage-included,
+  https://docs.github.com/en/billing/reference/actions-runner-pricing e
+  https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job.
+- Pendente para ativação: envio autorizado e primeira execução hosted, e
+  posterior regra obrigatória `gate-correcao` na main. A reorganização do
+  repositório continua fora do escopo. Não foi alegada proteção remota ativa.
+
+## 2026-11-13 — Preparação do índice para integração
+
+- O usuário pediu organizar o que falta para merge/push, citando alterações
+  não stageadas. A instrução anterior de autorização explícita para commits
+  foi preservada: preparado o stage da entrega conjunta CI/I/O, sem executar
+  commit, merge ou push. Mensagem proposta:
+  `ci: adiciona gate de correção e comparação de I/O`.
+- Checkout `ci/gate-correcao`, HEAD `edb9c84`. `main` local em `b61b87b` é
+  ancestral de HEAD; os dois commits CBD-001 já estão no branch. A integração
+  local admite fast-forward depois de versionar o conjunto stageado.
+- Verificação fresca: 28 testes Python aprovados, 59 GoogleTest aprovados
+  novamente via CTest Release (0,78 s), hashes da entrega I/O válidos. O
+  motor não recebeu novas alterações. Revisões independentes de CI e I/O
+  já registradas nas etapas anteriores, com achados resolvidos.
+- O manifesto histórico de CI identifica o workflow anterior à suíte I/O.
+  Preservado esse snapshot em `correcao-original.yml`, reconstruído a partir
+  do atual e confirmado idêntico ao SHA256 original `3a00729d...`. Adicionado
+  `FONTES_PRESERVADAS.sha256` para conferir o snapshot e os demais fontes
+  históricos, mantendo `FONTES.sha256` original intacto. O manifesto I/O
+  continua identificando a versão atual do workflow e ferramentas.
+- Dois CSVs de referência SQLite têm CRLF, gerados pelo escritor padrão;
+  conteúdo e hashes foram preservados. O log bruto `sem-gtest.log` termina
+  com linha vazia produzida pelo CMake. Adicionado `.gitattributes` para
+  preservar os bytes de CSV/logs de evidências, permitir CRLF nesses arquivos
+  e tolerar linha vazia final apenas nos logs. Whitespace de código e
+  documentação permanece com as verificações padrão.
+  O conjunto preparado contém código, documentação e evidências textuais,
+  sem builds, dumps adicionais de tuplas ou binários.
+- Tentativa de atualizar a referência remota com `git fetch origin main`
+  falhou por DNS (`Could not resolve hostname github.com`). Não foi possível
+  confirmar o estado remoto atual: refazer fetch e verificar divergência
+  antes de integrar. Nenhuma alteração foi enviada ao remoto.
+- Pendências posteriores ao stage: autorização e commit; fetch bem-sucedido;
+  envio do branch para a primeira execução hosted e conferência do gate;
+  integração/envio da main autorizados e proteção `gate-correcao` configurada
+  no GitHub. A reorganização de diretórios permanece uma melhoria opcional,
+  não uma condição técnica imposta para concluir estas duas entregas.
+
+## 2026-11-13 — Commit e envio do branch autorizados
+
+- O usuário executou `git fetch origin` com exit 0 e autorizou as três
+  etapas pendentes: commit, conferência do remoto e envio do branch com
+  acompanhamento do Actions. Merge com main não integra essas três etapas.
+- Conferida a referência local atualizada pelo fetch do usuário:
+  `origin/main` em `b61b87b`, sem commits ausentes em `ci/gate-correcao`;
+  antes deste commit, o branch estava dois commits à frente (CBD-001).
+- Validação fresca anterior ao commit: 28 testes Python aprovados, CTest
+  Release com 59 casos GoogleTest aprovado em 0,79 s, manifestos históricos
+  e atuais válidos, `git diff --cached --check` aprovado, nenhuma alteração
+  fora do índice. Autor Git já configurado como Carlos, com o endereço
+  noreply usado nos commits anteriores.
+- Commit preparado com a mensagem autorizada
+  `ci: adiciona gate de correção e comparação de I/O`, incluindo o conjunto
+  stageado e este registro. Sem alteração do motor nesta etapa.
+- Uma nova tentativa de fetch pelo ambiente do agente ainda falhou em DNS
+  (`Could not resolve hostname github.com`), apesar do fetch bem-sucedido no
+  terminal do usuário. Esse limite pode impedir o push e a consulta do
+  Actions pelo agente; não é falha de configuração do origin nem evidência
+  de credenciais inválidas. Nenhuma aprovação de CI hospedado foi alegada.

@@ -1,0 +1,14 @@
+/home/carlos/.pyenv/versions/3.11.14/bin/python3 -I /home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/Grupo-2---Avaliacao-2---SBD---UFRJ/PrototipoIA/Implementacao/tools/reference.py /tmp/cbd-io-00fhvO/workflow-final/io/candidato/smoke --tuplas
+referência: sel_pt_dre
+referência: sel_pt_cpf
+referência: sel_rg_dre_baixa
+referência: sel_rg_cr_baixa
+referência: sel_rg_curso_baixa
+referência: sel_rg_dre_alta
+referência: sel_rg_cr_alta
+referência: sel_rg_curso_alta
+referência: j_mestre_detalhe
+referência: j_pequenas
+referência: j_grande_pequena
+referência: j_unique
+referência: j_not_unique

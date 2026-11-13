@@ -1,0 +1,15 @@
+test_all_skipped_is_rejected (test_smoke_ci.SmokeCoverageTest.test_all_skipped_is_rejected) ... ok
+test_bad_repetition_is_rejected (test_smoke_ci.SmokeCoverageTest.test_bad_repetition_is_rejected) ... ok
+test_complete_profile_passes (test_smoke_ci.SmokeCoverageTest.test_complete_profile_passes) ... ok
+test_duplicate_execution_is_rejected (test_smoke_ci.SmokeCoverageTest.test_duplicate_execution_is_rejected) ... ok
+test_empty_results_are_rejected (test_smoke_ci.SmokeCoverageTest.test_empty_results_are_rejected) ... ok
+test_every_required_scenario_is_required (test_smoke_ci.SmokeCoverageTest.test_every_required_scenario_is_required) ... ok
+test_missing_dump_is_rejected (test_smoke_ci.SmokeCoverageTest.test_missing_dump_is_rejected) ... ok
+test_missing_fields_are_rejected (test_smoke_ci.SmokeCoverageTest.test_missing_fields_are_rejected) ... ok
+test_optional_unexecuted_rows_are_allowed (test_smoke_ci.SmokeCoverageTest.test_optional_unexecuted_rows_are_allowed) ... ok
+test_unknown_status_is_rejected (test_smoke_ci.SmokeCoverageTest.test_unknown_status_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.056s
+
+OK

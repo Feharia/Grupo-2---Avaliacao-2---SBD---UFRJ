@@ -1,0 +1,8 @@
+Internal ctest changing into directory: /tmp/cbd-ci-kzV5kR/cbd-normal/build
+Test project /tmp/cbd-ci-kzV5kR/cbd-normal/build
+    Start 1: testes
+1/1 Test #1: testes ...........................   Passed    0.77 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.77 sec

@@ -1,0 +1,213 @@
+politica,operacao,variante,algoritmo,rep,fase,leituras,gravacoes,requisicoes
+LRU,sel_pt_dre,aluno_heap:scan,,1,lote,3344,0,3346
+LRU,sel_pt_dre,aluno_bt_dre:primary_btree,,1,lote,103,0,205
+LRU,sel_pt_dre,aluno_h_dre:primary_hash,,1,lote,99,0,100
+LRU,sel_pt_cpf,aluno_heap:scan,,1,lote,3037,0,3045
+LRU,sel_pt_cpf,aluno_heap:secondary_hash,,1,lote,116,0,200
+LRU,sel_rg_dre_baixa,aluno_heap:scan,,1,faixa,65,0,65
+LRU,sel_rg_dre_baixa,aluno_bt_dre:primary_btree,,1,faixa,2,0,2
+LRU,sel_rg_cr_baixa,aluno_heap:scan,,1,faixa,65,0,65
+LRU,sel_rg_cr_baixa,aluno_heap:secondary_btree,,1,faixa,4,0,4
+LRU,sel_rg_curso_baixa,aluno_heap:scan,,1,faixa,65,0,65
+LRU,sel_rg_curso_baixa,aluno_bt_curso:primary_btree,,1,faixa,2,0,2
+LRU,sel_rg_curso_baixa,aluno_bt_curso:clustering_btree,,1,faixa,3,0,3
+LRU,sel_rg_curso_baixa,aluno_h_curso:clustering_btree,,1,faixa,4,0,4
+LRU,sel_rg_dre_alta,aluno_heap:scan,,1,faixa,65,0,65
+LRU,sel_rg_dre_alta,aluno_bt_dre:primary_btree,,1,faixa,50,0,50
+LRU,sel_rg_cr_alta,aluno_heap:scan,,1,faixa,65,0,65
+LRU,sel_rg_cr_alta,aluno_heap:secondary_btree,,1,faixa,960,0,1010
+LRU,sel_rg_curso_alta,aluno_heap:scan,,1,faixa,65,0,65
+LRU,sel_rg_curso_alta,aluno_bt_curso:primary_btree,,1,faixa,49,0,49
+LRU,sel_rg_curso_alta,aluno_bt_curso:clustering_btree,,1,faixa,50,0,50
+LRU,sel_rg_curso_alta,aluno_h_curso:clustering_btree,,1,faixa,160,0,160
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,bnl,1,bnl,915,0,915
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),bnl,1,bnl,885,0,885
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,sort_merge,1,runs_externa,170,172,170
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,sort_merge,1,runs_interna,65,65,65
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,sort_merge,1,passes,0,0,0
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,sort_merge,1,intercalacao_final,237,0,237
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,1,runs_externa,65,65,65
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,1,runs_interna,170,172,170
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,1,passes,0,0,0
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,1,intercalacao_final,237,0,237
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,hash,1,particiona_externa,65,66,65
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,hash,1,particiona_interna,170,171,170
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,hash,1,build_probe,237,0,237
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,1,particiona_externa,170,174,170
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,1,particiona_interna,65,68,65
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,1,build_probe,242,0,242
+LRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,bnl,1,bnl,1116,0,1116
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,sort_merge,1,runs_externa,170,172,170
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,sort_merge,1,passes,0,0,0
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,sort_merge,1,intercalacao_final,269,0,269
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,1,particiona_externa,96,66,96
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,1,particiona_interna,170,171,170
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,1,build_probe,237,0,237
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,bnl,1,bnl,1560,0,1560
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,sort_merge,1,passes,0,0,0
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,sort_merge,1,intercalacao_final,342,0,342
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,1,particiona_externa,96,66,96
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,1,particiona_interna,244,171,244
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,1,build_probe,237,0,237
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,bnl,1,bnl,1691,0,1691
+LRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,1,runs_externa,267,172,267
+LRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,1,runs_interna,89,65,89
+LRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,1,passes,0,0,0
+LRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,1,intercalacao_final,237,0,237
+LRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,hash,1,particiona_externa,89,66,89
+LRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,hash,1,build_probe,333,0,333
+LRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,bnl,1,bnl,1116,0,1116
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,sort_merge,1,runs_externa,170,172,170
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,sort_merge,1,passes,0,0,0
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,sort_merge,1,intercalacao_final,269,0,269
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,1,particiona_externa,96,66,96
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,1,particiona_interna,170,171,170
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,1,build_probe,237,0,237
+LRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,bnl,1,bnl,19,0,19
+LRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,sort_merge,1,runs_externa,12,12,12
+LRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,sort_merge,1,runs_interna,7,7,7
+LRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,sort_merge,1,passes,0,0,0
+LRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,sort_merge,1,intercalacao_final,19,0,19
+LRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,hash,1,build_probe,19,0,19
+LRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,bnl,1,bnl,72,0,72
+LRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,sort_merge,1,runs_externa,65,65,65
+LRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,sort_merge,1,runs_interna,7,7,7
+LRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,sort_merge,1,passes,0,0,0
+LRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,sort_merge,1,intercalacao_final,72,0,72
+LRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,hash,1,build_probe,72,0,72
+LRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,bnl,1,bnl,103,0,103
+LRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,sort_merge,1,runs_interna,7,7,7
+LRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,sort_merge,1,passes,0,0,0
+LRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,sort_merge,1,intercalacao_final,104,0,104
+LRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,hash,1,build_probe,103,0,103
+LRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,bnl,1,bnl,314,0,314
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,sort_merge,1,runs_externa,54,54,54
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,sort_merge,1,runs_interna,65,65,65
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,sort_merge,1,passes,0,0,0
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,sort_merge,1,intercalacao_final,119,0,119
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,1,particiona_externa,54,57,54
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,1,particiona_interna,65,67,65
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,1,build_probe,124,0,124
+LRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+LRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,bnl,1,bnl,70,0,70
+LRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,1,runs_externa,5,5,5
+LRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,1,runs_interna,65,59,65
+LRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,1,passes,0,0,0
+LRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,1,intercalacao_final,64,0,64
+LRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,hash,1,build_probe,70,0,70
+LRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,sel_pt_dre,aluno_heap:scan,,1,lote,3244,0,3346
+MRU,sel_pt_dre,aluno_bt_dre:primary_btree,,1,lote,102,0,205
+MRU,sel_pt_dre,aluno_h_dre:primary_hash,,1,lote,99,0,100
+MRU,sel_pt_cpf,aluno_heap:scan,,1,lote,2982,0,3045
+MRU,sel_pt_cpf,aluno_heap:secondary_hash,,1,lote,119,0,200
+MRU,sel_rg_dre_baixa,aluno_heap:scan,,1,faixa,65,0,65
+MRU,sel_rg_dre_baixa,aluno_bt_dre:primary_btree,,1,faixa,2,0,2
+MRU,sel_rg_cr_baixa,aluno_heap:scan,,1,faixa,65,0,65
+MRU,sel_rg_cr_baixa,aluno_heap:secondary_btree,,1,faixa,4,0,4
+MRU,sel_rg_curso_baixa,aluno_heap:scan,,1,faixa,65,0,65
+MRU,sel_rg_curso_baixa,aluno_bt_curso:primary_btree,,1,faixa,2,0,2
+MRU,sel_rg_curso_baixa,aluno_bt_curso:clustering_btree,,1,faixa,3,0,3
+MRU,sel_rg_curso_baixa,aluno_h_curso:clustering_btree,,1,faixa,4,0,4
+MRU,sel_rg_dre_alta,aluno_heap:scan,,1,faixa,65,0,65
+MRU,sel_rg_dre_alta,aluno_bt_dre:primary_btree,,1,faixa,50,0,50
+MRU,sel_rg_cr_alta,aluno_heap:scan,,1,faixa,65,0,65
+MRU,sel_rg_cr_alta,aluno_heap:secondary_btree,,1,faixa,951,0,1010
+MRU,sel_rg_curso_alta,aluno_heap:scan,,1,faixa,65,0,65
+MRU,sel_rg_curso_alta,aluno_bt_curso:primary_btree,,1,faixa,49,0,49
+MRU,sel_rg_curso_alta,aluno_bt_curso:clustering_btree,,1,faixa,50,0,50
+MRU,sel_rg_curso_alta,aluno_h_curso:clustering_btree,,1,faixa,160,0,160
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,bnl,1,bnl,851,0,915
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),bnl,1,bnl,725,0,885
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,sort_merge,1,runs_externa,170,172,170
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,sort_merge,1,runs_interna,65,65,65
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,sort_merge,1,passes,0,0,0
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,sort_merge,1,intercalacao_final,237,0,237
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,1,runs_externa,65,65,65
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,1,runs_interna,170,172,170
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,1,passes,0,0,0
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),sort_merge,1,intercalacao_final,237,0,237
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,hash,1,particiona_externa,65,66,65
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,hash,1,particiona_interna,170,171,170
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,hash,1,build_probe,237,0,237
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,1,particiona_externa,170,174,170
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,1,particiona_interna,65,68,65
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,1,build_probe,242,0,242
+MRU,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,bnl,1,bnl,1036,0,1116
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,sort_merge,1,runs_externa,170,172,170
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,sort_merge,1,passes,0,0,0
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,sort_merge,1,intercalacao_final,269,0,269
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,1,particiona_externa,96,66,96
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,1,particiona_interna,170,171,170
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,1,build_probe,237,0,237
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,bnl,1,bnl,1480,0,1560
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,sort_merge,1,passes,0,0,0
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,sort_merge,1,intercalacao_final,342,0,342
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,1,particiona_externa,96,66,96
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,1,particiona_interna,244,171,244
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,1,build_probe,237,0,237
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,bnl,1,bnl,1611,0,1691
+MRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,1,runs_externa,267,172,267
+MRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,1,runs_interna,89,65,89
+MRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,1,passes,0,0,0
+MRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,1,intercalacao_final,237,0,237
+MRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,hash,1,particiona_externa,89,66,89
+MRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,hash,1,build_probe,333,0,333
+MRU,j_mestre_detalhe,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,bnl,1,bnl,1036,0,1116
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,sort_merge,1,runs_externa,170,172,170
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,sort_merge,1,passes,0,0,0
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,sort_merge,1,intercalacao_final,269,0,269
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,1,particiona_externa,96,66,96
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,1,particiona_interna,170,171,170
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,1,build_probe,237,0,237
+MRU,j_mestre_detalhe,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,bnl,1,bnl,19,0,19
+MRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,sort_merge,1,runs_externa,12,12,12
+MRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,sort_merge,1,runs_interna,7,7,7
+MRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,sort_merge,1,passes,0,0,0
+MRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,sort_merge,1,intercalacao_final,19,0,19
+MRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,hash,1,build_probe,19,0,19
+MRU,j_pequenas,curso_heap:scan x disciplina_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,bnl,1,bnl,72,0,72
+MRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,sort_merge,1,runs_externa,65,65,65
+MRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,sort_merge,1,runs_interna,7,7,7
+MRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,sort_merge,1,passes,0,0,0
+MRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,sort_merge,1,intercalacao_final,72,0,72
+MRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,hash,1,build_probe,72,0,72
+MRU,j_grande_pequena,curso_heap:scan x aluno_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,bnl,1,bnl,103,0,103
+MRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,sort_merge,1,runs_interna,7,7,7
+MRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,sort_merge,1,passes,0,0,0
+MRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,sort_merge,1,intercalacao_final,104,0,104
+MRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,hash,1,build_probe,103,0,103
+MRU,j_grande_pequena,curso_heap:scan x aluno_bt_curso:primary_btree,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,bnl,1,bnl,266,0,314
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,sort_merge,1,runs_externa,54,54,54
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,sort_merge,1,runs_interna,65,65,65
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,sort_merge,1,passes,0,0,0
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,sort_merge,1,intercalacao_final,119,0,119
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,1,particiona_externa,54,57,54
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,1,particiona_interna,65,67,65
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,1,build_probe,124,0,124
+MRU,j_unique,aluno_heap:scan x detalhes_heap:scan,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
+MRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,bnl,1,bnl,70,0,70
+MRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,1,runs_externa,5,5,5
+MRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,1,runs_interna,65,59,65
+MRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,1,passes,0,0,0
+MRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,1,intercalacao_final,64,0,64
+MRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,hash,1,build_probe,70,0,70
+MRU,j_not_unique,aluno_heap:secondary_btree x turma_heap:secondary_btree,hash,1,resumo: passes_recursivos=0 bailouts=0,0,0,0
