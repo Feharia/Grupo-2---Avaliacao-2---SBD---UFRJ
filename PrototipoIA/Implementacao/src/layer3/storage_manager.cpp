@@ -283,11 +283,11 @@ SearchCursor StorageManager::find(const AccessPath& p, const Predicate& pred, In
     }
 }
 
-RidCursor StorageManager::probe(const AccessPath& p, const Predicate& pred, Intent i) {
+RidCursor StorageManager::probe(const AccessPath& p, const Predicate& pred, Intent i, const Reservation& r) {
     if (predicate_field(pred) != p.field) throw std::logic_error("probe: predicado em campo diferente do caminho");
     if (p.kind != PathKind::SecondaryHash && p.kind != PathKind::SecondaryBTreeNonClustering)
         throw std::logic_error("probe só em índice secundário não clustering");
-    return RidCursor(indexes_.at(p.id).idx->probe(pred, i));
+    return RidCursor(indexes_.at(p.id).idx->probe(pred, i, r.id()));
 }
 
 PinnedRecord StorageManager::fetch(TableId t, RID rid, Intent i, const Reservation& r) {
@@ -387,7 +387,7 @@ RID StorageManager::insert(TableId t, std::span<const std::byte> rec) {
     for (StructureId id : e.indexes) {   // unicidade verificada pela estrutura que indexa o campo (157)
         const IndexRt& ix = indexes_.at(id);
         if (!e.schema->field(ix.spec.key).unique || ix.spec.clustering || v.is_null(ix.spec.key)) continue;
-        auto st = ix.idx->probe(Point{ix.spec.key, v.key(ix.spec.key)}, kRandomReuse);
+        auto st = ix.idx->probe(Point{ix.spec.key, v.key(ix.spec.key)}, kRandomReuse, kNoReservation);
         if (st->next()) throw DuplicateKey("duplicata em " + e.schema->field(ix.spec.key).name);
     }
     PrimaryFile& pf = *tables_.at(t).primary;
@@ -442,7 +442,7 @@ std::size_t StorageManager::erase_key(TableId t, FieldId f, const Key& k) {
         for (StructureId id : e.indexes) {
             const IndexRt& ix = indexes_.at(id);
             if (ix.spec.key != f || ix.spec.clustering) continue;
-            auto st = ix.idx->probe(Point{f, k}, kRandomReuse);
+            auto st = ix.idx->probe(Point{f, k}, kRandomReuse, kNoReservation);
             return st->next();
         }
         BlockScan scan(&pool_, pf.scan_plan(), e.schema, kSeqOnce, kNoReservation);

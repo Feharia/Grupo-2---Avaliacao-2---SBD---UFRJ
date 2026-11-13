@@ -171,6 +171,36 @@ TEST(Monitor, EsDosTemporariosFicaDentroDaMedicao) {
     EXPECT_GT(expulsoes, 0u);                           // o cenário força expulsões de páginas sujas
 }
 
+// P02 da auditoria de 10/11 (decisão 172): M conta também as páginas de índice. Numa seleção pela
+// B+ primária com M = 2, cada descida pede os nós pela reserva, e não há mais o cache da área de
+// índices. Um caminho com índice e dados juntos não cabe em M = 1.
+TEST(Monitor, SelecaoComIndicesDentroDeM) {
+    Monitor m(test_config("mon_indices_m"));
+    Db db = build(m);
+    const AccessPath bt = path(m, db.t["a_bt"], PathKind::PrimaryBTree);
+    std::vector<Point> pts;
+    for (std::int32_t k = 0; k < 300; k += 3) pts.push_back(Point{0, Key{k}});
+    m.flush_all();
+    m.invalidate_all();
+    SelectParams sp;
+    sp.m = 2;
+    sp.expected_rows = static_cast<double>(pts.size());
+    const OpResult r = ok(m.select_points(bt, pts, ResultShape{}, sp));
+    EXPECT_EQ(r.rows, pts.size());
+    EXPECT_EQ(r.delta.global.index_area_requests, 0u);
+    const TableStats ts = m.stats(db.t["a_bt"]);
+    const StructureStats& st = ts.structures.front();
+    ASSERT_TRUE(st.height.has_value());
+    if (*st.height > 1)   // cada descida pede a raiz pela reserva (pode ser acerto, se ela ainda estiver lá)
+        EXPECT_GE(r.delta.per_kind[static_cast<std::size_t>(FileKind::Index)].requests, pts.size());
+    const AccessPath sec = path(m, db.t["b_heap"], PathKind::SecondaryBTreeNonClustering);
+    SelectParams um;
+    um.m = 1;
+    const auto plano = m.plan_select(sec, false, 1, um);
+    ASSERT_TRUE(std::holds_alternative<NotApplicable>(plano));
+    EXPECT_TRUE(std::get<NotApplicable>(plano).kind == NotApplicable::Kind::Inviavel);
+}
+
 TEST(Monitor, MruLeMenosQueLruNoBnlComVariasPassadas) {
     std::map<Policy, std::uint64_t> reads;
     for (Policy p : {Policy::Lru, Policy::Mru}) {

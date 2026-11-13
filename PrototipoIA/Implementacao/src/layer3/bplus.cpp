@@ -112,14 +112,14 @@ BPlusEngine::BPlusEngine(BufferPool& pool, FileId leaf_file, FileId node_file, K
     min_int_ = int_cap_ / 2;
 }
 
-PageGuard BPlusEngine::leaf(std::uint32_t b) const {
-    return pool_.fetch(BlockId{leaf_file_, b}, kRandomReuse, kNoReservation);
+PageGuard BPlusEngine::leaf(std::uint32_t b, ReservationId res) const {
+    return pool_.fetch(BlockId{leaf_file_, b}, kRandomReuse, res);
 }
-PageGuard BPlusEngine::node(std::uint32_t b) const {
-    return pool_.fetch(BlockId{node_file_, b}, kRandomReuse, kNoReservation);
+PageGuard BPlusEngine::node(std::uint32_t b, ReservationId res) const {
+    return pool_.fetch(BlockId{node_file_, b}, kRandomReuse, res);
 }
-InternalNode BPlusEngine::load_node(std::uint32_t b) const {
-    auto g = node(b);
+InternalNode BPlusEngine::load_node(std::uint32_t b, ReservationId res) const {
+    auto g = node(b, res);   // uma página de índice por vez: o guard sai antes da descida seguir
     return read_internal(g.read(), codec_);
 }
 void BPlusEngine::save_node(std::uint32_t b, const InternalNode& n) {
@@ -134,11 +134,11 @@ void BPlusEngine::init_empty() {
 }
 
 // ----------------------------------------------------------------------- busca
-std::uint32_t BPlusEngine::leaf_for(const std::optional<Key>& lo) const {
+std::uint32_t BPlusEngine::leaf_for(const std::optional<Key>& lo, ReservationId res) const {
     if (meta_.root_is_leaf) return meta_.root;
     std::uint32_t b = meta_.root;
     for (;;) {
-        const InternalNode n = load_node(b);
+        const InternalNode n = load_node(b, res);
         std::size_t i = 0;
         if (lo) while (i < n.keys.size() && compare_keys(n.keys[i], *lo) < 0) ++i;   // chaves < lo
         if (n.level == 1) return n.children[i];

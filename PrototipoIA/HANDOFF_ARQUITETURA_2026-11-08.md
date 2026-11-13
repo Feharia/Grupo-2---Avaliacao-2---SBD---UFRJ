@@ -189,7 +189,7 @@ Texto final, já com todas as revisões. A camada ou fronteira está entre colch
 - **142. Checksum canônico** [2, 1] — Campos na ordem dos operandos da consulta, cada um precedido de um byte de marca (0 = NULL, 1 = valor; decisão 158); inteiros como int64 little-endian; textos em UTF-8 sem preenchimento, com prefixo de tamanho; FNV-1a de 64 bits por tupla; soma módulo 2⁶⁴.
 - **143. Plano resolvido** [2] — JoinPlan e SelectPlan são calculados uma vez e usados igualmente pela execução e pela estimativa. O tamanho de runs e partições usa os blocos densos d = ⌈n/bfr⌉, porque elas são gravadas cheias. As estimativas usam b para ler a estrutura e d para gravar e reler runs e partições; com b em tudo, a B+ com fill 0,7 e o hash com α = 0,8 ficavam superestimados (emendada em 08/11).
 - **144. Catálogo fixado** [3, 4] — O catálogo fixa suas páginas na abertura e só as solta no fim; invalidate_all não toca na área de catálogo.
-- **145. B+ primária em dois arquivos** [3] — Nós internos num arquivo do tipo Index (área de índices, fora de M); folhas com os registros no arquivo de dados (pela reserva).
+- **145. B+ primária em dois arquivos** [3] — Nós internos num arquivo do tipo Index; folhas com os registros no arquivo de dados (pela reserva). *Emendada pela 172:* numa operação medida, os nós internos também vêm da reserva, e a área de índices só serve à carga e à manutenção.
 - **146. Seleção sem índice** [2] — O caminho Scan sempre executa, com scan_blocks e filtro na camada 2. Na seleção pontual em campo UNIQUE, a varredura de cada chave para no primeiro registro encontrado (b/2 em média, como nas fórmulas) (emendada em 08/11). NotApplicable só para caminho de índice ou hash que não responde ao predicado.
 - **147. Conferência com o SQLite** [1] — Lotes e constantes gravados em arquivo antes da execução; tools/reference.py grava referencia.csv; tools/compare.py cruza com resultados.csv e termina com erro se algo divergir.
 - **148. Orçamento de molduras** [2] — Todas as parcelas de memória estão no plano, e frames_used() ≤ m é verificado antes de executar (seção 7).
@@ -261,7 +261,15 @@ A reavaliação da arquitetura não criou decisões: corrigiu as existentes e ti
 
 Origem: `PROBLEMAS_IDENTIFICADOS_CBD_2026-11-10.md` (P01 a P15), conferido contra o código do commit `4091762` e contra o enunciado de 04/11. Cada item foi corrigido num commit próprio, com teste de regressão quando se aplica.
 
-- **172. (reservada)** — Contrato de M com as páginas de índice (P02). Fica num commit isolado, que pode ser revertido sem afetar as demais.
+- **172. M inclui as páginas de índice** [P02] — Altera 145 e a §7. Fica num commit isolado, que pode ser revertido sem afetar as demais.
+  - Durante uma operação medida, **toda página fixada** (dados, índice, temporário, rascunho) vem da reserva de M molduras.
+  - A área de índices só serve à carga e à manutenção. A página do catálogo continua fixada na área própria, sem E/S nas operações.
+  - A camada 3 passa a ReservationId pelas leituras de índice: descida da B+ (`leaf_for`, `load_node`), `EntryIter`, posting lists em overflow e buckets do hash secundário. `StorageManager::probe` passa a receber a Reservation.
+  - Na B+ secundária, a folha do índice é solta enquanto se lê a cadeia de overflow da posting list e relida depois, para índice + dados caberem em M = 2.
+  - `IoCounts.index_area_requests` conta os pedidos a arquivos Index sem reserva, e o Monitor exige que seja 0 numa operação medida, como já fazia com `data_area_requests` (159).
+  - `SelectPlan::frames_used` conta 2 molduras quando a página do índice fica fixada junto com a de dados (probe e clustering). Um plano que não caiba em m vira `inviavel`.
+  - **Efeito:** a B+ primária pontual passa de 1.045 para 3.041 blocos (1.000 chaves, M = 2), e a fórmula h + 1 passa a bater (−1,3%, antes +187%). O hash secundário pontual passa de 1.901 para cerca de 2.000.
+  - **Motivo:** decisão do grupo sobre o P02 da auditoria. M passa a ser toda a memória de páginas do operador, e as comparações não dependem de um cache de índices fora do orçamento.
 - **173. Estruturas auxiliares dentro de M** [P01, P03] — Altera 140 e a §7. As estruturas auxiliares do operador passam a ser cobradas das molduras da reserva: frames_used = páginas fixadas + ⌈bytes auxiliares / bloco⌉ ≤ m.
   - **ScratchSpace:** o diretório (slot, chain e head, 12 B por registro, mais a folga do vetor de slots) é cobrado das próprias páginas. A ordenação é no lugar, e a tabela hash tem n cabeças. `capacity_for` aplica a mesma regra, e o plano a usa para contar runs e decidir se o build cabe.
   - **BNL:** o diretório do chunk guarda só RecordView, nas m − 1 − chunk molduras restantes. O plano reduz o chunk quando ele não cabe; na execução, o excesso vira `inviavel` em vez de passar de M. Com M = 32, as tabelas da base mantêm chunk de 16 páginas.
@@ -333,9 +341,11 @@ Toda operação medida usa uma reserva de m molduras. O plano calcula cada parce
 - **Bailout (171):** m − 2 páginas de build + 1 do build em leitura + 1 do probe = m.
 - Entrada já organizada por hash, nas condições da 164: cada partição é um grupo de ⌈nbuckets / partitions⌉ buckets, lido por scan_buckets.
 
-**Seleções**
-- m = 2: uma página do cursor e uma do fetch.
-- Variante que ordena os RIDs (117): scratch_pages = m − 2, com m declarado maior.
+**Seleções** (com as páginas de índice dentro de M, 172)
+- m = 2. Varredura, B+ primária e hash primário fixam 1 página por vez; a descida da B+ solta cada nó antes de ler o seguinte.
+- Probe em índice secundário e clustering: a página do índice fica fixada enquanto o fetch fixa a de dados = 2. Na B+ secundária, a folha é solta durante a cadeia de overflow da posting list e relida depois.
+- Variante que ordena os RIDs (117): scratch_pages = m − 2, mais a página do índice e a do fetch = m.
+- Um plano que não caiba em m (por exemplo, probe com m = 1) é inviável.
 
 ---
 
@@ -524,7 +534,7 @@ Passos das primitivas medidas:
 3. Reserva m molduras.
 4. Tira o snapshot inicial e cria o PhaseRecorder.
 5. Executa o algoritmo ou a busca, mandando os resultados ao ResultSink. Se o algoritmo lançar DoesNotFit, libera a reserva e devolve NotApplicable{"não cabe em M"}.
-6. Tira o snapshot final e fecha as fases. Se o delta de data_area_requests não for zero, lança logic_error: alguma página de dados foi pedida sem reserva (159).
+6. Tira o snapshot final e fecha as fases. Se o delta de data_area_requests ou de index_area_requests não for zero, lança logic_error: alguma página de dados (159) ou de índice (172) foi pedida sem reserva.
 7. Chama flush_all e guarda o retorno em flush_writes, que deve ser zero.
 8. Calcula o custo estimado com o mesmo plano e as estatísticas medidas.
 9. Libera a reserva e devolve o OpResult, com delta = snapshot final − inicial.
@@ -672,7 +682,7 @@ public:
     BlockScan     scan_buckets(const AccessPath&, std::uint32_t first, std::uint32_t last, Intent, const Reservation&);
     std::uint32_t bucket_of(const AccessPath&, const Key&) const;
     SearchCursor  find(const AccessPath&, const Predicate&, Intent, const Reservation&);
-    RidCursor     probe(const AccessPath&, const Predicate&, Intent);
+    RidCursor     probe(const AccessPath&, const Predicate&, Intent, const Reservation&);   // índice pela reserva (172)
     PinnedRecord  fetch(TableId, RID, Intent, const Reservation&);
 
     // memória de trabalho e temporários
@@ -1539,7 +1549,7 @@ public:
 - Cada arquivo tem no máximo 32.576 blocos, cerca de 127 MiB (154). Com os volumes atuais, Inscrição chegaria a esse limite perto da escala 19.
 - O grupo de duplicatas do sort-merge tem de caber em group_pages; se não couber, a célula é inviável (151).
 - O hash join faz até 6 passes de particionamento. Depois disso, ou quando uma partição não diminui (grupo de chaves iguais maior que m − 1 páginas), ele usa o bailout em blocos, cujo custo é o de um BNL dentro da partição (171).
-- Nós internos da B+, páginas de índice e catálogo ficam fora de M, nas próprias áreas (145). As estruturas auxiliares do operador ficam dentro de M (173).
+- Nós internos da B+ e páginas de índice ficam dentro de M durante a operação (172). Só a carga, a manutenção e o catálogo (página fixada, sem E/S nas operações) usam áreas próprias. As estruturas auxiliares do operador também ficam dentro de M (173).
 - Com prefetch ligado, a leitura antecipada expulsa páginas não fixadas do subpool.
 - Página pedida pela reserva que esteja em outra região migra para o subpool e conta como acerto.
 - Os diretórios do ScratchSpace e do BNL são cobrados das molduras da reserva (173). Descritores de controle de tamanho O(m), como a lista de runs e as fontes do merge, ficam fora, como overhead declarado de menos de 1 moldura. O lote de chaves da seleção pontual é parâmetro de entrada da consulta (a tabela "lote" do SQL de referência), não memória de trabalho.
@@ -1596,7 +1606,7 @@ Estas decisões continuam registradas, porque o enunciado pede que o grupo as to
 - **Subpool:** com m = 8, nenhuma operação fixa mais de 8 molduras, e fixar a nona lança exceção.
 - **Sem cache oculto:** o BNL com m = 16 dá as mesmas leituras com área de trabalho 16 e 32.
 - **Orçamento:** para cada plano gerado nos testes, frames_used() ≤ m, e o pico de molduras fixadas medido na execução coincide com frames_used(). *(Ainda não implementado no protótipo.)*
-- **Nós internos fora de M:** select_points com 1.000 chaves na B+ primária lê a raiz do disco uma única vez. *(Ainda não implementado no protótipo.)*
+- **Índices dentro de M (172):** com M = 2, a busca na B+ primária, o probe na B+ secundária com overflow e o probe no hash secundário não passam de 2 molduras fixadas e não pedem página de índice fora da reserva (testes IndicesDentroDaReserva e SelecaoComIndicesDentroDeM).
 - **Scan:** select_range sem índice executa e devolve as mesmas linhas que o SQLite.
 - **seal:** uma run de k blocos gera k gravações temp e, no merge, k leituras físicas.
 - **Conferência:** compare.py não encontra divergência em nenhuma operação e repetição, inclusive com papéis trocados.
@@ -1722,5 +1732,5 @@ Linhas de raciocínio já percorridas e encerradas:
 - **B+ primária em dois arquivos,** e não flag de classe de página no Intent.
 - **Memória de trabalho em molduras (ScratchSpace),** e não estruturas da linguagem.
 - **Conferência com o SQLite fora do motor,** com lotes e constantes em arquivo.
-- **Índices fora de M** (145): a revisão de 06/11 propôs uma cota única por operador, que incluísse as páginas de índice. Fica como está; o que a revisão tinha de válido virou a 159.
+- **Índices fora de M** (145): a revisão de 06/11 propôs uma cota única por operador, que incluísse as páginas de índice. Na época ficou como estava, e o que a revisão tinha de válido virou a 159. Depois da auditoria de 10/11, o grupo adotou a cota única (172).
 - **Itens da revisão de 06/11 já resolvidos:** liberação de página (free_block), manutenção de RIDs (MoveListener), sequência de medição (149), ciclo de vida do TempFile (118, 139, 155) e catálogo fixado × invalidate_all (144).

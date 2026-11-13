@@ -159,6 +159,7 @@ struct IoCounts {
     std::uint64_t writes_seq = 0, writes_rand = 0;
     std::uint64_t dirty_evictions = 0, forced_writes = 0;
     std::uint64_t data_area_requests = 0;   // pedidos sem reserva a arquivos Data; 0 nas operações medidas (159)
+    std::uint64_t index_area_requests = 0;  // pedidos sem reserva a arquivos Index; 0 nas operações medidas (172)
     IoCounts& operator+=(const IoCounts&);
     IoCounts& operator-=(const IoCounts&);
     std::uint64_t reads()  const { return reads_seq + reads_rand; }

@@ -36,7 +36,7 @@ public:
     BlockScan     scan_buckets(const AccessPath&, std::uint32_t first, std::uint32_t last, Intent, const Reservation&);
     std::uint32_t bucket_of(const AccessPath&, const Key&) const;
     SearchCursor  find(const AccessPath&, const Predicate&, Intent, const Reservation&);
-    RidCursor     probe(const AccessPath&, const Predicate&, Intent);
+    RidCursor     probe(const AccessPath&, const Predicate&, Intent, const Reservation&);   // índice pela reserva (172)
     PinnedRecord  fetch(TableId, RID, Intent, const Reservation&);
 
     // memória de trabalho e temporários

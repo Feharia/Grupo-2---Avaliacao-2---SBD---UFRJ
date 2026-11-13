@@ -109,7 +109,7 @@ class ClusteringHashSearch final : public SearchState {
 public:
     ClusteringHashSearch(const BPlusIndex& idx, FileId data, std::shared_ptr<const Schema> s, FieldId field,
                          KeyRange range, Intent i, ReservationId r)
-        : idx_(idx), data_(data), schema_(std::move(s)), field_(field), it_(&idx, range, kRandomReuse),
+        : idx_(idx), data_(data), schema_(std::move(s)), field_(field), it_(&idx, range, kRandomReuse, r),
           intent_(i), res_(r) {}
     std::optional<RecordView> next() override {
         for (;;) {
@@ -154,14 +154,15 @@ private:
 // ----------------------------------------------------------------------- estados de RIDs
 class HashIndexRidState final : public RidState {
 public:
-    HashIndexRidState(BufferPool& p, FileId f, KeyCodec kc, Key k, std::uint32_t head, bool unique, Intent i)
-        : pool_(p), file_(f), kc_(kc), key_(std::move(k)), blk_(head), unique_(unique), intent_(i) {}
+    HashIndexRidState(BufferPool& p, FileId f, KeyCodec kc, Key k, std::uint32_t head, bool unique, Intent i,
+                      ReservationId r)
+        : pool_(p), file_(f), kc_(kc), key_(std::move(k)), blk_(head), unique_(unique), intent_(i), res_(r) {}
     std::optional<RID> next() override {
         if (stop_) return std::nullopt;
         for (;;) {
             if (!page_) {
                 if (blk_ == 0) return std::nullopt;
-                page_.emplace(pool_.fetch(BlockId{file_, blk_}, intent_, kNoReservation));
+                page_.emplace(pool_.fetch(BlockId{file_, blk_}, intent_, res_));
                 slot_ = 0;
             }
             const auto pg = page_->read();
@@ -188,6 +189,7 @@ private:
     std::uint32_t blk_;
     bool unique_;
     Intent intent_;
+    ReservationId res_;
     std::optional<PageGuard> page_;
     std::uint16_t slot_ = 0;
     bool stop_ = false;
@@ -195,7 +197,8 @@ private:
 
 class BTreeIndexRidState final : public RidState {
 public:
-    BTreeIndexRidState(const BPlusIndex& idx, KeyRange range, Intent i) : idx_(idx), it_(&idx, std::move(range), i), intent_(i) {}
+    BTreeIndexRidState(const BPlusIndex& idx, KeyRange range, Intent i, ReservationId r)
+        : idx_(idx), it_(&idx, std::move(range), i, r), intent_(i), res_(r) {}
     std::optional<RID> next() override {
         for (;;) {
             if (!entry_) {
@@ -210,10 +213,12 @@ public:
                 j_ = 0;
             }
             if (i_ < inline_n_) return idx_.entry_rid(*entry_, i_++);
-            // cadeia de overflow da posting list
+            // cadeia de overflow da posting list: a folha é solta antes, para índice + dados caberem em
+            // M = 2; o próximo it_.next() volta a lê-la (172)
             if (!ovf_page_) {
                 if (ovf_ == 0) { entry_.reset(); continue; }
-                ovf_page_.emplace(idx_.pool().fetch(BlockId{idx_.file(), ovf_}, intent_, kNoReservation));
+                it_.release();
+                ovf_page_.emplace(idx_.pool().fetch(BlockId{idx_.file(), ovf_}, intent_, res_));
                 j_ = 0;
             }
             const auto pg = ovf_page_->read();
@@ -232,6 +237,7 @@ private:
     const BPlusIndex& idx_;
     BPlusIndex::EntryIter it_;
     Intent intent_;
+    ReservationId res_;
     std::optional<std::span<const std::byte>> entry_;
     std::uint32_t count_ = 0, inline_n_ = 0, ovf_ = 0, i_ = 0, j_ = 0;
     std::optional<PageGuard> ovf_page_;
@@ -456,7 +462,7 @@ std::unique_ptr<SearchState> BPlusTreeFile::find(const Predicate& p, bool unique
     const bool unique_point = unique && std::holds_alternative<Point>(p);
     const BPlusEngine* eng = &engine_;
     return std::make_unique<LeafRangeSearch>(pool_, engine_.leaf_file(), schema_, key_, range, unique_point, i, r,
-                                             [eng, lo = range.lo] { return eng->leaf_for(lo); });
+                                             [eng, lo = range.lo, r] { return eng->leaf_for(lo, r); });
 }
 
 StructureStats BPlusTreeFile::measure() {
@@ -564,10 +570,10 @@ void HashIndex::move(const Key& k, RID from, RID to) {
     throw std::logic_error("índice hash: entrada não encontrada para mover");
 }
 
-std::unique_ptr<RidState> HashIndex::probe(const Predicate& p, Intent i) {
+std::unique_ptr<RidState> HashIndex::probe(const Predicate& p, Intent i, ReservationId r) {
     const auto* pt = std::get_if<Point>(&p);
     if (!pt) throw std::logic_error("índice hash só responde a igualdade (128)");
-    return std::make_unique<HashIndexRidState>(pool_, file_, codec_, pt->key, bucket_of(pt->key) + 1, unique_, i);
+    return std::make_unique<HashIndexRidState>(pool_, file_, codec_, pt->key, bucket_of(pt->key) + 1, unique_, i, r);
 }
 
 StructureStats HashIndex::measure() {
@@ -832,8 +838,8 @@ void BPlusIndex::set_first(const Key& k, std::optional<RID> rid) {
     }
 }
 
-std::unique_ptr<RidState> BPlusIndex::probe(const Predicate& p, Intent i) {
-    return std::make_unique<BTreeIndexRidState>(*this, as_range(p), i);
+std::unique_ptr<RidState> BPlusIndex::probe(const Predicate& p, Intent i, ReservationId r) {
+    return std::make_unique<BTreeIndexRidState>(*this, as_range(p), i, r);
 }
 
 StructureStats BPlusIndex::measure() {
@@ -868,21 +874,25 @@ Occupancy BPlusIndex::occupancy() {
     return o;
 }
 
-BPlusIndex::EntryIter::EntryIter(const BPlusIndex* idx, KeyRange range, Intent i)
-    : idx_(idx), range_(std::move(range)), intent_(i) {}
+BPlusIndex::EntryIter::EntryIter(const BPlusIndex* idx, KeyRange range, Intent i, ReservationId res)
+    : idx_(idx), range_(std::move(range)), intent_(i), res_(res) {}
 
 std::optional<std::pair<Key, std::span<const std::byte>>> BPlusIndex::EntryIter::next() {
     if (done_) { leaf_.reset(); return std::nullopt; }
     if (!started_) {
         started_ = true;
-        next_leaf_ = idx_->engine_.leaf_for(range_.lo);
+        next_leaf_ = idx_->engine_.leaf_for(range_.lo, res_);
     }
     for (;;) {
-        if (!leaf_) {
+        if (!leaf_ && mid_page_) {   // folha solta por release(): volta à mesma posição (172)
+            leaf_.emplace(idx_->pool_.fetch(BlockId{idx_->file_, cur_leaf_}, intent_, res_));
+        } else if (!leaf_) {
             if (next_leaf_ == 0) { done_ = true; return std::nullopt; }
-            leaf_.emplace(idx_->pool_.fetch(BlockId{idx_->file_, next_leaf_}, intent_, kNoReservation));
+            cur_leaf_ = next_leaf_;
+            leaf_.emplace(idx_->pool_.fetch(BlockId{idx_->file_, cur_leaf_}, intent_, res_));
             order_ = sorted_slots(leaf_->read(), idx_->engine_.key_of());
             pos_ = 0;
+            mid_page_ = true;
         }
         while (pos_ < order_.size()) {
             const auto& [k, slot] = order_[pos_++];
@@ -892,6 +902,7 @@ std::optional<std::pair<Key, std::span<const std::byte>>> BPlusIndex::EntryIter:
         }
         next_leaf_ = read_header(leaf_->read()).next;
         leaf_.reset();
+        mid_page_ = false;
     }
 }
 
@@ -907,8 +918,8 @@ std::unique_ptr<SearchState> make_clustering_search(const BPlusIndex& idx, Prima
     const bool unique_point = unique && std::holds_alternative<Point>(p);
     const BPlusIndex* ip = &idx;
     return std::make_unique<LeafRangeSearch>(pool, primary.data_file(), std::move(schema), field, range, unique_point,
-                                             i, r, [ip, range]() -> std::uint32_t {
-                                                 BPlusIndex::EntryIter it(ip, range, kRandomReuse);
+                                             i, r, [ip, range, r]() -> std::uint32_t {
+                                                 BPlusIndex::EntryIter it(ip, range, kRandomReuse, r);
                                                  auto e = it.next();
                                                  return e ? ip->entry_rid(e->second, 0).block : 0u;
                                              });

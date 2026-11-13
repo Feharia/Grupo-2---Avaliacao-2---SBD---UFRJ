@@ -190,6 +190,7 @@ PageGuard BufferPool::fetch(BlockId b, Intent intent, ReservationId res) {
     Region& target = region_for(res, kind);
     bump(b.file, &IoCounts::requests);
     if (res == kNoReservation && kind == FileKind::Data) bump(b.file, &IoCounts::data_area_requests);
+    if (res == kNoReservation && kind == FileKind::Index) bump(b.file, &IoCounts::index_area_requests);   // (172)
 
     if (auto it = page_table_.find(b); it != page_table_.end()) {
         const FrameId f = it->second;

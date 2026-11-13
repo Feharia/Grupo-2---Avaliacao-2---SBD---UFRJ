@@ -3,4 +3,4 @@ junção: BNL,21,0.0,21,0.0,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:sc
 junção: hash,21,0.0,20,29.1982,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados)
 junção: sort-merge,21,0.6677,21,-7.4074,j_pequenas,curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree
 seleção: faixa,16,0.0,13,-43.7275,sel_rg_curso_alta,aluno_h_curso:clustering_btree
-seleção: igualdade (lote),5,5.2078,4,187.0813,sel_pt_dre,aluno_bt_dre:primary_btree
+seleção: igualdade (lote),5,1.1265,5,9.8166,sel_pt_dre,aluno_h_dre:primary_hash

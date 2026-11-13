@@ -196,7 +196,7 @@ TEST(StorageManager, RidsEstaveisComDivisoesEReorganize) {   // (141, 169)
             AccessPath p;
             for (const auto& ap : sm.access_paths(t))
                 if (ap.kind == PathKind::SecondaryBTreeNonClustering) p = ap;
-            RidCursor rc = sm.probe(p, Point{1, Key{std::int32_t(g)}}, kRandomReuse);
+            RidCursor rc = sm.probe(p, Point{1, Key{std::int32_t(g)}}, kRandomReuse, r);
             int seen = 0;
             while (auto rid = rc.next()) {
                 PinnedRecord pr = sm.fetch(t, *rid, kRandomOnce, r);
@@ -209,7 +209,7 @@ TEST(StorageManager, RidsEstaveisComDivisoesEReorganize) {   // (141, 169)
         for (const auto& ap : sm.access_paths(t))
             if (ap.kind == PathKind::SecondaryHash) hp = ap;
         for (int u : {0, 777, 1999, 10005, 11499}) {
-            RidCursor rc = sm.probe(hp, Point{2, Key{std::int32_t(u)}}, kRandomReuse);
+            RidCursor rc = sm.probe(hp, Point{2, Key{std::int32_t(u)}}, kRandomReuse, r);
             if (auto rid = rc.next()) {
                 PinnedRecord pr = sm.fetch(t, *rid, kRandomOnce, r);
                 EXPECT_EQ(pr.view.get<std::int32_t>(2), u);
@@ -371,6 +371,57 @@ TEST(ScratchSpace, OrdenarRidsNaoAlocaFora) {
         const RID a = sc.rid_at(i - 1), b = sc.rid_at(i);
         EXPECT_TRUE(a.block < b.block || (a.block == b.block && a.slot <= b.slot));
     }
+}
+
+// P02 da auditoria de 10/11 (decisão 172): numa busca com reserva, as páginas de índice também vêm
+// da reserva. Com M = 2, a B+ primária (descida + folha), a B+ secundária com posting lists em
+// overflow e o hash secundário cabem nas 2 molduras, e nenhuma página de índice é pedida fora dela.
+TEST(StorageManager, IndicesDentroDaReserva) {
+    StorageManager sm(test_config("sm_indices_m"));
+    const TableId tb = sm.create_table("tb", kv_schema(true, 60), PrimarySpec{StructureKind::BTree, 0, 0.7});
+    const TableId th = sm.create_table("th", kv_schema(false, 60), PrimarySpec{});
+    sm.create_index(th, IndexSpec{StructureKind::SecBTree, 1, false});   // g: 4 valores, posting lists longas
+    sm.create_index(th, IndexSpec{StructureKind::SecHash, 2, false});    // u: UNIQUE
+    std::vector<std::vector<std::byte>> rb, rh;
+    for (int i = 0; i < 6000; ++i) rb.push_back(kv(sm, tb, i, 0, i));
+    for (int i = 0; i < 6000; ++i) rh.push_back(kv(sm, th, i, i % 4, i));
+    VecStream vb(std::move(rb)), vh(std::move(rh));
+    sm.bulk_load(tb, vb);
+    sm.bulk_load(th, vh);
+    sm.flush_all();
+    sm.invalidate_all();
+    const auto index_kind = static_cast<std::size_t>(FileKind::Index);
+    auto r = sm.reserve(2);
+    const Counters s0 = sm.snapshot();
+    for (int k : {5, 777, 4321, 5999}) {   // B+ primária: a descida passa por nós de índice
+        SearchCursor c = sm.find(path_of(sm, tb, PathKind::PrimaryBTree), Point{0, Key{std::int32_t(k)}}, kRandomOnce, r);
+        auto rec = c.next();
+        ASSERT_TRUE(rec.has_value());
+        EXPECT_EQ(rec->get<std::int32_t>(0), k);
+    }
+    int seen = 0;   // B+ secundária: folha do índice, overflow da posting list e fetch
+    {
+        RidCursor rc = sm.probe(path_of(sm, th, PathKind::SecondaryBTreeNonClustering), Point{1, Key{std::int32_t(2)}},
+                                kRandomOnce, r);
+        while (auto rid = rc.next()) {
+            PinnedRecord pr = sm.fetch(th, *rid, kRandomOnce, r);
+            EXPECT_EQ(pr.view.get<std::int32_t>(1), 2);
+            ++seen;
+        }
+    }
+    EXPECT_EQ(seen, 1500);
+    for (int u : {0, 2999, 5999}) {   // hash secundário
+        RidCursor rc = sm.probe(path_of(sm, th, PathKind::SecondaryHash), Point{2, Key{std::int32_t(u)}}, kRandomOnce, r);
+        auto rid = rc.next();
+        ASSERT_TRUE(rid.has_value());
+        PinnedRecord pr = sm.fetch(th, *rid, kRandomOnce, r);
+        EXPECT_EQ(pr.view.get<std::int32_t>(2), u);
+    }
+    const Counters d = sm.snapshot() - s0;
+    EXPECT_LE(r.peak_pinned(), 2u);
+    EXPECT_EQ(d.global.index_area_requests, 0u);
+    EXPECT_EQ(d.global.data_area_requests, 0u);
+    EXPECT_GT(d.per_kind[index_kind].requests, 0u);   // as páginas de índice passaram pela reserva
 }
 
 // P10 da auditoria de 10/11: clustering B+ sobre hash com chaves colidindo no mesmo bucket e

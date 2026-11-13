@@ -8,10 +8,10 @@ j_mestre_detalhe,b,aluno_bt_dre:primary_btree x inscricao_heap:scan,bnl,102652,1
 j_mestre_detalhe,d,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,bnl,102652,101751,-0.8777,0.0,0.0088
 j_mestre_detalhe,c,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,bnl,147292,146391,-0.6117,0.0,0.0061
 j_mestre_detalhe,c,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,bnl,147840,147000,-0.5682,0.0,0.0057
-sel_pt_cpf,c,aluno_heap:secondary_hash,,1901,1892,-0.4734,0.0495,0.054
+sel_pt_cpf,c,aluno_heap:secondary_hash,,1992,1997,0.251,0.004,0.0015
 sel_pt_dre,a,aluno_heap:scan,,326680,325976,-0.2155,0.0,0.0014
 sel_pt_cpf,a,aluno_heap:scan,,321360.0,320821.0,-0.1677,0.0,0.0017
-sel_rg_curso_alta,c,aluno_h_curso:clustering_btree,,668.0,667.0,-0.1497,0.0,0.0015
-sel_pt_dre,b,aluno_h_dre:primary_hash,,1008.5,1010,0.1487,0.004,0.002
-sel_rg_cr_alta,c,aluno_heap:secondary_btree,,9646,9633,-0.1348,0.0409,0.0422
+sel_pt_dre,b,aluno_bt_dre:primary_btree,,3041,3037,-0.1315,0.0,0.0013
+sel_pt_dre,b,aluno_h_dre:primary_hash,,1008.5,1009.5,0.0992,0.004,0.002
+sel_rg_cr_alta,c,aluno_heap:secondary_btree,,9700,9696.0,-0.0412,0.0402,0.0406
 j_mestre_detalhe,a,aluno_heap:scan x inscricao_heap:scan (papeis trocados),hash,12035,12034,-0.0083,0.0,0.0001

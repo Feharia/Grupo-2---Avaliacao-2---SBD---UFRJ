@@ -4,9 +4,9 @@ Este é um protótipo funcional da arquitetura descrita em `../HANDOFF_ARQUITETU
 
 Estado em 13/11/2026:
 - **compila sem avisos** com Apple clang 21 e GCC 13 (`-Wall -Wextra -Wpedantic -Wshadow`);
-- **65 testes passam**, também com ASan e UBSan;
+- **67 testes passam**, também com ASan e UBSan;
 - a bancada roda na escala do handoff (Aluno com 20.000 linhas, Inscrição com 100.000) em cerca de 40 s;
-- todas as **555 linhas medidas batem com o SQLite**, em número de linhas e checksum. Cada combinação repete até as contagens e o tempo variarem menos de 5% (de 3 a 10 vezes; decisão 132 emendada), e o `convergencia.csv` marca os grupos que pararam no teto;
+- todas as **534 linhas medidas batem com o SQLite**, em número de linhas e checksum. Cada combinação repete até as contagens e o tempo variarem menos de 5% (de 3 a 10 vezes; decisão 132 emendada), e o `convergencia.csv` marca os grupos que pararam no teto;
 - a matriz obrigatória do enunciado de 04/11 está completa: 60 células, 54 executadas e 6 não aplicáveis (caso 3); veja a tabela "Cobertura da matriz";
 - as células que não rodam aparecem no resultado com o motivo (decisão 170 do handoff): 132 com status `nao_aplicavel` (casos 1 a 4). Nenhuma célula fica `inviavel` desde o particionamento recursivo do hash join (decisão 171).
 
@@ -14,7 +14,7 @@ Estado em 13/11/2026:
 
 ```bash
 make                 # build/bancada e build/testes
-make test            # 65 testes (shim com a sintaxe do GoogleTest)
+make test            # 67 testes (shim com a sintaxe do GoogleTest)
 make asan            # testes com AddressSanitizer + UBSan
 make rapido          # bancada em escala 0,1 + reference.py + compare.py + tabelas.py
 ```
@@ -70,7 +70,7 @@ cmake -S . -B build-cmake && cmake --build build-cmake && ctest --test-dir build
 | 1 | `src/layer1/bench.cpp` | gerador da base, especificação padrão, constantes por quantis, lotes, repetições, CSVs, manifesto |
 | — | `tools/reference.py`, `tools/compare.py` | conferência com o SQLite (147, 166) |
 | — | `tools/tabelas.py` | tabelas de análise a partir de uma saída (Markdown e CSV) |
-| — | `tests/` | 65 testes das camadas 2, 3 e 4 |
+| — | `tests/` | 67 testes das camadas 2, 3 e 4 |
 
 ## Saídas da bancada
 

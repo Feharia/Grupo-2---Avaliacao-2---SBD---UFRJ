@@ -399,7 +399,7 @@ void select_find(StorageManager& sm, const AccessPath& path, const Predicate& p,
 
 void select_probe(StorageManager& sm, const AccessPath& path, const Predicate& p, const SelectPlan& plan,
                   const Reservation& res, ResultSink& sink) {
-    RidCursor rc = sm.probe(path, p, kRandomReuse);
+    RidCursor rc = sm.probe(path, p, kRandomReuse, res);
     if (!plan.sort_rids) {   // baseline: RIDs na ordem das posting lists (117)
         while (auto rid = rc.next()) {
             PinnedRecord pr = sm.fetch(path.table, *rid, kRandomOnce, res);

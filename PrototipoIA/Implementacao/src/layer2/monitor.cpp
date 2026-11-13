@@ -122,8 +122,12 @@ std::size_t JoinPlan::frames_used() const {
 }
 
 std::size_t SelectPlan::frames_used() const {
-    if (sort_rids) return scratch_pages + 1;
-    return 1;   // uma página do cursor ou do fetch por vez; páginas de índice ficam fora de M (145)
+    // M inclui as páginas de índice (172): no probe e no clustering, a página do índice fica fixada
+    // enquanto o fetch fixa a de dados; a descida da B+ fixa um nó por vez.
+    const bool index_and_data = path == PathKind::SecondaryHash || path == PathKind::SecondaryBTreeNonClustering ||
+                                path == PathKind::SecondaryBTreeClustering;
+    const std::size_t base = index_and_data ? 2 : 1;
+    return sort_rids ? scratch_pages + base : base;
 }
 
 std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, const JoinInput& outer,
@@ -263,6 +267,8 @@ std::variant<SelectPlan, NotApplicable> Monitor::plan_select(const AccessPath& p
         p.scratch_pages = p.m - 2;
     }
     if (p.m < 1) return NotApplicable{"m < 1", NotApplicable::Kind::Inviavel};
+    if (p.frames_used() > p.m)   // índice e dados juntos não cabem em m (172)
+        return NotApplicable{"página de índice e página de dados não cabem em m", NotApplicable::Kind::Inviavel};
     try {
         (void)storage_.stats(path.table);
     } catch (const std::logic_error& e) {
@@ -294,6 +300,8 @@ Outcome Monitor::measured(std::size_t m, std::size_t frames, bool swapped, const
     r.delta = s1 - s0;
     if (r.delta.global.data_area_requests != 0)
         throw std::logic_error("página de dados pedida sem reserva durante a operação medida (159)");
+    if (r.delta.global.index_area_requests != 0)
+        throw std::logic_error("página de índice pedida sem reserva durante a operação medida (172)");
     r.flush_writes = storage_.flush_all();                        // 7: verificação, deve ser 0
     r.estimate = est();                                           // 8
     r.rows = sink.rows();

@@ -30,7 +30,7 @@ O enunciado ([PDF, versão de 04/11/2026](PrototipoIA/Avaliacao_2_v2_Indexacao_e
 
 A métrica central é o **número de blocos transferidos** entre os arquivos do motor e o buffer pool, contado em cada `pread` e `pwrite` do gerente de arquivos. Não é E/S física do SSD: o cache de páginas do sistema operacional pode atender a leitura, e os seeks são classificados (sequencial × aleatório), não observados. Por isso o tempo de relógio é registrado só como informação complementar. Cada medida tem ao lado o custo estimado pelas fórmulas dos livros-texto (Silberschatz e afins), calculado com os parâmetros medidos pela própria bancada. Cada resultado é conferido contra o SQLite, em número de linhas e checksum.
 
-O código em `PrototipoIA/Implementacao/` é um **protótipo gerado por IA (Claude)**, ainda sem revisão completa do grupo. O log de prompts está em [`PROMPTS.md`](PrototipoIA/Implementacao/PROMPTS.md). A arquitetura e as decisões que guiaram a geração estão em [`HANDOFF_ARQUITETURA_2026-11-08.md`](PrototipoIA/HANDOFF_ARQUITETURA_2026-11-08.md). As decisões 173 a 175 vêm da auditoria de 10/11/2026.
+O código em `PrototipoIA/Implementacao/` é um **protótipo gerado por IA (Claude)**, ainda sem revisão completa do grupo. O log de prompts está em [`PROMPTS.md`](PrototipoIA/Implementacao/PROMPTS.md). A arquitetura e as decisões que guiaram a geração estão em [`HANDOFF_ARQUITETURA_2026-11-08.md`](PrototipoIA/HANDOFF_ARQUITETURA_2026-11-08.md). As decisões 172 a 175 vêm da auditoria de 10/11/2026.
 
 ## 2. Objetivo
 
@@ -83,7 +83,7 @@ Células da matriz do enunciado que não fazem sentido, como uma faixa sobre has
    make -j8
    ```
 
-3. Rode os testes: são 65, das camadas 2, 3 e 4. Para rodar os mesmos testes com AddressSanitizer e UBSan, use `make asan`. O CI exige GoogleTest real; o comando `make test` mantém o shim local.
+3. Rode os testes: são 67, das camadas 2, 3 e 4. Para rodar os mesmos testes com AddressSanitizer e UBSan, use `make asan`. O CI exige GoogleTest real; o comando `make test` mantém o shim local.
 
    ```bash
    make test
@@ -153,7 +153,7 @@ Os números abaixo vêm da rodada completa em [`resultados_exemplo/`](PrototipoI
 - M = 32 molduras nas junções e M = 2 nas seleções;
 - de 3 a 10 repetições por combinação.
 
-As 555 linhas medidas batem com o SQLite. Todas as 16 tabelas estão em [`resultados_exemplo/tabelas.md`](PrototipoIA/Implementacao/resultados_exemplo/tabelas.md). Uma rodada nova reproduz as mesmas contagens de blocos; só o tempo e o nº de repetições mudam.
+As 534 linhas medidas batem com o SQLite. Todas as 16 tabelas estão em [`resultados_exemplo/tabelas.md`](PrototipoIA/Implementacao/resultados_exemplo/tabelas.md). Uma rodada nova reproduz as mesmas contagens de blocos; só o tempo e o nº de repetições mudam.
 
 **A base** é o esquema de universidade do enunciado:
 
@@ -185,12 +185,12 @@ Blocos transferidos pela mesma consulta em cada organização e caminho. Em negr
 
 | Consulta | Selet. | Heap (varredura) | B+ primária | Hash primário | Heap + hash sec. | Heap + B+ sec. | B+ prim. + clustering | Hash prim. + clustering |
 |---|---|---:|---:|---|---:|---:|---:|---:|
-| igualdade em UNIQUE: cpf | pontual | 321.360 |  |  | **1.901** |  |  |  |
-| igualdade em UNIQUE: dre | pontual | 326.680 | 1.045 | **1.008** |  |  |  |  |
+| igualdade em UNIQUE: cpf | pontual | 321.360 |  |  | **1.992** |  |  |  |
+| igualdade em UNIQUE: dre | pontual | 326.680 | 3.041 | **1.008** |  |  |  |  |
 | faixa em UNIQUE: dre | 1% | 646 | **12** | n/a (caso 4) |  |  |  |  |
 | faixa em UNIQUE: dre | 50% | 646 | **479** | n/a (caso 4) |  |  |  |  |
 | faixa em NOT UNIQUE: cr | 1% | 646 |  |  |  | **201** |  |  |
-| faixa em NOT UNIQUE: cr | 50% | **646** |  |  |  | 9.646 |  |  |
+| faixa em NOT UNIQUE: cr | 50% | **646** |  |  |  | 9.700 |  |  |
 | faixa em NOT UNIQUE: curso | 1% | 646 | 13 | n/a (caso 4) |  |  | 13 | **10** |
 | faixa em NOT UNIQUE: curso | 50% | 646 | **477** | n/a (caso 4) |  |  | **477** | 668 |
 
@@ -200,14 +200,14 @@ A faixa é feita de grupos inteiros de valores iguais (decisão 174): as seletiv
 
 - **Igualdade (1.000 chaves por lote):**
   - Sem índice, cada chave custa em média metade do heap, cerca de 323 blocos.
-  - O hash primário custa 1,01 bloco por chave; a B+ primária, 1,04. A B+ fica perto do hash porque os nós internos ficam na área de índices do buffer (taxa de acerto de 0,66).
-  - O hash secundário custa 1,9 bloco por chave: o bucket do índice e depois o bloco de dados. Contra a varredura, os índices reduzem o custo de 169 a 324 vezes.
+  - O hash primário custa 1,01 bloco por chave; a B+ primária, 3,04. Com as páginas de índice dentro de M = 2 (decisão 172), cada chave lê a descida inteira (raiz, nó interno e folha), como na fórmula h + 1. Por isso, para igualdade, o hash ganha da B+ por 3×.
+  - O hash secundário custa 2,0 blocos por chave: o bucket do índice e depois o bloco de dados. Contra a varredura, os índices reduzem o custo de 107 a 324 vezes.
 - **Faixa estreita (1%):**
   - Os índices ganham da varredura: a B+ primária lê 12 blocos contra 646 (54×), e o clustering sobre hash lê 10.
   - O índice secundário não clustering ainda ganha, mas por pouco: 201 blocos contra 646 (3,2×). Já são 199 registros, e cada um custa um acesso aleatório.
   - O hash primário não responde a faixa, porque não preserva a ordem das chaves.
 - **Faixa larga (50%):**
-  - O índice secundário não clustering **perde** da varredura: 9.646 blocos contra 646, 15 vezes mais. Cada um dos 9.976 registros vira um acesso aleatório a um bloco de dados; nesta rodada, os RIDs não são ordenados antes do fetch.
+  - O índice secundário não clustering **perde** da varredura: 9.700 blocos contra 646, 15 vezes mais. Cada um dos 9.976 registros vira um acesso aleatório a um bloco de dados; nesta rodada, os RIDs não são ordenados antes do fetch.
   - A B+ primária ainda ganha (479 × 646), mas só por 1,35×, porque as folhas ficam 70% cheias.
 - **Clustering sobre B+ × clustering sobre hash:**
   - Com 1%, os dois custam quase o mesmo (13 × 10 blocos).
@@ -280,7 +280,7 @@ Na LRU, a releitura sequencial da interna sempre expulsa a página que vai ser p
 | Junção: BNL | 21 | 0,0% | 21 de 21 | +0,0% |
 | Junção: sort-merge | 21 | 0,7% | 21 de 21 | −7,4% (Curso ⋈ Disciplina, B+ × B+) |
 | Junção: hash | 21 | 0,0% | 20 de 21 | +29,2% (Inscrição como build) |
-| Seleção: igualdade (lote) | 5 | 5,2% | 4 de 5 | +187,1% (B+ primária) |
+| Seleção: igualdade (lote) | 5 | 1,1% | 5 de 5 | +9,8% (hash primário) |
 | Seleção: faixa | 16 | 0,0% | 13 de 16 | −43,7% (clustering sobre hash, 50%) |
 
 A auditoria de 10/11 apontou erros grandes, e três premissas comprovadamente erradas foram corrigidas, sem calibrar as fórmulas:
@@ -288,9 +288,10 @@ A auditoria de 10/11 apontou erros grandes, e três premissas comprovadamente er
 - **Faixas sobre B+:** a fórmula supunha folhas cheias. Agora usa a fração das folhas reais, com o fill de 70% da carga, e o erro caiu de cerca de −32% para −0,2%.
 - **Clustering sobre hash:** agora a estimativa é o nº de valores da faixa × a cadeia média do bucket, como faz a busca.
 
+A B+ primária na igualdade passou de +187% para −1,3% com o contrato de M da decisão 172, e não com uma mudança de fórmula. A fórmula h + 1 supõe que os nós internos não ficam em cache. Antes, eles ficavam na área de índices, fora de M; agora disputam as 2 molduras da operação.
+
 As diferenças que restam têm causa identificada:
 - **Hash join com Inscrição como build (+29%):** o termo 4·n_h, que conta blocos parcialmente cheios, cresce com as 961 subpartições da recursão.
-- **B+ primária, igualdade (+187%):** a fórmula conta 3 blocos por chave, a altura da árvore, mas os nós internos ficam na área de índices do buffer.
 - **Clustering sobre hash com 50% (−44%):** valores que caem no mesmo bucket releem a cadeia, e a fórmula não modela essas colisões.
 
 ### 4.6 Ocupação depois da carga de manutenção
@@ -308,7 +309,7 @@ A carga de manutenção faz 5% de inserções e 1% de remoções nas variantes d
 
 ### 4.7 Repetições e células que não rodam
 
-**Repetições.** Dos 168 grupos de repetições, 166 convergiram: E/S e tempo variaram menos de 5%. Os dois que pararam no teto de 10 repetições são o hash join Aluno ⋈ Detalhes, em LRU e MRU. Neles a E/S ficou estável, e só o tempo variou (10,0% e 5,4%). O `convergencia.csv` marca cada caso.
+**Repetições.** Dos 168 grupos de repetições, 167 convergiram: E/S e tempo variaram menos de 5%. O que parou no teto de 10 repetições é o hash join Aluno ⋈ Detalhes em MRU. Nele a E/S ficou estável, e só o tempo variou (6,1%). O `convergencia.csv` marca cada caso.
 
 **Células que não rodam.** Por política, 66 células da matriz do enunciado aparecem como `nao_aplicavel`, com o motivo no CSV:
 
@@ -325,7 +326,7 @@ Os detalhes estão na §9 do [handoff](PrototipoIA/HANDOFF_ARQUITETURA_2026-11-0
 
 - **Código ainda não revisado.** É um protótipo gerado por IA. A revisão do código, os testes de estresse e a análise crítica (§7 do enunciado) ainda são tarefa do grupo.
 - **Plataforma.** O CI roda no Ubuntu 24.04 com GCC 13, CMake, GoogleTest real e ASan/UBSan. Localmente, foi testado no macOS (Apple clang 21) com `make`, CMake e ASan/UBSan. O LeakSanitizer não foi validado: o protocolo usa `detect_leaks=0`.
-- **Memória de trabalho.** M conta as molduras da reserva da operação, e as estruturas auxiliares do operador (diretório do rascunho, diretório do BNL) são cobradas dessas molduras (decisão 173). As páginas de índice e de catálogo ficam em áreas próprias do buffer, fora de M, e iguais em todos os cenários (decisão 145).
+- **Memória de trabalho.** M é toda a memória de páginas do operador: dados, índice, temporários e rascunho vêm da reserva (decisão 172), e as estruturas auxiliares são cobradas das mesmas molduras (decisão 173). A área de índices só serve à carga e à manutenção. A página do catálogo fica fixada fora de M, sem E/S durante as operações.
 - **Modelo de custo.** Restam os desvios da §4.5.
 - **Recursos desligados.** O prefetch e o toss-immediate ficam desligados em todas as configurações. A ordenação dos RIDs antes do fetch existe, mas não é usada na especificação padrão.
 - **Escala reduzida.** Com `--escala` abaixo de cerca de 0,72, Turma passa a caber em M e o equijoin NOT UNIQUE muda de "maior ⋈ maior" para "menor ⋈ maior". A bancada avisa e grava o tamanho calculado.

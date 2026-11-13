@@ -20,6 +20,16 @@ hash join, de +0,2% a +1,1%. Nenhum cenário diminuiu. A causa é a decisão
 então as runs ficam um pouco menores e as partições do hash, um pouco mais
 numerosas.
 
+Com a decisão 172 (P02, commit isolado), são 29 alertas: os 22 acima e 7
+nas seleções por índice. Agora as páginas de índice vêm da reserva de M = 2,
+sem o cache da área de índices:
+- hash secundário pontual: +64% a +68%;
+- B+ primária pontual: +4,9% em LRU e +98% em MRU (na escala 0,1 a árvore
+  tem altura 2, e a MRU expulsa a raiz a cada chave);
+- B+ secundária por faixa: +0,4% a +4,8%, pela releitura da folha depois da
+  cadeia de overflow.
+Reverter o commit do P02 volta aos 22 alertas.
+
 ## Protocolo
 
 - Escala 0,1; semente 20261122; uma repetição; lote de 100 chaves;

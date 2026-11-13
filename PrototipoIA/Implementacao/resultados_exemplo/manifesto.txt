@@ -1,7 +1,7 @@
-data: 2026-11-13 17:50:23
+data: 2026-11-13 18:05:48
 compilador: Apple LLVM 21.0.0 (clang-2100.1.1.101)
 flags: -std=c++20 -O2 -g
-commit: b9e1c1a
+commit: b3826e6 + P02
 escala: 1
 semente: 20261122
 reps: 3..10
@@ -10,4 +10,4 @@ m_juncao: 32
 m_selecao: 2
 lote: 1000
 hash_especificacao: 3ecf24fe9eb6f17f
-duracao_s: 37.9
+duracao_s: 38.5
