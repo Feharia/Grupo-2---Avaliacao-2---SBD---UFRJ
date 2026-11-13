@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 
+#include <unistd.h>   // mkdtemp: no macOS fica em unistd.h; no glibc, também em stdlib.h
+
 using namespace cbd;
 namespace spec = cbd001_spec;
 
