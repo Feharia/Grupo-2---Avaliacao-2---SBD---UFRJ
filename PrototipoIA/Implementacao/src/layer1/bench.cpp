@@ -285,10 +285,16 @@ Spec spec_padrao() {
     Spec s;
     using SK = StructureKind;
     s.variants = {
-        {"curso_heap", "curso", SK::Heap, "", {}},
-        {"disciplina_heap", "disciplina", SK::Heap, "", {}},
+        // P05 (decisão 175): no heap, secundário de campo UNIQUE é hash e de NOT UNIQUE é B+ (§4.2)
+        {"curso_heap", "curso", SK::Heap, "", {{SK::SecHash, "codigo"}}},
+        {"curso_bt_codigo", "curso", SK::BTree, "codigo", {}},
+        {"curso_h_codigo", "curso", SK::Hash, "codigo", {}},
+        {"disciplina_heap", "disciplina", SK::Heap, "", {{SK::SecBTree, "curso"}}},
+        {"disciplina_bt_curso", "disciplina", SK::BTree, "curso", {}},
+        {"disciplina_h_curso", "disciplina", SK::Hash, "curso", {}},
         {"turma_heap", "turma", SK::Heap, "", {{SK::SecBTree, "professor"}}},
-        {"aluno_heap", "aluno", SK::Heap, "", {{SK::SecHash, "cpf"}, {SK::SecBTree, "professor_orientador"}, {SK::SecBTree, "cr"}}},
+        {"aluno_heap", "aluno", SK::Heap, "", {{SK::SecHash, "cpf"}, {SK::SecBTree, "professor_orientador"}, {SK::SecBTree, "cr"},
+                                               {SK::SecHash, "dre"}, {SK::SecBTree, "curso"}}},
         {"aluno_bt_dre", "aluno", SK::BTree, "dre", {}},
         {"aluno_bt_curso", "aluno", SK::BTree, "curso", {{SK::SecBTree, "curso", true}}},
         {"aluno_h_dre", "aluno", SK::Hash, "dre", {}},
@@ -346,15 +352,25 @@ Spec spec_padrao() {
                           {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::Scan, ""}, "b"},
                           {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_bt_dre", PK::PrimaryBTree, "dre"}, "c"},
                           {{"aluno_h_dre", PK::PrimaryHash, "dre"}, {"inscricao_h_dre", PK::PrimaryHash, "dre"}, "c"},
-                          {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::SecondaryBTreeNonClustering, "dre"}, "d"}},
+                          {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::SecondaryBTreeNonClustering, "dre"}, "d"},
+                          {{"aluno_heap", PK::SecondaryHash, "dre"}, {"inscricao_heap", PK::SecondaryBTreeNonClustering, "dre"}, "e"}},
                          true));
     s.ops.push_back(join("j_pequenas", "natural_join", "menor_menor",
                          "SELECT x.*, y.* FROM curso x JOIN disciplina y ON x.codigo = y.curso", "codigo", "curso",
-                         {{{"curso_heap", PK::Scan, ""}, {"disciplina_heap", PK::Scan, ""}, "a"}}));
+                         {{{"curso_heap", PK::Scan, ""}, {"disciplina_heap", PK::Scan, ""}, "a"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap", PK::Scan, ""}, "b"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_bt_curso", PK::PrimaryBTree, "curso"}, "c"},
+                          {{"curso_h_codigo", PK::PrimaryHash, "codigo"}, {"disciplina_h_curso", PK::PrimaryHash, "curso"}, "c"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap", PK::SecondaryBTreeNonClustering, "curso"}, "d"},
+                          {{"curso_heap", PK::SecondaryHash, "codigo"}, {"disciplina_heap", PK::SecondaryBTreeNonClustering, "curso"}, "e"}}));
     s.ops.push_back(join("j_grande_pequena", "natural_join", "menor_maior",
                          "SELECT x.*, y.* FROM curso x JOIN aluno y ON x.codigo = y.curso", "codigo", "curso",
                          {{{"curso_heap", PK::Scan, ""}, {"aluno_heap", PK::Scan, ""}, "a"},
-                          {{"curso_heap", PK::Scan, ""}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "b"}}));
+                          {{"curso_heap", PK::Scan, ""}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "b"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "c"},
+                          {{"curso_h_codigo", PK::PrimaryHash, "codigo"}, {"aluno_h_curso", PK::PrimaryHash, "curso"}, "c"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "curso"}, "d"},
+                          {{"curso_heap", PK::SecondaryHash, "codigo"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "curso"}, "e"}}));
     // tipos 2 e 3: só as configurações a e e existem; b, c e d são o caso 1 (170)
     s.ops.push_back(join("j_unique", "equijoin_unique", "maior_maior",
                          "SELECT x.*, y.* FROM aluno x JOIN detalhes y ON x.cpf = y.cpf", "cpf", "cpf",

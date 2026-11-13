@@ -705,8 +705,72 @@ def t_convergencia(b):
          "convergiu_io", "convergiu_tempo"])
 
 
-GERADORES = (t_resumo, t_igualdade, t_faixa, t_organizacoes, t_juncoes, t_vencedor, t_ordem, t_politicas,
-             t_estimativa, t_fases, t_estruturas, t_ocupacao, t_nao_executadas, t_acesso, t_convergencia)
+def estado_celula(b, tipo, tamanho, config, selet, alg):
+    """Estado de uma célula da matriz do enunciado no resultados.csv (política escolhida)."""
+    rs = [r for r in b.brutos if r["politica"] == b.politica and r["tipo"] == tipo and r["config"] == config
+          and r["tamanho"] == tamanho and r["seletividade"] == selet and r["algoritmo"] == alg]
+    ok = {r["variante"].replace(" (papeis trocados)", "") for r in rs if r["status"] == "ok"}
+    if ok:
+        return "ok" if len(ok) == 1 else f"ok ({len(ok)} variantes)", "ok"
+    for st in ("inviavel", "nao_aplicavel"):
+        motivo = next((r["motivo"] for r in rs if r["status"] == st), None)
+        if motivo is not None:
+            caso = motivo.split(":")[0] if motivo.startswith("caso") else ""
+            return ("inviável" if st == "inviavel" else "n/a") + (f" ({caso})" if caso else ""), st
+    return None, "ausente"
+
+
+def t_cobertura(b):
+    """P15: a matriz do enunciado v2 célula por célula, gerada do resultados.csv."""
+    configs = ("a", "b", "c", "d", "e")
+    tamanhos = ("menor_menor", "menor_maior", "maior_maior")
+    cont = Counter()
+    linhas, brutas = [], []
+
+    def bloco(grupo, obrig, rotulo, celulas, colunas):
+        for chave, args_por_col in celulas:
+            lin = [grupo, rotulo(chave)]
+            for args in args_por_col:
+                if args is None:   # coluna que não existe para este tipo
+                    lin.append("—")
+                    continue
+                txt, st = estado_celula(b, *args)
+                if st == "ausente":
+                    txt = "**AUSENTE**" if obrig == "obrigatória" else "não implementada"
+                cont[(obrig, st)] += 1
+                lin.append(txt)
+                brutas.append([grupo, obrig, *args, st if st != "ausente" or obrig == "obrigatória" else "nao_implementado"])
+            linhas.append(lin)
+
+    algs = ("bnl", "sort_merge", "hash")
+    for tipo, obrig in (("natural_join", "obrigatória"), ("equijoin_unique", "opcional"),
+                        ("equijoin_not_unique", "opcional")):
+        celulas = [((tam, cfg), [(tipo, tam, cfg, "", a) for a in algs]) for tam in tamanhos for cfg in configs]
+        bloco(f"{TIPO[tipo]} ({obrig})", obrig, lambda k: f"{TAMANHO[k[0]]}, config. {k[1]}", celulas, algs)
+    for tipo, obrig in (("igualdade_unique", "obrigatória"), ("faixa_not_unique", "obrigatória"),
+                        ("faixa_unique", "opcional")):
+        selets = ("pontual", "1%", "50%") if tipo.startswith("igualdade") else (None, "1%", "50%")
+        celulas = [(cfg, [None if s is None else (tipo, "", cfg, s, "") for s in selets]) for cfg in ("a", "b", "c")]
+        bloco(f"{TIPO[tipo]} ({obrig})", obrig, lambda k: f"config. {k}", celulas, selets)
+    tot = lambda o: sum(n for (ob, _), n in cont.items() if ob == o)
+    resumo = "; ".join(
+        f"{rot}: {tot(o)} células, {cont[(o, 'ok')]} executadas, {cont[(o, 'nao_aplicavel')]} não aplicáveis, "
+        f"{cont[(o, 'inviavel')]} inviáveis e {cont[(o, 'ausente')]} {aus}"
+        for o, rot, aus in (("obrigatória", "obrigatórias", "ausentes"), ("opcional", "opcionais", "não implementadas")))
+    return Tabela(
+        "16_cobertura_matriz", "Cobertura da matriz do enunciado",
+        f"Cada célula do enunciado v2 (04/11/2026), lida do resultados.csv ({b.politica}). {resumo}. "
+        "Nas junções, as colunas são os algoritmos (BNL, sort-merge, hash); nas seleções, as seletividades "
+        "(pontual, 1%, 50%; a faixa não tem nível pontual). Igualdade em UNIQUE com 1% ou 50% é o caso 3: a "
+        "consulta devolve 1 linha e é medida no nível pontual. “AUSENTE” em negrito seria uma célula obrigatória "
+        "sem linha no CSV; “não implementada” é uma célula opcional que a bancada não monta.",
+        ["Grupo", "Célula", "1ª coluna", "2ª coluna", "3ª coluna"], linhas, brutas,
+        ["grupo", "obrigatoriedade", "tipo", "tamanho", "config", "seletividade", "algoritmo", "estado"])
+
+
+GERADORES = (t_resumo, t_cobertura, t_igualdade, t_faixa, t_organizacoes, t_juncoes, t_vencedor, t_ordem,
+             t_politicas, t_estimativa, t_fases, t_estruturas, t_ocupacao, t_nao_executadas, t_acesso,
+             t_convergencia)
 
 
 def main():

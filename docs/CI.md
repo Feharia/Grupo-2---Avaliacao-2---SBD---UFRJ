@@ -62,7 +62,7 @@ a correção dos valores é verificada pelo comparador SQLite existente.
 
 Essa rodada reduzida não certifica a matriz experimental integral. A
 [suíte de I/O](IO.md) acrescenta comparação entre revisões com inventário
-versionado de 108 execuções e alerta para aumentos, sem budget bloqueante.
+versionado de 168 execuções e alerta para aumentos, sem budget bloqueante.
 O [consumo do Actions](CUSTO_ACTIONS.md) foi avaliado separadamente.
 
 ## Evidências e reprodução

@@ -1,9 +1,17 @@
 # Suíte pequena para regressão de I/O
 
-O perfil `io-rapido-v1` compara **108 execuções de consultas**, incluindo
+O perfil `io-rapido-v1` compara **168 execuções de consultas**, incluindo
 seleções em heap/B+/hash e índices secundários, BNL, hash join, sort-merge,
 LRU e MRU. Reutiliza a escala reduzida da bancada existente. Não substitui
 a matriz experimental integral exigida no trabalho.
+
+**Revisão do inventário (13/11/2026, auditoria P04/P05).** O inventário
+passou de 108 para 168 identidades, só com acréscimos: as 8 células do
+NATURAL JOIN que faltavam (P×P b–e, P×G c–e, G×G e) × 3 algoritmos × 2
+políticas, com as duas variantes da configuração c. A seletividade baixa
+passou de 0,1% para 1% (enunciado v2). Nenhuma identidade antiga mudou, e
+os dois lados continuam rodando o mesmo driver, então a comparação segue
+válida sem nova versão do perfil.
 
 ## Protocolo
 
@@ -23,7 +31,7 @@ a matriz experimental integral exigida no trabalho.
   fontes e saída. As flags e a versão do compilador precisam coincidir.
 - SHA256 de dados, esquema, consultas, constantes e lotes, além dos hashes
   de driver/ferramentas, precisam coincidir. O inventário
-  `tools/io_cenarios_v1.json` fixa as 108 identidades, incluindo variantes;
+  `tools/io_cenarios_v1.json` fixa as 168 identidades, incluindo variantes;
   remover uma delas dos dois lados também falha.
 - Ambos os lados passam pela referência SQLite do candidato, comparação de
   contagens/checksums e multiconjuntos de tuplas e verificação de cobertura.
