@@ -648,3 +648,10 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   terminal do usuário. Esse limite pode impedir o push e a consulta do
   Actions pelo agente; não é falha de configuração do origin nem evidência
   de credenciais inválidas. Nenhuma aprovação de CI hospedado foi alegada.
+- Resultado: criado `d3a7249b509c1e5fbc367f31e7fe4ad36c721d91` com CI/I/O,
+  85 arquivos e autoria Carlos. A tentativa autorizada de
+  `git push -u origin ci/gate-correcao` terminou com exit 128 por DNS de
+  github.com. `gh run list` também não conseguiu conectar a api.github.com.
+  Assim, o envio e a conferência hosted permanecem pendentes, sem merge.
+  Este resultado é registrado em commit documental separado para manter a
+  árvore limpa sem reescrever o commit já criado.
