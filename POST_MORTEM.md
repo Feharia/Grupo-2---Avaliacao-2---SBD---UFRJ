@@ -733,3 +733,120 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   hospedada do commit documental final e ativação de status obrigatório.
   O helper foi preparado para executar essas etapas em sequência; este
   registro não declara que já ocorreram.
+
+## 2026-11-16 — Correções da auditoria de 10/11 (P01–P15) com o Claude
+
+### Origem, escopo e decisões
+
+- Fonte: `PROBLEMAS_IDENTIFICADOS_CBD_2026-11-10.md` (P01 a P15), auditoria
+  do commit `b61b87b`, conferida em 13/11 contra a main `4091762` e contra o
+  enunciado de 04/11/2026 (v2: seletividade baixa de 1%, NATURAL JOIN
+  obrigatório, equijoins e faixa em UNIQUE opcionais, política escolhida por
+  teste).
+- Ferramenta: Claude (Claude Code, modelo Opus 5.5). Trabalho no branch local
+  `fix/auditoria-p01-p15`, um commit por item, sem push até esta entrada.
+- O CBD-001 da main não é o P01 da auditoria: o CBD-001 corrigiu a ocupação
+  da B+ no bulk load; o P01 é a memória auxiliar do `ScratchSpace`, que
+  continuava sem correção.
+- Decisões do usuário: M inclui as páginas de índice (P02); os equijoins
+  opcionais já implementados ficam; o P02 vai num commit isolado, para poder
+  ser revertido sozinho; os commits sobem um por vez, por autorização.
+- Relação com a revisão de 06/11 (`revisao_interfaces_claude_cbd_2026-11-06.md`):
+  ela foi tratada em 08/11 (decisões 157 a 169), exceto o P0-2 (cota única de
+  M), aceito só em parte na época (159). A auditoria reencontrou o problema
+  (P01, P02, P03), e ele foi resolvido agora (decisões 172 e 173). O P0-4 da
+  revisão deixou o resíduo do P06; o teste de "acesso malformado" do P0-3
+  continua pendente (issue #3, CBD-008).
+- Issues do GitHub: #2, #4, #8, #10, #11, #12 e #13 têm os critérios de aceite
+  atendidos; #5, #6, #7, #9, #14, #15, #16, #17 e #18 só em parte (ver "Não
+  afirmado"); #1 (CBD-007) e #3 (CBD-008) não foram tratadas.
+
+### Commits e evidências
+
+1. `66205e3` (portabilidade): `test_bplus_bulk_load_integration.cpp` chamava
+   `::mkdtemp` sem `<unistd.h>`. Os testes da main não compilavam no macOS; no
+   glibc a declaração vem de `stdlib.h`, por isso o CI passava.
+2. `2ff46c5` (P06): `BufferPool::fetch` passa a recusar bloco livre no bitmap.
+   RED: `FetchDeBlocoLivreLanca` falhou na baseline com "allocate: bloco novo
+   já estava no pool" (o bloco liberado tinha voltado ao pool); GREEN depois.
+3. `f151672` (P07, P09): `convergencia.csv` registra repetições, dispersões e
+   parada por convergência ou pelo teto; `caminhos.csv` registra o acesso
+   executado. O `resultados.csv` não mudou, porque o CI o lê.
+4. `ffb3411` (P01): o diretório do `ScratchSpace` (12 B por registro) passou a
+   ser cobrado das páginas, com ordenação no lugar. No pior caso do E03 (2
+   páginas, registros de um Int32), a capacidade caiu de 1.364 para 448
+   registros, e `record_bytes() + aux_bytes() <= 8.192`. Na escala 1, sort-merge
+   e hash mudaram até 1,3%; BNL e seleções, nada.
+5. `41a402a` (P03): o diretório do BNL guarda só `RecordView` nas m − 1 − chunk
+   molduras restantes. Com registros pequenos (teste `DiretorioDoBnlCabeEmM`),
+   o chunk cai abaixo de 16; com M = 32, as tabelas da base mantêm 16.
+6. `42146fa` (P04): seletividade baixa de 1%, com faixas de grupos inteiros de
+   valores. Efetivas na escala 1: 1,00% (dre), 1,00% (cr), 1,03% (curso); 50%
+   entre 49,84% e 50,00%.
+7. `0827d0f` (P05, P15): as 8 células que faltavam no NATURAL JOIN. Cobertura
+   na escala 1: 60 células obrigatórias, 54 executadas, 6 não aplicáveis
+   (caso 3), nenhuma ausente. Inventário do CI de E/S de 108 para 168
+   identidades, só acréscimos.
+8. `bb6f5cc` (P08): premissas das estimativas. Aluno ⋈ Detalhes: hash de
+   +257,4% para +1,7%, sort-merge de +60,6% para −5,1%; faixa de 50% na B+ de
+   −32,2% para −0,2%; clustering sobre hash com 50% de −51,5% para −43,7%
+   (colisões de buckets não modeladas). Não houve calibração.
+9. `b9e1c1a` (P10, P12): clustering sobre hash contra oráculo (30 chaves em 3
+   buckets, antes e depois de manutenção e reorganize) e E/S dos temporários
+   dentro da medição com M = 4. Os dois passaram: não havia bug.
+10. `b3826e6` e `97f4903` (documentação): resultados de exemplo, READMEs,
+    handoff (decisões 173 a 175, blocos copiados dos headers reais, nota do
+    LSan), catálogos de decisões e enunciado v2 no repositório.
+11. `02bd998` (P02, decisão 172): as páginas de índice vêm da reserva durante
+    a operação. RED intermediário: a primeira versão precisou de 3 molduras na
+    B+ secundária com posting list em overflow, e
+    `RidsEstaveisComDivisoesEReorganize` falhou com "todas as molduras da
+    região estão fixadas"; a folha passou a ser solta durante a cadeia de
+    overflow. Efeito na escala 1: B+ primária pontual de 1.045 para 3.041
+    blocos, com a estimativa h + 1 passando de +187,1% para −1,3%; hash
+    secundário pontual de 1.901 para 1.992; junções iguais.
+
+### Erros da IA corrigidos durante o trabalho
+
+- Erro de sintaxe ao editar `fmt_vezes` no `tools/tabelas.py` (aspas não
+  fechadas), visto na compilação do script.
+- Número errado na mensagem do commit do P08 (+0,3% em vez de +1,7%),
+  corrigido com `--amend` antes de qualquer push.
+- O primeiro teste do P12 usou `c_heap`, cujo grupo de duplicatas é inviável
+  de propósito no sort-merge; foi trocado por A ⋈ B.
+- O primeiro teste do P02 exigia leituras de índice por chave; numa B+ de
+  altura 2 a raiz fica nas 2 molduras, e o certo era contar pedidos.
+- A primeira tabela de cobertura mostrava uma coluna "pontual" nas faixas,
+  que não tem sentido, e contava os papéis trocados como variante.
+- O README afirmou que a configuração d custa o mesmo que a b em todos os
+  tamanhos; isso só vale quando as duas têm a mesma organização (P×P e G×G).
+- Uma tag local criada sem pedido foi removida antes de qualquer push.
+
+### Validação executada
+
+- macOS, Apple clang 21, `make` e CMake/Ninja (do CLion): 67 testes com o
+  shim, também com ASan/UBSan (`detect_leaks=0`); 30 testes Python.
+- Rodada integral (escala 1, LRU e MRU): 555 linhas conferidas com o SQLite
+  sem o P02 e 534 com o P02, zero divergências. Smoke `--rapido --tuplas`:
+  168 execuções, cobertura do CI completa.
+- Comparação de E/S do CI rodada localmente contra `4091762`: 168 cenários
+  pareados; 22 alertas sem o P02 (+0,2% a +1,1%, sort-merge e hash) e 29 com
+  o P02 (mais 7 nas seleções por índice); nenhuma falha de protocolo.
+- A árvore resultante de reverter o P02 é a do `97f4903`: compila e passa nos
+  65 testes daquele ponto.
+
+### Não afirmado
+
+- GCC 13 e GoogleTest real não foram executados localmente; ficam para o CI
+  de cada commit.
+- O LeakSanitizer não foi validado.
+- Critérios parciais das issues: #5 mede a memória auxiliar pela capacidade
+  dos vetores, não por alocações instrumentadas; #6 não testa registros
+  variáveis isoladamente; #7 não tem testes dirigidos de skew e recursão; #9
+  não usa uma sequência calculada à mão; #14 é uma tabela, não um verificador
+  que reprova, e não tem testes negativos; #15 não conta combinações
+  ausentes no `compare.py`; #16 não tem teste determinístico de série que
+  não converge; #17 não tem testes dos estimadores com valores manuais; #18
+  tem manifesto com "b3826e6 + P02" e precisa ser regenerado com o SHA final.
+- Os resultados desta entrada são locais; a validação hospedada de cada
+  commit ainda não ocorreu.
