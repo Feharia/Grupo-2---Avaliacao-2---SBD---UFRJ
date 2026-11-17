@@ -14,13 +14,13 @@ Geradas por `tools/tabelas.py` a partir de `resultados_exemplo/`. A métrica é 
 | M das junções / das seleções | 32 / 2 molduras |
 | Chaves por lote de seleção pontual | 1000 |
 | Combinações medidas (por política) | 84 |
-| Linhas medidas no CSV (todas as repetições e políticas) | 534 |
+| Linhas medidas no CSV (todas as repetições e políticas) | 563 |
 | Células `nao_aplicavel` (caso 1) por política | 54 |
 | Células `nao_aplicavel` (caso 2) por política | 2 |
 | Células `nao_aplicavel` (caso 3) por política | 6 |
 | Células `nao_aplicavel` (caso 4) por política | 4 |
-| Conferência com o SQLite | conferidas: 534 linhas medidas; sem execução: nao_aplicavel: 132; divergências: 0 |
-| Duração da rodada | 38.5 s |
+| Conferência com o SQLite | conferidas: 563 linhas medidas em 168 combinações; sem execução: nao_aplicavel: 132; ausentes: 0; divergências: 0 |
+| Duração da rodada | 39.6 s |
 
 ## Cobertura da matriz do enunciado
 
@@ -89,11 +89,11 @@ Cada execução busca um lote de 1.000 chaves sorteadas. O lote muda a cada repe
 
 | Consulta | Config. | Caminho | Linhas | Leituras | Leituras/chave | Aleatórias | Taxa de acerto | Estimado | Erro est. | Tempo (ms) | Var. reps | × melhor |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| igualdade em UNIQUE: cpf | a | heap, varredura | 1.000 | 321.360 | 321,36 | 996 | 0,00 | 323.000 | +0,5% | 314,2 | 5,3% | 161,3× |
+| igualdade em UNIQUE: cpf | a | heap, varredura | 1.000 | 321.360 | 321,36 | 996 | 0,00 | 323.000 | +0,5% | 316,2 | 5,3% | 161,3× |
 | igualdade em UNIQUE: cpf | c | heap + hash secundário (cpf) | 1.000 | 1.992 | 1,99 | 1.992 | 0,00 | 2.000 | +0,4% | 1,7 | 0,3% | melhor |
-| igualdade em UNIQUE: dre | a | heap, varredura | 1.000 | 326.680 | 326,68 | 996 | 0,00 | 323.000 | -1,1% | 254,4 | 3,0% | 323,9× |
+| igualdade em UNIQUE: dre | a | heap, varredura | 1.000 | 326.680 | 326,68 | 996 | 0,00 | 323.000 | -1,1% | 260,0 | 3,0% | 323,9× |
 | igualdade em UNIQUE: dre | b | hash primário (dre) | 1.000 | 1.008 | 1,01 | 1.006 | 0,00 | 1.108 | +9,8% | 0,8 | 0,6% | melhor |
-| igualdade em UNIQUE: dre | b | B+ primária (dre) | 1.000 | 3.041 | 3,04 | 3.000 | 0,00 | 3.000 | -1,3% | 4,2 | 0,5% | 3,02× |
+| igualdade em UNIQUE: dre | b | B+ primária (dre) | 1.000 | 3.041 | 3,04 | 3.000 | 0,00 | 3.000 | -1,3% | 4,3 | 0,5% | 3,02× |
 
 ## Seleção por faixa
 
@@ -103,20 +103,20 @@ Cada execução busca um lote de 1.000 chaves sorteadas. O lote muda a cada repe
 |---|---:|---:|---|---|---:|---:|---:|---:|---:|---:|---:|
 | faixa em UNIQUE: dre | 1% | 1,00% | a | heap, varredura | 200 | 646 | 99,8% | 646 | +0,0% | 0,59 | 53,8× |
 | faixa em UNIQUE: dre | 1% | 1,00% | b | B+ primária (dre) | 200 | 12 | 75,0% | 12 | +0,0% | 0,06 | melhor |
-| faixa em UNIQUE: dre | 50% | 50,00% | a | heap, varredura | 10.000 | 646 | 99,8% | 646 | +0,0% | 2,96 | 1,35× |
+| faixa em UNIQUE: dre | 50% | 50,00% | a | heap, varredura | 10.000 | 646 | 99,8% | 646 | +0,0% | 2,95 | 1,35× |
 | faixa em UNIQUE: dre | 50% | 50,00% | b | B+ primária (dre) | 10.000 | 479 | 99,4% | 478 | -0,2% | 2,90 | melhor |
-| faixa em NOT UNIQUE: cr | 1% | 1,00% | a | heap, varredura | 199 | 646 | 99,8% | 646 | +0,0% | 0,51 | 3,21× |
+| faixa em NOT UNIQUE: cr | 1% | 1,00% | a | heap, varredura | 199 | 646 | 99,8% | 646 | +0,0% | 0,55 | 3,21× |
 | faixa em NOT UNIQUE: cr | 1% | 1,00% | c | heap + B+ secundária (cr) | 199 | 201 | 0,5% | 201 | +0,0% | 0,14 | melhor |
-| faixa em NOT UNIQUE: cr | 50% | 49,88% | a | heap, varredura | 9.976 | 646 | 99,8% | 646 | +0,0% | 2,92 | melhor |
-| faixa em NOT UNIQUE: cr | 50% | 49,88% | c | heap + B+ secundária (cr) | 9.976 | 9.700 | 6,8% | 9.978 | +2,9% | 6,54 | 15,0× |
-| faixa em NOT UNIQUE: curso | 1% | 1,03% | a | heap, varredura | 207 | 646 | 99,8% | 646 | +0,0% | 0,58 | 64,6× |
+| faixa em NOT UNIQUE: cr | 50% | 49,88% | a | heap, varredura | 9.976 | 646 | 99,8% | 646 | +0,0% | 2,96 | melhor |
+| faixa em NOT UNIQUE: cr | 50% | 49,88% | c | heap + B+ secundária (cr) | 9.976 | 9.700 | 6,8% | 9.978 | +2,9% | 6,50 | 15,0× |
+| faixa em NOT UNIQUE: curso | 1% | 1,03% | a | heap, varredura | 207 | 646 | 99,8% | 646 | +0,0% | 0,60 | 64,6× |
 | faixa em NOT UNIQUE: curso | 1% | 1,03% | b | B+ primária (curso) | 207 | 13 | 76,9% | 12 | -7,7% | 0,07 | 1,30× |
 | faixa em NOT UNIQUE: curso | 1% | 1,03% | c | hash primário (curso) + B+ clustering (curso) | 207 | 10 | 0,0% | 12 | +22,0% | 0,06 | melhor |
-| faixa em NOT UNIQUE: curso | 1% | 1,03% | c | B+ primária (curso) + B+ clustering (curso) | 207 | 13 | 76,9% | 11 | -15,4% | 0,06 | 1,30× |
-| faixa em NOT UNIQUE: curso | 50% | 49,84% | a | heap, varredura | 9.967 | 646 | 99,8% | 646 | +0,0% | 2,96 | 1,35× |
-| faixa em NOT UNIQUE: curso | 50% | 49,84% | b | B+ primária (curso) | 9.967 | 477 | 99,4% | 477 | +0,0% | 2,86 | melhor |
-| faixa em NOT UNIQUE: curso | 50% | 49,84% | c | B+ primária (curso) + B+ clustering (curso) | 9.967 | 477 | 99,4% | 476 | -0,2% | 2,88 | melhor |
-| faixa em NOT UNIQUE: curso | 50% | 49,84% | c | hash primário (curso) + B+ clustering (curso) | 9.967 | 668 | 0,0% | 376 | -43,7% | 2,91 | 1,40× |
+| faixa em NOT UNIQUE: curso | 1% | 1,03% | c | B+ primária (curso) + B+ clustering (curso) | 207 | 13 | 76,9% | 11 | -15,4% | 0,07 | 1,30× |
+| faixa em NOT UNIQUE: curso | 50% | 49,84% | a | heap, varredura | 9.967 | 646 | 99,8% | 646 | +0,0% | 2,98 | 1,35× |
+| faixa em NOT UNIQUE: curso | 50% | 49,84% | b | B+ primária (curso) | 9.967 | 477 | 99,4% | 477 | +0,0% | 2,93 | melhor |
+| faixa em NOT UNIQUE: curso | 50% | 49,84% | c | B+ primária (curso) + B+ clustering (curso) | 9.967 | 477 | 99,4% | 476 | -0,2% | 2,90 | melhor |
+| faixa em NOT UNIQUE: curso | 50% | 49,84% | c | hash primário (curso) + B+ clustering (curso) | 9.967 | 668 | 0,0% | 376 | -43,7% | 2,95 | 1,40× |
 
 ## Mesma seleção, organizações e caminhos diferentes
 
@@ -139,69 +139,69 @@ M = 32 molduras. A primeira tabela de “Externa → interna” é a externa no 
 
 | Junção | Tamanho | Config. | Externa → interna | Algoritmo | Leituras | Gravações | Total | Estimado | Erro est. | Tempo (ms) | × melhor |
 |---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Aluno: heap, varredura → Inscrição: heap, varredura | BNL | 70.141 | 0 | 70.141 | 70.141 | +0,0% | 423,9 | 9,91× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Inscrição: heap, varredura → Aluno: heap, varredura | BNL | 70.171 | 0 | 70.171 | 70.171 | +0,0% | 278,9 | 9,92× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Inscrição: heap, varredura → Aluno: heap, varredura | sort-merge | 6.412 | 4.071 | 10.483 | 10.413 | -0,7% | 106,0 | 1,48× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Aluno: heap, varredura → Inscrição: heap, varredura | sort-merge | 6.412 | 4.071 | 10.483 | 10.413 | -0,7% | 106,5 | 1,48× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Aluno: heap, varredura → Inscrição: heap, varredura | hash | 4.708 | 2.367 | 7.075 | 7.135 | +0,8% | 57,3 | melhor |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Inscrição: heap, varredura → Aluno: heap, varredura | hash | 7.202 | 4.833 | 12.035 | 15.549 | +29,2% | 85,5 | 1,70× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | b | Aluno: B+ primária (dre) → Inscrição: heap, varredura | BNL | 102.652 | 0 | 102.652 | 102.652 | +0,0% | 554,1 | 13,9× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | b | Inscrição: heap, varredura → Aluno: B+ primária (dre) | sort-merge | 6.062 | 3.413 | 9.475 | 9.427 | -0,5% | 95,7 | 1,28× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | b | Aluno: B+ primária (dre) → Inscrição: heap, varredura | hash | 5.014 | 2.367 | 7.381 | 7.441 | +0,8% | 57,2 | melhor |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Aluno: B+ primária (dre) → Inscrição: B+ primária (dre) | BNL | 147.292 | 0 | 147.292 | 147.292 | +0,0% | 551,3 | 43,4× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Inscrição: B+ primária (dre) → Aluno: B+ primária (dre) | sort-merge | 3.395 | 0 | 3.395 | 3.391 | -0,1% | 40,9 | melhor |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Aluno: B+ primária (dre) → Inscrição: B+ primária (dre) | hash | 5.758 | 2.367 | 8.125 | 8.185 | +0,7% | 58,8 | 2,39× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Aluno: hash primário (dre) → Inscrição: hash primário (dre) | BNL | 147.840 | 0 | 147.840 | 147.840 | +0,0% | 573,5 | 30,5× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Inscrição: hash primário (dre) → Aluno: hash primário (dre) | sort-merge | 7.591 | 4.071 | 11.662 | 11.592 | -0,6% | 107,3 | 2,41× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Aluno: hash primário (dre) → Inscrição: hash primário (dre) | hash | 4.180 | 660 | 4.840 | 4.924 | +1,7% | 46,4 | melhor |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | d | Aluno: B+ primária (dre) → Inscrição: heap + B+ secundária (dre) | BNL | 102.652 | 0 | 102.652 | 102.652 | +0,0% | 565,5 | 13,9× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | d | Inscrição: heap + B+ secundária (dre) → Aluno: B+ primária (dre) | sort-merge | 6.062 | 3.413 | 9.475 | 9.427 | -0,5% | 96,0 | 1,28× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | d | Aluno: B+ primária (dre) → Inscrição: heap + B+ secundária (dre) | hash | 5.014 | 2.367 | 7.381 | 7.441 | +0,8% | 59,0 | melhor |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | e | Aluno: heap + hash secundário (dre) → Inscrição: heap + B+ secundária (dre) | BNL | 70.141 | 0 | 70.141 | 70.141 | +0,0% | 418,1 | 9,91× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | e | Inscrição: heap + B+ secundária (dre) → Aluno: heap + hash secundário (dre) | sort-merge | 6.412 | 4.071 | 10.483 | 10.413 | -0,7% | 104,1 | 1,48× |
-| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | e | Aluno: heap + hash secundário (dre) → Inscrição: heap + B+ secundária (dre) | hash | 4.708 | 2.367 | 7.075 | 7.135 | +0,8% | 57,0 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | a | Curso: heap, varredura → Disciplina: heap, varredura | BNL | 19 | 0 | 19 | 19 | +0,0% | 0,4 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | a | Disciplina: heap, varredura → Curso: heap, varredura | sort-merge | 38 | 19 | 57 | 57 | +0,0% | 1,1 | 3,00× |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | a | Curso: heap, varredura → Disciplina: heap, varredura | hash | 19 | 0 | 19 | 19 | +0,0% | 0,5 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | b | Curso: B+ primária (codigo) → Disciplina: heap, varredura | BNL | 21 | 0 | 21 | 21 | +0,0% | 0,4 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | b | Disciplina: heap, varredura → Curso: B+ primária (codigo) | sort-merge | 34 | 12 | 46 | 45 | -2,2% | 0,9 | 2,19× |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | b | Curso: B+ primária (codigo) → Disciplina: heap, varredura | hash | 21 | 0 | 21 | 21 | +0,0% | 0,5 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Curso: B+ primária (codigo) → Disciplina: B+ primária (curso) | BNL | 25 | 0 | 25 | 25 | +0,0% | 0,4 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Disciplina: B+ primária (curso) → Curso: B+ primária (codigo) | sort-merge | 27 | 0 | 27 | 25 | -7,4% | 0,5 | 1,08× |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Curso: B+ primária (codigo) → Disciplina: B+ primária (curso) | hash | 25 | 0 | 25 | 25 | +0,0% | 0,5 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Curso: hash primário (codigo) → Disciplina: hash primário (curso) | BNL | 28 | 0 | 28 | 28 | +0,0% | 0,5 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Disciplina: hash primário (curso) → Curso: hash primário (codigo) | sort-merge | 47 | 19 | 66 | 66 | +0,0% | 1,1 | 2,36× |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Curso: hash primário (codigo) → Disciplina: hash primário (curso) | hash | 28 | 0 | 28 | 28 | +0,0% | 0,5 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | d | Curso: B+ primária (codigo) → Disciplina: heap + B+ secundária (curso) | BNL | 21 | 0 | 21 | 21 | +0,0% | 0,4 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | d | Disciplina: heap + B+ secundária (curso) → Curso: B+ primária (codigo) | sort-merge | 34 | 12 | 46 | 45 | -2,2% | 0,9 | 2,19× |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | d | Curso: B+ primária (codigo) → Disciplina: heap + B+ secundária (curso) | hash | 21 | 0 | 21 | 21 | +0,0% | 0,5 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | e | Curso: heap + hash secundário (codigo) → Disciplina: heap + B+ secundária (curso) | BNL | 19 | 0 | 19 | 19 | +0,0% | 0,4 | melhor |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | e | Disciplina: heap + B+ secundária (curso) → Curso: heap + hash secundário (codigo) | sort-merge | 38 | 19 | 57 | 57 | +0,0% | 1,1 | 3,00× |
-| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | e | Curso: heap + hash secundário (codigo) → Disciplina: heap + B+ secundária (curso) | hash | 19 | 0 | 19 | 19 | +0,0% | 0,5 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | a | Curso: heap, varredura → Aluno: heap, varredura | BNL | 653 | 0 | 653 | 653 | +0,0% | 9,7 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | a | Aluno: heap, varredura → Curso: heap, varredura | sort-merge | 1.318 | 665 | 1.983 | 1.959 | -1,2% | 18,4 | 3,04× |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | a | Curso: heap, varredura → Aluno: heap, varredura | hash | 653 | 0 | 653 | 653 | +0,0% | 9,1 | melhor |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Aluno: heap, varredura → Inscrição: heap, varredura | BNL | 70.141 | 0 | 70.141 | 70.141 | +0,0% | 411,4 | 9,91× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Inscrição: heap, varredura → Aluno: heap, varredura | BNL | 70.171 | 0 | 70.171 | 70.171 | +0,0% | 278,1 | 9,92× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Inscrição: heap, varredura → Aluno: heap, varredura | sort-merge | 7.032 | 4.691 | 11.723 | 11.705 | -0,2% | 110,4 | 1,66× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Aluno: heap, varredura → Inscrição: heap, varredura | sort-merge | 7.032 | 4.691 | 11.723 | 11.705 | -0,2% | 111,9 | 1,66× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Aluno: heap, varredura → Inscrição: heap, varredura | hash | 4.708 | 2.367 | 7.075 | 7.135 | +0,8% | 59,6 | melhor |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | a | Inscrição: heap, varredura → Aluno: heap, varredura | hash | 7.202 | 4.833 | 12.035 | 15.549 | +29,2% | 87,3 | 1,70× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | b | Aluno: B+ primária (dre) → Inscrição: heap, varredura | BNL | 102.652 | 0 | 102.652 | 102.652 | +0,0% | 551,7 | 13,9× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | b | Inscrição: heap, varredura → Aluno: B+ primária (dre) | sort-merge | 6.048 | 3.399 | 9.447 | 9.427 | -0,2% | 99,3 | 1,28× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | b | Aluno: B+ primária (dre) → Inscrição: heap, varredura | hash | 5.014 | 2.367 | 7.381 | 7.441 | +0,8% | 58,9 | melhor |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Aluno: B+ primária (dre) → Inscrição: B+ primária (dre) | BNL | 147.292 | 0 | 147.292 | 147.292 | +0,0% | 560,4 | 43,4× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Inscrição: B+ primária (dre) → Aluno: B+ primária (dre) | sort-merge | 3.395 | 0 | 3.395 | 3.391 | -0,1% | 41,5 | melhor |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Aluno: B+ primária (dre) → Inscrição: B+ primária (dre) | hash | 5.758 | 2.367 | 8.125 | 8.185 | +0,7% | 58,6 | 2,39× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Aluno: hash primário (dre) → Inscrição: hash primário (dre) | BNL | 147.840 | 0 | 147.840 | 147.840 | +0,0% | 553,5 | 30,5× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Inscrição: hash primário (dre) → Aluno: hash primário (dre) | sort-merge | 8.211 | 4.691 | 12.902 | 12.884 | -0,1% | 112,2 | 2,67× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | c | Aluno: hash primário (dre) → Inscrição: hash primário (dre) | hash | 4.180 | 660 | 4.840 | 4.924 | +1,7% | 46,9 | melhor |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | d | Aluno: B+ primária (dre) → Inscrição: heap + B+ secundária (dre) | BNL | 102.652 | 0 | 102.652 | 102.652 | +0,0% | 546,5 | 13,9× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | d | Inscrição: heap + B+ secundária (dre) → Aluno: B+ primária (dre) | sort-merge | 6.048 | 3.399 | 9.447 | 9.427 | -0,2% | 98,6 | 1,28× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | d | Aluno: B+ primária (dre) → Inscrição: heap + B+ secundária (dre) | hash | 5.014 | 2.367 | 7.381 | 7.441 | +0,8% | 60,1 | melhor |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | e | Aluno: heap + hash secundário (dre) → Inscrição: heap + B+ secundária (dre) | BNL | 70.141 | 0 | 70.141 | 70.141 | +0,0% | 411,3 | 9,91× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | e | Inscrição: heap + B+ secundária (dre) → Aluno: heap + hash secundário (dre) | sort-merge | 7.032 | 4.691 | 11.723 | 11.705 | -0,2% | 110,5 | 1,66× |
+| Aluno ⋈ Inscrição (dre) — natural join | maior ⋈ maior | e | Aluno: heap + hash secundário (dre) → Inscrição: heap + B+ secundária (dre) | hash | 4.708 | 2.367 | 7.075 | 7.135 | +0,8% | 59,1 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | a | Curso: heap, varredura → Disciplina: heap, varredura | BNL | 19 | 0 | 19 | 19 | +0,0% | 0,2 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | a | Disciplina: heap, varredura → Curso: heap, varredura | sort-merge | 38 | 19 | 57 | 57 | +0,0% | 0,6 | 3,00× |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | a | Curso: heap, varredura → Disciplina: heap, varredura | hash | 19 | 0 | 19 | 19 | +0,0% | 0,2 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | b | Curso: B+ primária (codigo) → Disciplina: heap, varredura | BNL | 21 | 0 | 21 | 21 | +0,0% | 0,3 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | b | Disciplina: heap, varredura → Curso: B+ primária (codigo) | sort-merge | 34 | 12 | 46 | 45 | -2,2% | 0,5 | 2,19× |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | b | Curso: B+ primária (codigo) → Disciplina: heap, varredura | hash | 21 | 0 | 21 | 21 | +0,0% | 0,2 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Curso: B+ primária (codigo) → Disciplina: B+ primária (curso) | BNL | 25 | 0 | 25 | 25 | +0,0% | 0,3 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Disciplina: B+ primária (curso) → Curso: B+ primária (codigo) | sort-merge | 27 | 0 | 27 | 25 | -7,4% | 0,2 | 1,08× |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Curso: B+ primária (codigo) → Disciplina: B+ primária (curso) | hash | 25 | 0 | 25 | 25 | +0,0% | 0,2 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Curso: hash primário (codigo) → Disciplina: hash primário (curso) | BNL | 28 | 0 | 28 | 28 | +0,0% | 0,3 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Disciplina: hash primário (curso) → Curso: hash primário (codigo) | sort-merge | 47 | 19 | 66 | 66 | +0,0% | 0,6 | 2,36× |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | c | Curso: hash primário (codigo) → Disciplina: hash primário (curso) | hash | 28 | 0 | 28 | 28 | +0,0% | 0,2 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | d | Curso: B+ primária (codigo) → Disciplina: heap + B+ secundária (curso) | BNL | 21 | 0 | 21 | 21 | +0,0% | 0,2 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | d | Disciplina: heap + B+ secundária (curso) → Curso: B+ primária (codigo) | sort-merge | 34 | 12 | 46 | 45 | -2,2% | 0,5 | 2,19× |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | d | Curso: B+ primária (codigo) → Disciplina: heap + B+ secundária (curso) | hash | 21 | 0 | 21 | 21 | +0,0% | 0,2 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | e | Curso: heap + hash secundário (codigo) → Disciplina: heap + B+ secundária (curso) | BNL | 19 | 0 | 19 | 19 | +0,0% | 0,3 | melhor |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | e | Disciplina: heap + B+ secundária (curso) → Curso: heap + hash secundário (codigo) | sort-merge | 38 | 19 | 57 | 57 | +0,0% | 0,6 | 3,00× |
+| Curso ⋈ Disciplina (codigo = curso) — natural join | menor ⋈ menor | e | Curso: heap + hash secundário (codigo) → Disciplina: heap + B+ secundária (curso) | hash | 19 | 0 | 19 | 19 | +0,0% | 0,2 | melhor |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | a | Curso: heap, varredura → Aluno: heap, varredura | BNL | 653 | 0 | 653 | 653 | +0,0% | 9,8 | melhor |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | a | Aluno: heap, varredura → Curso: heap, varredura | sort-merge | 1.316 | 663 | 1.979 | 1.959 | -1,0% | 18,9 | 3,03× |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | a | Curso: heap, varredura → Aluno: heap, varredura | hash | 653 | 0 | 653 | 653 | +0,0% | 8,9 | melhor |
 | Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | b | Curso: heap, varredura → Aluno: B+ primária (curso) | BNL | 959 | 0 | 959 | 959 | +0,0% | 9,8 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | b | Aluno: B+ primária (curso) → Curso: heap, varredura | sort-merge | 968 | 7 | 975 | 973 | -0,2% | 9,3 | 1,02× |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | b | Curso: heap, varredura → Aluno: B+ primária (curso) | hash | 959 | 0 | 959 | 959 | +0,0% | 9,1 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Curso: B+ primária (codigo) → Aluno: B+ primária (curso) | BNL | 961 | 0 | 961 | 961 | +0,0% | 9,7 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Aluno: B+ primária (curso) → Curso: B+ primária (codigo) | sort-merge | 964 | 0 | 964 | 961 | -0,3% | 9,1 | 1,00× |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Curso: B+ primária (codigo) → Aluno: B+ primária (curso) | hash | 961 | 0 | 961 | 961 | +0,0% | 9,1 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Curso: hash primário (codigo) → Aluno: hash primário (curso) | BNL | 802 | 0 | 802 | 802 | +0,0% | 9,7 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Aluno: hash primário (curso) → Curso: hash primário (codigo) | sort-merge | 1.467 | 665 | 2.132 | 2.108 | -1,1% | 18,5 | 2,66× |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Curso: hash primário (codigo) → Aluno: hash primário (curso) | hash | 802 | 0 | 802 | 802 | +0,0% | 9,0 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | d | Curso: B+ primária (codigo) → Aluno: heap + B+ secundária (curso) | BNL | 655 | 0 | 655 | 655 | +0,0% | 9,7 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | d | Aluno: heap + B+ secundária (curso) → Curso: B+ primária (codigo) | sort-merge | 1.314 | 658 | 1.972 | 1.947 | -1,3% | 18,3 | 3,01× |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | d | Curso: B+ primária (codigo) → Aluno: heap + B+ secundária (curso) | hash | 655 | 0 | 655 | 655 | +0,0% | 9,1 | melhor |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | b | Aluno: B+ primária (curso) → Curso: heap, varredura | sort-merge | 968 | 7 | 975 | 973 | -0,2% | 9,1 | 1,02× |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | b | Curso: heap, varredura → Aluno: B+ primária (curso) | hash | 959 | 0 | 959 | 959 | +0,0% | 8,8 | melhor |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Curso: B+ primária (codigo) → Aluno: B+ primária (curso) | BNL | 961 | 0 | 961 | 961 | +0,0% | 9,8 | melhor |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Aluno: B+ primária (curso) → Curso: B+ primária (codigo) | sort-merge | 964 | 0 | 964 | 961 | -0,3% | 8,9 | 1,00× |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Curso: B+ primária (codigo) → Aluno: B+ primária (curso) | hash | 961 | 0 | 961 | 961 | +0,0% | 8,8 | melhor |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Curso: hash primário (codigo) → Aluno: hash primário (curso) | BNL | 802 | 0 | 802 | 802 | +0,0% | 9,9 | melhor |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Aluno: hash primário (curso) → Curso: hash primário (codigo) | sort-merge | 1.465 | 663 | 2.128 | 2.108 | -0,9% | 18,5 | 2,65× |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | c | Curso: hash primário (codigo) → Aluno: hash primário (curso) | hash | 802 | 0 | 802 | 802 | +0,0% | 8,8 | melhor |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | d | Curso: B+ primária (codigo) → Aluno: heap + B+ secundária (curso) | BNL | 655 | 0 | 655 | 655 | +0,0% | 9,8 | melhor |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | d | Aluno: heap + B+ secundária (curso) → Curso: B+ primária (codigo) | sort-merge | 1.312 | 656 | 1.968 | 1.947 | -1,1% | 18,5 | 3,00× |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | d | Curso: B+ primária (codigo) → Aluno: heap + B+ secundária (curso) | hash | 655 | 0 | 655 | 655 | +0,0% | 9,0 | melhor |
 | Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | e | Curso: heap + hash secundário (codigo) → Aluno: heap + B+ secundária (curso) | BNL | 653 | 0 | 653 | 653 | +0,0% | 9,7 | melhor |
-| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | e | Aluno: heap + B+ secundária (curso) → Curso: heap + hash secundário (codigo) | sort-merge | 1.318 | 665 | 1.983 | 1.959 | -1,2% | 18,7 | 3,04× |
+| Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | e | Aluno: heap + B+ secundária (curso) → Curso: heap + hash secundário (codigo) | sort-merge | 1.316 | 663 | 1.979 | 1.959 | -1,0% | 19,4 | 3,03× |
 | Curso ⋈ Aluno (codigo = curso) — natural join | menor ⋈ maior | e | Curso: heap + hash secundário (codigo) → Aluno: heap + B+ secundária (curso) | hash | 653 | 0 | 653 | 653 | +0,0% | 9,1 | melhor |
-| Aluno ⋈ Detalhes (cpf) — equijoin UNIQUE | maior ⋈ maior | a | Detalhes: heap, varredura → Aluno: heap, varredura | BNL | 22.506 | 0 | 22.506 | 22.506 | +0,0% | 126,0 | 6,21× |
-| Aluno ⋈ Detalhes (cpf) — equijoin UNIQUE | maior ⋈ maior | a | Detalhes: heap, varredura → Aluno: heap, varredura | sort-merge | 3.040 | 1.852 | 4.892 | 4.644 | -5,1% | 42,3 | 1,35× |
-| Aluno ⋈ Detalhes (cpf) — equijoin UNIQUE | maior ⋈ maior | a | Detalhes: heap, varredura → Aluno: heap, varredura | hash | 2.406 | 1.218 | 3.624 | 3.686 | +1,7% | 23,0 | melhor |
-| Aluno ⋈ Turma (professor_orientador = professor) — equijoin NOT UNIQUE | maior ⋈ maior | e | Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | BNL | 1.980 | 0 | 1.980 | 1.980 | +0,0% | 79,7 | 1,02× |
-| Aluno ⋈ Turma (professor_orientador = professor) — equijoin NOT UNIQUE | maior ⋈ maior | e | Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | sort-merge | 1.322 | 634 | 1.956 | 2.064 | +5,5% | 85,6 | 1,01× |
-| Aluno ⋈ Turma (professor_orientador = professor) — equijoin NOT UNIQUE | maior ⋈ maior | e | Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | hash | 1.314 | 626 | 1.940 | 2.076 | +7,0% | 78,2 | melhor |
+| Aluno ⋈ Detalhes (cpf) — equijoin UNIQUE | maior ⋈ maior | a | Detalhes: heap, varredura → Aluno: heap, varredura | BNL | 22.506 | 0 | 22.506 | 22.506 | +0,0% | 124,1 | 6,21× |
+| Aluno ⋈ Detalhes (cpf) — equijoin UNIQUE | maior ⋈ maior | a | Detalhes: heap, varredura → Aluno: heap, varredura | sort-merge | 3.034 | 1.846 | 4.880 | 4.644 | -4,8% | 44,0 | 1,35× |
+| Aluno ⋈ Detalhes (cpf) — equijoin UNIQUE | maior ⋈ maior | a | Detalhes: heap, varredura → Aluno: heap, varredura | hash | 2.406 | 1.218 | 3.624 | 3.686 | +1,7% | 22,5 | melhor |
+| Aluno ⋈ Turma (professor_orientador = professor) — equijoin NOT UNIQUE | maior ⋈ maior | e | Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | BNL | 1.980 | 0 | 1.980 | 1.980 | +0,0% | 80,6 | 1,02× |
+| Aluno ⋈ Turma (professor_orientador = professor) — equijoin NOT UNIQUE | maior ⋈ maior | e | Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | sort-merge | 1.319 | 631 | 1.950 | 2.064 | +5,8% | 86,0 | 1,01× |
+| Aluno ⋈ Turma (professor_orientador = professor) — equijoin NOT UNIQUE | maior ⋈ maior | e | Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | hash | 1.314 | 626 | 1.940 | 2.076 | +7,0% | 78,3 | melhor |
 
 ## Melhor algoritmo por situação
 
@@ -209,26 +209,26 @@ Para cada célula (tipo, tamanho, configuração), o total de blocos de cada alg
 
 | Junção | Tipo | Tamanho | Config. | Entradas | BNL | Sort-merge | Hash | Vencedor | Vantagem |
 |---|---|---|---|---|---:|---:|---:|---|---:|
-| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | a | Aluno: heap, varredura ⋈ Inscrição: heap, varredura | 70.141 | 10.483 | **7.075** | hash | 1,48× |
-| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | b | Aluno: B+ primária (dre) ⋈ Inscrição: heap, varredura | 102.652 | 9.475 | **7.381** | hash | 1,28× |
+| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | a | Aluno: heap, varredura ⋈ Inscrição: heap, varredura | 70.141 | 11.723 | **7.075** | hash | 1,66× |
+| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | b | Aluno: B+ primária (dre) ⋈ Inscrição: heap, varredura | 102.652 | 9.447 | **7.381** | hash | 1,28× |
 | Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | c | Aluno: B+ primária (dre) ⋈ Inscrição: B+ primária (dre) | 147.292 | **3.395** | 8.125 | sort-merge | 2,39× |
-| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | c | Aluno: hash primário (dre) ⋈ Inscrição: hash primário (dre) | 147.840 | 11.662 | **4.840** | hash | 2,41× |
-| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | d | Aluno: B+ primária (dre) ⋈ Inscrição: heap + B+ secundária (dre) | 102.652 | 9.475 | **7.381** | hash | 1,28× |
-| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | e | Aluno: heap + hash secundário (dre) ⋈ Inscrição: heap + B+ secundária (dre) | 70.141 | 10.483 | **7.075** | hash | 1,48× |
+| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | c | Aluno: hash primário (dre) ⋈ Inscrição: hash primário (dre) | 147.840 | 12.902 | **4.840** | hash | 2,67× |
+| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | d | Aluno: B+ primária (dre) ⋈ Inscrição: heap + B+ secundária (dre) | 102.652 | 9.447 | **7.381** | hash | 1,28× |
+| Aluno ⋈ Inscrição (dre) | natural join | maior ⋈ maior | e | Aluno: heap + hash secundário (dre) ⋈ Inscrição: heap + B+ secundária (dre) | 70.141 | 11.723 | **7.075** | hash | 1,66× |
 | Curso ⋈ Disciplina (codigo = curso) | natural join | menor ⋈ menor | a | Curso: heap, varredura ⋈ Disciplina: heap, varredura | **19** | 57 | **19** | BNL = hash (empate) | 3,00× |
 | Curso ⋈ Disciplina (codigo = curso) | natural join | menor ⋈ menor | b | Curso: B+ primária (codigo) ⋈ Disciplina: heap, varredura | **21** | 46 | **21** | BNL = hash (empate) | 2,19× |
 | Curso ⋈ Disciplina (codigo = curso) | natural join | menor ⋈ menor | c | Curso: B+ primária (codigo) ⋈ Disciplina: B+ primária (curso) | **25** | 27 | **25** | BNL = hash (empate) | 1,08× |
 | Curso ⋈ Disciplina (codigo = curso) | natural join | menor ⋈ menor | c | Curso: hash primário (codigo) ⋈ Disciplina: hash primário (curso) | **28** | 66 | **28** | BNL = hash (empate) | 2,36× |
 | Curso ⋈ Disciplina (codigo = curso) | natural join | menor ⋈ menor | d | Curso: B+ primária (codigo) ⋈ Disciplina: heap + B+ secundária (curso) | **21** | 46 | **21** | BNL = hash (empate) | 2,19× |
 | Curso ⋈ Disciplina (codigo = curso) | natural join | menor ⋈ menor | e | Curso: heap + hash secundário (codigo) ⋈ Disciplina: heap + B+ secundária (curso) | **19** | 57 | **19** | BNL = hash (empate) | 3,00× |
-| Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | a | Curso: heap, varredura ⋈ Aluno: heap, varredura | **653** | 1.983 | **653** | BNL = hash (empate) | 3,04× |
+| Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | a | Curso: heap, varredura ⋈ Aluno: heap, varredura | **653** | 1.979 | **653** | BNL = hash (empate) | 3,03× |
 | Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | b | Curso: heap, varredura ⋈ Aluno: B+ primária (curso) | **959** | 975 | **959** | BNL = hash (empate) | 1,02× |
 | Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | c | Curso: B+ primária (codigo) ⋈ Aluno: B+ primária (curso) | **961** | 964 | **961** | BNL = hash (empate) | 1,00× |
-| Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | c | Curso: hash primário (codigo) ⋈ Aluno: hash primário (curso) | **802** | 2.132 | **802** | BNL = hash (empate) | 2,66× |
-| Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | d | Curso: B+ primária (codigo) ⋈ Aluno: heap + B+ secundária (curso) | **655** | 1.972 | **655** | BNL = hash (empate) | 3,01× |
-| Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | e | Curso: heap + hash secundário (codigo) ⋈ Aluno: heap + B+ secundária (curso) | **653** | 1.983 | **653** | BNL = hash (empate) | 3,04× |
-| Aluno ⋈ Detalhes (cpf) | equijoin UNIQUE | maior ⋈ maior | a | Detalhes: heap, varredura ⋈ Aluno: heap, varredura | 22.506 | 4.892 | **3.624** | hash | 1,35× |
-| Aluno ⋈ Turma (professor_orientador = professor) | equijoin NOT UNIQUE | maior ⋈ maior | e | Turma: heap + B+ secundária (professor) ⋈ Aluno: heap + B+ secundária (professor_orientador) | 1.980 | 1.956 | **1.940** | hash | 1,01× |
+| Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | c | Curso: hash primário (codigo) ⋈ Aluno: hash primário (curso) | **802** | 2.128 | **802** | BNL = hash (empate) | 2,65× |
+| Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | d | Curso: B+ primária (codigo) ⋈ Aluno: heap + B+ secundária (curso) | **655** | 1.968 | **655** | BNL = hash (empate) | 3,00× |
+| Curso ⋈ Aluno (codigo = curso) | natural join | menor ⋈ maior | e | Curso: heap + hash secundário (codigo) ⋈ Aluno: heap + B+ secundária (curso) | **653** | 1.979 | **653** | BNL = hash (empate) | 3,03× |
+| Aluno ⋈ Detalhes (cpf) | equijoin UNIQUE | maior ⋈ maior | a | Detalhes: heap, varredura ⋈ Aluno: heap, varredura | 22.506 | 4.880 | **3.624** | hash | 1,35× |
+| Aluno ⋈ Turma (professor_orientador = professor) | equijoin NOT UNIQUE | maior ⋈ maior | e | Turma: heap + B+ secundária (professor) ⋈ Aluno: heap + B+ secundária (professor_orientador) | 1.980 | 1.950 | **1.940** | hash | 1,01× |
 
 ## Escolha da externa e da interna
 
@@ -237,7 +237,7 @@ A ordem padrão segue a decisão 122: no BNL e no hash, a menor por fora (build)
 | Junção | Config. | Algoritmo | Ordem padrão | Total | Ordem trocada | Total | Δ |
 |---|---|---|---|---:|---|---:|---:|
 | Aluno ⋈ Inscrição (dre) | a | BNL | Aluno: heap, varredura → Inscrição: heap, varredura | 70.141 | Inscrição: heap, varredura → Aluno: heap, varredura | 70.171 | +0,0% |
-| Aluno ⋈ Inscrição (dre) | a | sort-merge | Inscrição: heap, varredura → Aluno: heap, varredura | 10.483 | Aluno: heap, varredura → Inscrição: heap, varredura | 10.483 | +0,0% |
+| Aluno ⋈ Inscrição (dre) | a | sort-merge | Inscrição: heap, varredura → Aluno: heap, varredura | 11.723 | Aluno: heap, varredura → Inscrição: heap, varredura | 11.723 | +0,0% |
 | Aluno ⋈ Inscrição (dre) | a | hash | Aluno: heap, varredura → Inscrição: heap, varredura | 7.075 | Inscrição: heap, varredura → Aluno: heap, varredura | 12.035 | +70,1% |
 
 ## Política de substituição: LRU × MRU
@@ -246,34 +246,34 @@ Só as combinações em que o total de blocos muda. Nas outras 68, as duas polí
 
 | Consulta | Selet./tamanho | Onde | LRU | MRU | Δ | Acerto LRU | Acerto MRU |
 |---|---|---|---:|---:|---:|---:|---:|
-| Aluno ⋈ Detalhes (cpf) | maior ⋈ maior | BNL, config. a: Detalhes: heap, varredura → Aluno: heap, varredura | 22.506 | 21.995 | -2,3% | 0,00 | 0,02 |
-| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. a: Inscrição: heap, varredura → Aluno: heap, varredura | 70.171 | 68.580 | -2,3% | 0,00 | 0,02 |
-| Aluno ⋈ Turma (professor_orientador = professor) | maior ⋈ maior | BNL, config. e: Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | 1.980 | 1.948 | -1,6% | 0,00 | 0,02 |
-| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. a: Aluno: heap, varredura → Inscrição: heap, varredura | 70.141 | 69.525 | -0,9% | 0,00 | 0,01 |
-| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. e: Aluno: heap + hash secundário (dre) → Inscrição: heap + B+ secundária (dre) | 70.141 | 69.525 | -0,9% | 0,00 | 0,01 |
-| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. b: Aluno: B+ primária (dre) → Inscrição: heap, varredura | 102.652 | 101.751 | -0,9% | 0,00 | 0,01 |
-| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. d: Aluno: B+ primária (dre) → Inscrição: heap + B+ secundária (dre) | 102.652 | 101.751 | -0,9% | 0,00 | 0,01 |
-| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. c: Aluno: B+ primária (dre) → Inscrição: B+ primária (dre) | 147.292 | 146.391 | -0,6% | 0,00 | 0,01 |
-| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. c: Aluno: hash primário (dre) → Inscrição: hash primário (dre) | 147.840 | 147.000 | -0,6% | 0,00 | 0,01 |
+| Aluno ⋈ Detalhes (cpf) | maior ⋈ maior | BNL, config. a: Detalhes: heap, varredura → Aluno: heap, varredura | 22.506 | 22.131 | -1,7% | 0,00 | 0,02 |
+| igualdade em UNIQUE: dre | pontual | config. a: heap, varredura | 326.680 | 321.725 | -1,5% | 0,00 | 0,00 |
+| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. a: Inscrição: heap, varredura → Aluno: heap, varredura | 70.171 | 69.216 | -1,4% | 0,00 | 0,01 |
+| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. a: Aluno: heap, varredura → Inscrição: heap, varredura | 70.141 | 69.648 | -0,7% | 0,00 | 0,01 |
+| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. e: Aluno: heap + hash secundário (dre) → Inscrição: heap + B+ secundária (dre) | 70.141 | 69.648 | -0,7% | 0,00 | 0,01 |
+| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. b: Aluno: B+ primária (dre) → Inscrição: heap, varredura | 102.652 | 101.931 | -0,7% | 0,00 | 0,01 |
+| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. d: Aluno: B+ primária (dre) → Inscrição: heap + B+ secundária (dre) | 102.652 | 101.931 | -0,7% | 0,00 | 0,01 |
+| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. c: Aluno: B+ primária (dre) → Inscrição: B+ primária (dre) | 147.292 | 146.571 | -0,5% | 0,00 | 0,00 |
+| Aluno ⋈ Inscrição (dre) | maior ⋈ maior | BNL, config. c: Aluno: hash primário (dre) → Inscrição: hash primário (dre) | 147.840 | 147.168 | -0,5% | 0,00 | 0,00 |
 | igualdade em UNIQUE: cpf | pontual | config. c: heap + hash secundário (cpf) | 1.992 | 1.997 | +0,3% | 0,00 | 0,00 |
-| igualdade em UNIQUE: dre | pontual | config. a: heap, varredura | 326.680 | 325.976 | -0,2% | 0,00 | 0,00 |
+| Aluno ⋈ Turma (professor_orientador = professor) | maior ⋈ maior | BNL, config. e: Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | 1.980 | 1.976 | -0,2% | 0,00 | 0,00 |
 | igualdade em UNIQUE: cpf | pontual | config. a: heap, varredura | 321.360 | 320.821 | -0,2% | 0,00 | 0,00 |
-| igualdade em UNIQUE: dre | pontual | config. b: B+ primária (dre) | 3.041 | 3.037 | -0,1% | 0,00 | 0,00 |
 | igualdade em UNIQUE: dre | pontual | config. b: hash primário (dre) | 1.008 | 1.010 | +0,1% | 0,00 | 0,00 |
+| igualdade em UNIQUE: dre | pontual | config. b: B+ primária (dre) | 3.041 | 3.040 | -0,0% | 0,00 | 0,00 |
 | faixa em NOT UNIQUE: cr | 50% | config. c: heap + B+ secundária (cr) | 9.700 | 9.696 | -0,0% | 0,04 | 0,04 |
 | Aluno ⋈ Inscrição (dre) | maior ⋈ maior | hash, config. a: Inscrição: heap, varredura → Aluno: heap, varredura | 12.035 | 12.034 | -0,0% | 0,00 | 0,00 |
 
 ## Custo estimado × medido
 
-Erro = (estimado − medido) / medido, em blocos transferidos. As fórmulas são as dos livros (Elmasri e Silberschatz), com os parâmetros medidos pela própria bancada.
+Erro = (estimado − medido) / medido, em blocos transferidos. As fórmulas são as dos livros (Elmasri e Silberschatz), com os parâmetros medidos pela própria bancada. A última coluna traz os parâmetros que entraram na fórmula da pior combinação; os de todas estão em parametros.csv.
 
-| Família | Combinações | Mediana do erro absoluto | Erro absoluto ≤ 10% | Maior erro | Onde |
-|---|---:|---:|---|---:|---|
-| junção: BNL | 21 | 0,0% | 21 de 21 | +0,0% | Aluno ⋈ Inscrição (dre) (config. a: Aluno: heap, varredura → Inscrição: heap, varredura) |
-| junção: hash | 21 | 0,0% | 20 de 21 | +29,2% | Aluno ⋈ Inscrição (dre) (config. a: Inscrição: heap, varredura → Aluno: heap, varredura) |
-| junção: sort-merge | 21 | 0,7% | 21 de 21 | -7,4% | Curso ⋈ Disciplina (codigo = curso) (config. c: Disciplina: B+ primária (curso) → Curso: B+ primária (codigo)) |
-| seleção: faixa | 16 | 0,0% | 13 de 16 | -43,7% | faixa em NOT UNIQUE: curso (config. c: hash primário (curso) + B+ clustering (curso)) |
-| seleção: igualdade (lote) | 5 | 1,1% | 5 de 5 | +9,8% | igualdade em UNIQUE: dre (config. b: hash primário (dre)) |
+| Família | Combinações | Mediana do erro absoluto | Erro absoluto ≤ 10% | Maior erro | Onde | Parâmetros da pior |
+|---|---:|---:|---|---:|---|---|
+| junção: BNL | 21 | 0,0% | 21 de 21 | +0,0% | Aluno ⋈ Inscrição (dre) (config. a: Aluno: heap, varredura → Inscrição: heap, varredura) | m=32; b_ext=646; b_int=1695; d_ext=646; d_int=1695; chunk=16; dir_frames=3 |
+| junção: hash | 21 | 0,0% | 20 de 21 | +29,2% | Aluno ⋈ Inscrição (dre) (config. a: Inscrição: heap, varredura → Aluno: heap, varredura) | m=32; b_ext=1695; b_int=646; d_ext=1695; d_int=646; particoes=31; niveis=2; build_pages=31; pre_ext=nao; pre_int=nao |
+| junção: sort-merge | 21 | 0,2% | 21 de 21 | -7,4% | Curso ⋈ Disciplina (codigo = curso) (config. c: Disciplina: B+ primária (curso) → Curso: B+ primária (codigo)) | m=32; b_ext=16; b_int=9; d_ext=12; d_int=7; ordena_ext=nao; ordena_int=nao; run_pages=30; runs_ext=1; runs_int=1; fan_in=31; passes_ext=0; passes_int=0; group_pages=0; desc_frames=0 |
+| seleção: faixa | 16 | 0,0% | 13 de 16 | -43,7% | faixa em NOT UNIQUE: curso (config. c: hash primário (curso) + B+ clustering (curso)) | n=20000; b=791; bfr=31; bfr_medio=31; lote=1; linhas_esperadas=9967; h=2; distintos=200; cadeia_media_primaria=3.75 |
+| seleção: igualdade (lote) | 5 | 1,1% | 5 de 5 | +9,8% | igualdade em UNIQUE: dre (config. b: hash primário (dre)) | n=20000; b=896; bfr=31; bfr_medio=31; lote=1000; linhas_esperadas=1000; cadeia_media=1.11 |
 
 ## Fases do sort-merge e do hash join
 
@@ -281,19 +281,19 @@ Leituras/gravações de cada fase (1ª repetição). No hash join, o resumo traz
 
 | Junção | Config. | Externa → interna | Algoritmo | Fases (leituras/gravações) | Recursão |
 |---|---|---|---|---|---|
-| Aluno ⋈ Inscrição (dre) | a | Inscrição: heap, varredura → Aluno: heap, varredura | sort-merge | runs externa 1.695/1.718 · runs interna 646/658 · passes 1.718/1.695 · intercalação final 2.353/0 | — |
-| Aluno ⋈ Inscrição (dre) | a | Aluno: heap, varredura → Inscrição: heap, varredura | sort-merge | runs externa 646/658 · runs interna 1.695/1.718 · passes 1.718/1.695 · intercalação final 2.353/0 | — |
+| Aluno ⋈ Inscrição (dre) | a | Inscrição: heap, varredura → Aluno: heap, varredura | sort-merge | runs externa 1.695/1.697 · runs interna 646/652 · passes 2.349/2.342 · intercalação final 2.342/0 | — |
+| Aluno ⋈ Inscrição (dre) | a | Aluno: heap, varredura → Inscrição: heap, varredura | sort-merge | runs externa 646/652 · runs interna 1.695/1.697 · passes 2.349/2.342 · intercalação final 2.342/0 | — |
 | Aluno ⋈ Inscrição (dre) | a | Aluno: heap, varredura → Inscrição: heap, varredura | hash | particiona externa 646/657 · particiona interna 1.695/1.710 · build probe 2.367/0 | passes recursivos=0 bailouts=0 |
 | Aluno ⋈ Inscrição (dre) | a | Inscrição: heap, varredura → Aluno: heap, varredura | hash | particiona externa 1.695/1.707 · particiona interna 646/660 · build probe 4.861/2.466 | passes recursivos=32 bailouts=0 |
-| Aluno ⋈ Inscrição (dre) | b | Inscrição: heap, varredura → Aluno: B+ primária (dre) | sort-merge | runs externa 1.695/1.718 · passes 1.718/1.695 · intercalação final 2.649/0 | — |
+| Aluno ⋈ Inscrição (dre) | b | Inscrição: heap, varredura → Aluno: B+ primária (dre) | sort-merge | runs externa 1.695/1.702 · passes 1.702/1.697 · intercalação final 2.651/0 | — |
 | Aluno ⋈ Inscrição (dre) | b | Aluno: B+ primária (dre) → Inscrição: heap, varredura | hash | particiona externa 952/657 · particiona interna 1.695/1.710 · build probe 2.367/0 | passes recursivos=0 bailouts=0 |
 | Aluno ⋈ Inscrição (dre) | c | Inscrição: B+ primária (dre) → Aluno: B+ primária (dre) | sort-merge | passes 0/0 · intercalação final 3.395/0 | — |
 | Aluno ⋈ Inscrição (dre) | c | Aluno: B+ primária (dre) → Inscrição: B+ primária (dre) | hash | particiona externa 952/657 · particiona interna 2.439/1.710 · build probe 2.367/0 | passes recursivos=0 bailouts=0 |
-| Aluno ⋈ Inscrição (dre) | c | Inscrição: hash primário (dre) → Aluno: hash primário (dre) | sort-merge | runs externa 2.624/1.718 · runs interna 896/658 · passes 1.718/1.695 · intercalação final 2.353/0 | — |
+| Aluno ⋈ Inscrição (dre) | c | Inscrição: hash primário (dre) → Aluno: hash primário (dre) | sort-merge | runs externa 2.624/1.697 · runs interna 896/652 · passes 2.349/2.342 · intercalação final 2.342/0 | — |
 | Aluno ⋈ Inscrição (dre) | c | Aluno: hash primário (dre) → Inscrição: hash primário (dre) | hash | particiona externa 896/660 · build probe 3.284/0 | passes recursivos=0 bailouts=0 |
-| Aluno ⋈ Inscrição (dre) | d | Inscrição: heap + B+ secundária (dre) → Aluno: B+ primária (dre) | sort-merge | runs externa 1.695/1.718 · passes 1.718/1.695 · intercalação final 2.649/0 | — |
+| Aluno ⋈ Inscrição (dre) | d | Inscrição: heap + B+ secundária (dre) → Aluno: B+ primária (dre) | sort-merge | runs externa 1.695/1.702 · passes 1.702/1.697 · intercalação final 2.651/0 | — |
 | Aluno ⋈ Inscrição (dre) | d | Aluno: B+ primária (dre) → Inscrição: heap + B+ secundária (dre) | hash | particiona externa 952/657 · particiona interna 1.695/1.710 · build probe 2.367/0 | passes recursivos=0 bailouts=0 |
-| Aluno ⋈ Inscrição (dre) | e | Inscrição: heap + B+ secundária (dre) → Aluno: heap + hash secundário (dre) | sort-merge | runs externa 1.695/1.718 · runs interna 646/658 · passes 1.718/1.695 · intercalação final 2.353/0 | — |
+| Aluno ⋈ Inscrição (dre) | e | Inscrição: heap + B+ secundária (dre) → Aluno: heap + hash secundário (dre) | sort-merge | runs externa 1.695/1.697 · runs interna 646/652 · passes 2.349/2.342 · intercalação final 2.342/0 | — |
 | Aluno ⋈ Inscrição (dre) | e | Aluno: heap + hash secundário (dre) → Inscrição: heap + B+ secundária (dre) | hash | particiona externa 646/657 · particiona interna 1.695/1.710 · build probe 2.367/0 | passes recursivos=0 bailouts=0 |
 | Curso ⋈ Disciplina (codigo = curso) | a | Disciplina: heap, varredura → Curso: heap, varredura | sort-merge | runs externa 12/12 · runs interna 7/7 · passes 0/0 · intercalação final 19/0 | — |
 | Curso ⋈ Disciplina (codigo = curso) | a | Curso: heap, varredura → Disciplina: heap, varredura | hash | build probe 19/0 | passes recursivos=0 bailouts=0 |
@@ -307,21 +307,21 @@ Leituras/gravações de cada fase (1ª repetição). No hash join, o resumo traz
 | Curso ⋈ Disciplina (codigo = curso) | d | Curso: B+ primária (codigo) → Disciplina: heap + B+ secundária (curso) | hash | build probe 21/0 | passes recursivos=0 bailouts=0 |
 | Curso ⋈ Disciplina (codigo = curso) | e | Disciplina: heap + B+ secundária (curso) → Curso: heap + hash secundário (codigo) | sort-merge | runs externa 12/12 · runs interna 7/7 · passes 0/0 · intercalação final 19/0 | — |
 | Curso ⋈ Disciplina (codigo = curso) | e | Curso: heap + hash secundário (codigo) → Disciplina: heap + B+ secundária (curso) | hash | build probe 19/0 | passes recursivos=0 bailouts=0 |
-| Curso ⋈ Aluno (codigo = curso) | a | Aluno: heap, varredura → Curso: heap, varredura | sort-merge | runs externa 646/658 · runs interna 7/7 · passes 0/0 · intercalação final 665/0 | — |
+| Curso ⋈ Aluno (codigo = curso) | a | Aluno: heap, varredura → Curso: heap, varredura | sort-merge | runs externa 646/656 · runs interna 7/7 · passes 0/0 · intercalação final 663/0 | — |
 | Curso ⋈ Aluno (codigo = curso) | a | Curso: heap, varredura → Aluno: heap, varredura | hash | build probe 653/0 | passes recursivos=0 bailouts=0 |
 | Curso ⋈ Aluno (codigo = curso) | b | Aluno: B+ primária (curso) → Curso: heap, varredura | sort-merge | runs interna 7/7 · passes 0/0 · intercalação final 961/0 | — |
 | Curso ⋈ Aluno (codigo = curso) | b | Curso: heap, varredura → Aluno: B+ primária (curso) | hash | build probe 959/0 | passes recursivos=0 bailouts=0 |
 | Curso ⋈ Aluno (codigo = curso) | c | Aluno: B+ primária (curso) → Curso: B+ primária (codigo) | sort-merge | passes 0/0 · intercalação final 964/0 | — |
 | Curso ⋈ Aluno (codigo = curso) | c | Curso: B+ primária (codigo) → Aluno: B+ primária (curso) | hash | build probe 961/0 | passes recursivos=0 bailouts=0 |
-| Curso ⋈ Aluno (codigo = curso) | c | Aluno: hash primário (curso) → Curso: hash primário (codigo) | sort-merge | runs externa 791/658 · runs interna 11/7 · passes 0/0 · intercalação final 665/0 | — |
+| Curso ⋈ Aluno (codigo = curso) | c | Aluno: hash primário (curso) → Curso: hash primário (codigo) | sort-merge | runs externa 791/656 · runs interna 11/7 · passes 0/0 · intercalação final 663/0 | — |
 | Curso ⋈ Aluno (codigo = curso) | c | Curso: hash primário (codigo) → Aluno: hash primário (curso) | hash | build probe 802/0 | passes recursivos=0 bailouts=0 |
-| Curso ⋈ Aluno (codigo = curso) | d | Aluno: heap + B+ secundária (curso) → Curso: B+ primária (codigo) | sort-merge | runs externa 646/658 · passes 0/0 · intercalação final 668/0 | — |
+| Curso ⋈ Aluno (codigo = curso) | d | Aluno: heap + B+ secundária (curso) → Curso: B+ primária (codigo) | sort-merge | runs externa 646/656 · passes 0/0 · intercalação final 666/0 | — |
 | Curso ⋈ Aluno (codigo = curso) | d | Curso: B+ primária (codigo) → Aluno: heap + B+ secundária (curso) | hash | build probe 655/0 | passes recursivos=0 bailouts=0 |
-| Curso ⋈ Aluno (codigo = curso) | e | Aluno: heap + B+ secundária (curso) → Curso: heap + hash secundário (codigo) | sort-merge | runs externa 646/658 · runs interna 7/7 · passes 0/0 · intercalação final 665/0 | — |
+| Curso ⋈ Aluno (codigo = curso) | e | Aluno: heap + B+ secundária (curso) → Curso: heap + hash secundário (codigo) | sort-merge | runs externa 646/656 · runs interna 7/7 · passes 0/0 · intercalação final 663/0 | — |
 | Curso ⋈ Aluno (codigo = curso) | e | Curso: heap + hash secundário (codigo) → Aluno: heap + B+ secundária (curso) | hash | build probe 653/0 | passes recursivos=0 bailouts=0 |
-| Aluno ⋈ Detalhes (cpf) | a | Detalhes: heap, varredura → Aluno: heap, varredura | sort-merge | runs externa 542/548 · runs interna 646/658 · passes 658/646 · intercalação final 1.194/0 | — |
+| Aluno ⋈ Detalhes (cpf) | a | Detalhes: heap, varredura → Aluno: heap, varredura | sort-merge | runs externa 542/546 · runs interna 646/654 · passes 654/646 · intercalação final 1.192/0 | — |
 | Aluno ⋈ Detalhes (cpf) | a | Detalhes: heap, varredura → Aluno: heap, varredura | hash | particiona externa 542/558 · particiona interna 646/660 · build probe 1.218/0 | passes recursivos=0 bailouts=0 |
-| Aluno ⋈ Turma (professor_orientador = professor) | e | Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | sort-merge | runs externa 42/43 · runs interna 646/591 · passes 0/0 · intercalação final 634/0 | — |
+| Aluno ⋈ Turma (professor_orientador = professor) | e | Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | sort-merge | runs externa 42/42 · runs interna 646/589 · passes 0/0 · intercalação final 631/0 | — |
 | Aluno ⋈ Turma (professor_orientador = professor) | e | Turma: heap + B+ secundária (professor) → Aluno: heap + B+ secundária (professor_orientador) | hash | particiona externa 42/44 · particiona interna 646/582 · build probe 626/0 | passes recursivos=0 bailouts=0 |
 
 ## Estruturas construídas
@@ -416,5 +416,5 @@ O que cada algoritmo lê de fato em cada entrada (externa · interna), tirado do
 
 | Política | Consulta | Variante | Algoritmo | Repetições | Dispersão E/S | Dispersão tempo | Convergiu E/S | Convergiu tempo |
 |---|---|---|---|---:|---:|---:|---|---|
-| MRU | Aluno ⋈ Detalhes (cpf) | aluno_heap:scan x detalhes_heap:scan | hash | 10 | 0,0% | 6,1% | sim | nao |
+| MRU | faixa em UNIQUE: dre | aluno_bt_dre:primary_btree | seleção | 10 | 0,0% | 10,5% | sim | nao |
 

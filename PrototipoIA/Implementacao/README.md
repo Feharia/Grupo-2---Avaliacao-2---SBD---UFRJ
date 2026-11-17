@@ -2,12 +2,12 @@
 
 Este é um protótipo funcional da arquitetura descrita em `../HANDOFF_ARQUITETURA_2026-11-08.md` (decisões 1 a 45 e 100 a 175, com as emendas de 08/11 e da auditoria de 10/11) e no diagrama `../diagrama_camadas_v5.png`. É **código bruto gerado por IA**, ainda sem revisão do grupo. O `PROMPTS.md` traz o log de prompts e as correções que a própria IA fez durante a geração.
 
-Estado em 13/11/2026:
-- **compila sem avisos** com Apple clang 21 e GCC 13 (`-Wall -Wextra -Wpedantic -Wshadow`);
-- **67 testes passam**, também com ASan e UBSan;
+Estado em 17/11/2026 (commit `49be2d4`, rodada definitiva em `resultados_exemplo/`):
+- **compila sem avisos** com `make` no Apple clang 21 (`-Wall -Wextra -Wpedantic -Wshadow`); o CI compila com GCC 13;
+- **87 testes passam** na suíte principal e **11** no `testes_memoria`, que conta as alocações reais das estruturas auxiliares, também com ASan e UBSan; mais 48 testes Python das ferramentas;
 - a bancada roda na escala do handoff (Aluno com 20.000 linhas, Inscrição com 100.000) em cerca de 40 s;
-- todas as **534 linhas medidas batem com o SQLite**, em número de linhas e checksum. Cada combinação repete até as contagens e o tempo variarem menos de 5% (de 3 a 10 vezes; decisão 132 emendada), e o `convergencia.csv` marca os grupos que pararam no teto;
-- a matriz obrigatória do enunciado de 04/11 está completa: 60 células, 54 executadas e 6 não aplicáveis (caso 3); veja a tabela "Cobertura da matriz";
+- todas as **563 linhas medidas batem com o SQLite**, em número de linhas e checksum. Cada combinação repete até as contagens e o tempo variarem menos de 5% (de 3 a 10 vezes; decisão 132 emendada), e o `convergencia.csv` marca os grupos que pararam no teto;
+- a matriz obrigatória do enunciado de 04/11 está completa: 60 células, 54 executadas e 6 não aplicáveis (caso 3), e o `tools/verificar_matriz.py` aprova a rodada; veja a tabela "Cobertura da matriz";
 - as células que não rodam aparecem no resultado com o motivo (decisão 170 do handoff): 132 com status `nao_aplicavel` (casos 1 a 4). Nenhuma célula fica `inviavel` desde o particionamento recursivo do hash join (decisão 171).
 
 ## Como rodar
@@ -89,7 +89,7 @@ cmake -S . -B build-cmake && cmake --build build-cmake && ctest --test-dir build
 | `operacoes.csv`, `constantes.csv`, `lotes/` | SQL equivalente, constantes de cada faixa (com a seletividade pedida e a efetiva) e lotes de chaves |
 | `dados/`, `esquema.csv`, `manifesto.txt` | a base gerada, o esquema e o manifesto da execução |
 
-Uma rodada completa está em `resultados_exemplo/` (sem os dados e os arquivos do motor), com as tabelas do `tabelas.py` em `resultados_exemplo/tabelas.md` e `resultados_exemplo/tabelas/`.
+A rodada definitiva, feita com o código do commit `49be2d4` e reproduzida num clone limpo, está em `resultados_exemplo/` (sem os dados e os arquivos do motor), com as tabelas do `tabelas.py` em `resultados_exemplo/tabelas.md` e `resultados_exemplo/tabelas/`.
 
 ## Resultados
 

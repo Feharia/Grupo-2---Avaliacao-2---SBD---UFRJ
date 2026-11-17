@@ -1,6 +1,6 @@
-familia,combinacoes,mediana_abs_erro_pct,ate_10pct,maior_erro_pct,operacao,variante
-junção: BNL,21,0.0,21,0.0,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan
-junção: hash,21,0.0,20,29.1982,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados)
-junção: sort-merge,21,0.6677,21,-7.4074,j_pequenas,curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree
-seleção: faixa,16,0.0,13,-43.7275,sel_rg_curso_alta,aluno_h_curso:clustering_btree
-seleção: igualdade (lote),5,1.1265,5,9.8166,sel_pt_dre,aluno_h_dre:primary_hash
+familia,combinacoes,mediana_abs_erro_pct,ate_10pct,maior_erro_pct,operacao,variante,parametros
+junção: BNL,21,0.0,21,0.0,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan,m=32; b_ext=646; b_int=1695; d_ext=646; d_int=1695; chunk=16; dir_frames=3
+junção: hash,21,0.0,20,29.1982,j_mestre_detalhe,aluno_heap:scan x inscricao_heap:scan (papeis trocados),m=32; b_ext=1695; b_int=646; d_ext=1695; d_int=646; particoes=31; niveis=2; build_pages=31; pre_ext=nao; pre_int=nao
+junção: sort-merge,21,0.2117,21,-7.4074,j_pequenas,curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree,m=32; b_ext=16; b_int=9; d_ext=12; d_int=7; ordena_ext=nao; ordena_int=nao; run_pages=30; runs_ext=1; runs_int=1; fan_in=31; passes_ext=0; passes_int=0; group_pages=0; desc_frames=0
+seleção: faixa,16,0.0,13,-43.7275,sel_rg_curso_alta,aluno_h_curso:clustering_btree,n=20000; b=791; bfr=31; bfr_medio=31; lote=1; linhas_esperadas=9967; h=2; distintos=200; cadeia_media_primaria=3.75
+seleção: igualdade (lote),5,1.1265,5,9.8166,sel_pt_dre,aluno_h_dre:primary_hash,n=20000; b=896; bfr=31; bfr_medio=31; lote=1000; linhas_esperadas=1000; cadeia_media=1.11

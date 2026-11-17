@@ -146,20 +146,44 @@ As opções da bancada estão no [README do protótipo](PrototipoIA/Implementaca
 | `fases.csv` | E/S de cada fase: runs, passes, particionamento, build/probe |
 | `convergencia.csv` | Para cada grupo de repetições: quantas rodaram, a dispersão de E/S e de tempo e se cada critério convergiu ou se a parada foi pelo teto |
 | `caminhos.csv` | O acesso que cada algoritmo realmente executou em cada entrada |
+| `parametros.csv` | Os parâmetros que entraram na estimativa de cada combinação (plano da junção, estatísticas da seleção) |
 | `estatisticas.csv`, `ocupacao.csv` | Parâmetros medidos de cada estrutura e a ocupação antes e depois da carga de manutenção |
 | `constantes.csv` | Limites de cada faixa, com a seletividade pedida e a efetiva |
-| `referencia.csv`, `conferencia.txt` | Resultado do SQLite e da conferência |
+| `referencia.csv`, `conferencia.txt` | Resultado do SQLite e da conferência (combinações conferidas, ausentes e divergentes) |
+| `verificacao_matriz.txt` | Saída do `verificar_matriz.py` na rodada de exemplo |
 | `tabelas.md`, `tabelas/*.csv` | As 16 tabelas de análise do `tabelas.py` |
-| `manifesto.txt` | Commit, compilador, flags, escala, semente, parâmetros e duração |
+| `manifesto.txt` | Commit (da variável `CBD_COMMIT`), compilador, flags, escala, semente, parâmetros e duração |
+
+### Reproduzir a rodada definitiva
+
+A rodada em `resultados_exemplo/` (§4) foi feita com o código do commit `49be2d4` e reproduzida num clone limpo, com `make`, no macOS (Apple clang 21). Para refazê-la:
+
+```bash
+git clone https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ.git cbd && cd cbd
+```
+
+```bash
+git checkout 49be2d44be4cf95820659cd279ae2f23a39e4523 && cd PrototipoIA/Implementacao && make
+```
+
+```bash
+CBD_COMMIT=$(git rev-parse HEAD) ./build/bancada --saida saida
+```
+
+```bash
+python3 -I tools/reference.py saida && python3 -I tools/compare.py saida && python3 -I tools/verificar_matriz.py saida && python3 -I tools/tabelas.py saida
+```
+
+As contagens de blocos, linhas e checksums de cada combinação saem iguais às de `resultados_exemplo/resultados.csv`: no clone limpo, as 176 linhas da 1ª repetição bateram uma a uma. O tempo e, por causa dele, o número de repetições de cada combinação variam de uma máquina para outra (o critério de parada inclui o tempo). As contagens são de blocos transferidos entre os arquivos e o buffer pool simulado, e não de E/S física do SSD.
 
 ## 4. Resultados
 
-Os números abaixo vêm da rodada completa em [`resultados_exemplo/`](PrototipoIA/Implementacao/resultados_exemplo/):
+Os números abaixo vêm da rodada definitiva em [`resultados_exemplo/`](PrototipoIA/Implementacao/resultados_exemplo/), feita com o código do commit `49be2d4` (o SHA completo está no `manifesto.txt`):
 - escala 1, política LRU;
 - M = 32 molduras nas junções e M = 2 nas seleções;
 - de 3 a 10 repetições por combinação.
 
-As 534 linhas medidas batem com o SQLite. Todas as 16 tabelas estão em [`resultados_exemplo/tabelas.md`](PrototipoIA/Implementacao/resultados_exemplo/tabelas.md). Uma rodada nova reproduz as mesmas contagens de blocos; só o tempo e o nº de repetições mudam.
+As 563 linhas medidas, em 168 combinações, batem com o SQLite, sem nenhuma ausente (`conferencia.txt`), e o verificador aprova a matriz obrigatória (`verificacao_matriz.txt`). Todas as 16 tabelas estão em [`resultados_exemplo/tabelas.md`](PrototipoIA/Implementacao/resultados_exemplo/tabelas.md), e os parâmetros de cada estimativa, em `parametros.csv`. Uma rodada nova reproduz as mesmas contagens de blocos; só o tempo e o nº de repetições mudam (veja "Reproduzir a rodada definitiva", abaixo).
 
 **A base** é o esquema de universidade do enunciado:
 
@@ -231,20 +255,20 @@ Total de blocos de cada algoritmo, na melhor ordem externa/interna, com M = 32. 
 | Curso ⋈ Disciplina | menor ⋈ menor | c | hash (codigo) ⋈ hash (curso) | **28** | 66 | **28** | BNL = hash |
 | Curso ⋈ Disciplina | menor ⋈ menor | d | B+ (codigo) ⋈ heap + B+ sec. (curso) | **21** | 46 | **21** | BNL = hash |
 | Curso ⋈ Disciplina | menor ⋈ menor | e | heap + hash sec. ⋈ heap + B+ sec. | **19** | 57 | **19** | BNL = hash |
-| Curso ⋈ Aluno | menor ⋈ maior | a | heap ⋈ heap | **653** | 1.983 | **653** | BNL = hash |
+| Curso ⋈ Aluno | menor ⋈ maior | a | heap ⋈ heap | **653** | 1.979 | **653** | BNL = hash |
 | Curso ⋈ Aluno | menor ⋈ maior | b | heap ⋈ B+ (curso) | **959** | 975 | **959** | BNL = hash |
 | Curso ⋈ Aluno | menor ⋈ maior | c | B+ (codigo) ⋈ B+ (curso) | **961** | 964 | **961** | BNL = hash |
-| Curso ⋈ Aluno | menor ⋈ maior | c | hash (codigo) ⋈ hash (curso) | **802** | 2.132 | **802** | BNL = hash |
-| Curso ⋈ Aluno | menor ⋈ maior | d | B+ (codigo) ⋈ heap + B+ sec. (curso) | **655** | 1.972 | **655** | BNL = hash |
-| Curso ⋈ Aluno | menor ⋈ maior | e | heap + hash sec. ⋈ heap + B+ sec. | **653** | 1.983 | **653** | BNL = hash |
-| Aluno ⋈ Inscrição | maior ⋈ maior | a | heap ⋈ heap | 70.141 | 10.483 | **7.075** | hash (1,48×) |
-| Aluno ⋈ Inscrição | maior ⋈ maior | b | B+ (dre) ⋈ heap | 102.652 | 9.475 | **7.381** | hash (1,28×) |
+| Curso ⋈ Aluno | menor ⋈ maior | c | hash (codigo) ⋈ hash (curso) | **802** | 2.128 | **802** | BNL = hash |
+| Curso ⋈ Aluno | menor ⋈ maior | d | B+ (codigo) ⋈ heap + B+ sec. (curso) | **655** | 1.968 | **655** | BNL = hash |
+| Curso ⋈ Aluno | menor ⋈ maior | e | heap + hash sec. ⋈ heap + B+ sec. | **653** | 1.979 | **653** | BNL = hash |
+| Aluno ⋈ Inscrição | maior ⋈ maior | a | heap ⋈ heap | 70.141 | 11.723 | **7.075** | hash (1,66×) |
+| Aluno ⋈ Inscrição | maior ⋈ maior | b | B+ (dre) ⋈ heap | 102.652 | 9.447 | **7.381** | hash (1,28×) |
 | Aluno ⋈ Inscrição | maior ⋈ maior | c | B+ (dre) ⋈ B+ (dre) | 147.292 | **3.395** | 8.125 | sort-merge (2,39×) |
-| Aluno ⋈ Inscrição | maior ⋈ maior | c | hash (dre) ⋈ hash (dre) | 147.840 | 11.662 | **4.840** | hash (2,41×) |
-| Aluno ⋈ Inscrição | maior ⋈ maior | d | B+ (dre) ⋈ heap + B+ sec. (dre) | 102.652 | 9.475 | **7.381** | hash (1,28×) |
-| Aluno ⋈ Inscrição | maior ⋈ maior | e | heap + hash sec. ⋈ heap + B+ sec. | 70.141 | 10.483 | **7.075** | hash (1,48×) |
-| Aluno ⋈ Detalhes (opcional) | maior ⋈ maior | a | heap ⋈ heap | 22.506 | 4.892 | **3.624** | hash (1,35×) |
-| Aluno ⋈ Turma (opcional) | maior ⋈ maior | e | heap + B+ sec. ⋈ heap + B+ sec. | 1.980 | 1.956 | **1.940** | hash (1,01×) |
+| Aluno ⋈ Inscrição | maior ⋈ maior | c | hash (dre) ⋈ hash (dre) | 147.840 | 12.902 | **4.840** | hash (2,67×) |
+| Aluno ⋈ Inscrição | maior ⋈ maior | d | B+ (dre) ⋈ heap + B+ sec. (dre) | 102.652 | 9.447 | **7.381** | hash (1,28×) |
+| Aluno ⋈ Inscrição | maior ⋈ maior | e | heap + hash sec. ⋈ heap + B+ sec. | 70.141 | 11.723 | **7.075** | hash (1,66×) |
+| Aluno ⋈ Detalhes (opcional) | maior ⋈ maior | a | heap ⋈ heap | 22.506 | 4.880 | **3.624** | hash (1,35×) |
+| Aluno ⋈ Turma (opcional) | maior ⋈ maior | e | heap + B+ sec. ⋈ heap + B+ sec. | 1.980 | 1.950 | **1.940** | hash (1,01×) |
 
 O número entre parênteses é quanto o 2º colocado custa em relação ao vencedor.
 
@@ -252,10 +276,10 @@ O número entre parênteses é quanto o 2º colocado custa em relação ao vence
 
 - **Uma tabela pequena muda tudo.** Quando uma das tabelas cabe em M − 2 blocos, BNL e hash leem cada tabela uma vez só (b_r + b_s) e empatam em todas as 12 células menor ⋈ menor e menor ⋈ maior. O sort-merge custa até 3 vezes mais, porque ordena e grava runs. A exceção é quando as duas entradas já estão em ordem (B+ × B+): aí o sort-merge só intercala e quase empata (27 × 25; 964 × 961).
 - **Com duas tabelas grandes, o BNL custa de 6 a 43 vezes o vencedor.** Ele relê a interna inteira para cada bloco de 16 páginas da externa: 646 + 41 × 1.695 = 70.141. A exceção é Aluno ⋈ Turma: Turma tem só 42 blocos, e o BNL empata com os outros.
-- **Com heaps (configuração a), o hash join vence o sort-merge.** São 7.075 blocos contra 10.483: o hash particiona uma vez (cerca de 3·(b_r + b_s)), enquanto o sort-merge grava runs e ainda faz um passe de intercalação.
+- **Com heaps (configuração a), o hash join vence o sort-merge.** São 7.075 blocos contra 11.723: o hash particiona uma vez (cerca de 3·(b_r + b_s)), enquanto o sort-merge grava runs e ainda faz um passe de intercalação em cada entrada. A lista de runs ocupa 3 molduras de M (decisão 173), e a intercalação final aceita 29 runs: as 71 runs de Inscrição viram 3, e com as 27 de Aluno passam do limite por uma. Por isso Aluno também ganha um passe (+1.240 blocos em relação à rodada em que a lista ficava fora de M).
 - **A organização primária pode decidir o vencedor:**
   - Duas B+ pelo campo da junção dispensam a ordenação: o sort-merge só intercala as folhas (3.395 = 952 + 2.439 + 4 da descida até a primeira folha de cada árvore) e ganha do hash por 2,4×.
-  - Dois hash pelo campo poupam particionamento: o hash join usa os buckets de Inscrição como partições, só particiona Aluno e ganha do sort-merge por 2,4×.
+  - Dois hash pelo campo poupam particionamento: o hash join usa os buckets de Inscrição como partições, só particiona Aluno e ganha do sort-merge por 2,7×.
   - Já para o BNL, as B+ pioram, porque as folhas a 70% somam mais blocos que o heap.
 - **O índice secundário não clustering não ajuda nenhum dos três algoritmos.** BNL, sort-merge e partition-hash leem a organização primária inteira (tabela "Acesso executado nas junções"). Por isso a configuração e custa o mesmo que a a nos três tamanhos, e a d custa o mesmo que a b sempre que as duas têm a mesma organização primária (P×P e G×G).
 
@@ -263,17 +287,17 @@ O número entre parênteses é quanto o 2º colocado custa em relação ao vence
 
 ### 4.4 Política de substituição: LRU × MRU
 
-Em 68 das 84 combinações, as duas políticas transferem exatamente o mesmo número de blocos. As diferenças estão no BNL entre tabelas grandes, em que a MRU economiza de 0,6% a 2,3%:
+Em 68 das 84 combinações, as duas políticas transferem exatamente o mesmo número de blocos. As diferenças estão no BNL entre tabelas grandes, em que a MRU economiza de 0,5% a 1,7%:
 
 | Junção (BNL) | Config. | LRU | MRU | Δ |
 |---|---|---:|---:|---:|
-| Aluno ⋈ Detalhes | a | 22.506 | 21.995 | −2,3% |
-| Inscrição ⋈ Aluno (ordem trocada) | a | 70.171 | 68.580 | −2,3% |
-| Turma ⋈ Aluno | e | 1.980 | 1.948 | −1,6% |
-| Aluno ⋈ Inscrição | a | 70.141 | 69.525 | −0,9% |
-| Aluno ⋈ Inscrição | c (B+ × B+) | 147.292 | 146.391 | −0,6% |
+| Aluno ⋈ Detalhes | a | 22.506 | 22.131 | −1,7% |
+| Inscrição ⋈ Aluno (ordem trocada) | a | 70.171 | 69.216 | −1,4% |
+| Aluno ⋈ Inscrição | a | 70.141 | 69.648 | −0,7% |
+| Aluno ⋈ Inscrição | c (B+ × B+) | 147.292 | 146.571 | −0,5% |
+| Turma ⋈ Aluno | e | 1.980 | 1.976 | −0,2% |
 
-Na LRU, a releitura sequencial da interna sempre expulsa a página que vai ser pedida em seguida (*sequential flooding*). A MRU mantém algumas páginas da interna na reserva, e a taxa de acerto sobe de 0,00 para 0,01–0,02. Fora do BNL, as diferenças ficam em até 0,6%.
+Na LRU, a releitura sequencial da interna sempre expulsa a página que vai ser pedida em seguida (*sequential flooding*). A MRU mantém algumas páginas da interna na reserva, e a taxa de acerto sobe de 0,00 para 0,01–0,02. A economia ficou menor que na rodada anterior (de 0,6% a 2,3%) porque as molduras do diretório do chunk agora ficam retidas (CBD-004) e não servem mais de cache para a interna. Fora do BNL, as diferenças vêm das seleções pontuais, em que o lote muda a cada repetição e a mediana depende de quantas repetições rodaram (até 1,5% na varredura), e não da política.
 
 **Política escolhida para cada teste (enunciado v2, §6.2):**
 - **MRU** para o BNL com interna maior que a reserva, onde ela evita o *sequential flooding*.
@@ -284,10 +308,12 @@ Na LRU, a releitura sequencial da interna sempre expulsa a página que vai ser p
 | Família | Combinações | Mediana do erro absoluto | Erro absoluto ≤ 10% | Maior erro |
 |---|---:|---:|---|---:|
 | Junção: BNL | 21 | 0,0% | 21 de 21 | +0,0% |
-| Junção: sort-merge | 21 | 0,7% | 21 de 21 | −7,4% (Curso ⋈ Disciplina, B+ × B+) |
+| Junção: sort-merge | 21 | 0,2% | 21 de 21 | −7,4% (Curso ⋈ Disciplina, B+ × B+) |
 | Junção: hash | 21 | 0,0% | 20 de 21 | +29,2% (Inscrição como build) |
 | Seleção: igualdade (lote) | 5 | 1,1% | 5 de 5 | +9,8% (hash primário) |
 | Seleção: faixa | 16 | 0,0% | 13 de 16 | −43,7% (clustering sobre hash, 50%) |
+
+Os parâmetros que entraram em cada estimativa estão em `parametros.csv`, e a tabela de `tabelas.md` mostra os da pior combinação de cada família (BENCH-008).
 
 A auditoria de 10/11 apontou erros grandes, e três premissas comprovadamente erradas foram corrigidas, sem calibrar as fórmulas:
 - **Blocos densos:** eram calculados pelo tamanho **máximo** do registro. Em Detalhes, que tem VarChar, isso supunha 1.334 blocos contra 542 reais e previa um passe recursivo que não acontece. Agora a blocagem é a do tamanho médio real: Aluno ⋈ Detalhes passou de +257% para +1,7% no hash e de +61% para −5,1% no sort-merge.
@@ -315,7 +341,7 @@ A carga de manutenção faz 5% de inserções e 1% de remoções nas variantes d
 
 ### 4.7 Repetições e células que não rodam
 
-**Repetições.** Dos 168 grupos de repetições, 167 convergiram: E/S e tempo variaram menos de 5%. O que parou no teto de 10 repetições é o hash join Aluno ⋈ Detalhes em MRU. Nele a E/S ficou estável, e só o tempo variou (6,1%). O `convergencia.csv` marca cada caso.
+**Repetições.** Dos 168 grupos de repetições, 167 convergiram: E/S e tempo variaram menos de 5%. O que parou no teto de 10 repetições é a faixa de 50% em dre pela B+ primária, em MRU. Nela a E/S ficou estável, e só o tempo variou (10,5%). Qual grupo para no teto muda de uma rodada para outra, porque depende do tempo. O `convergencia.csv` marca cada caso.
 
 **Células que não rodam.** Por política, 66 células da matriz do enunciado aparecem como `nao_aplicavel`, com o motivo no CSV:
 

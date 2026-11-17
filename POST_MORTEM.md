@@ -1083,3 +1083,49 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
     da junção (`SELECT x.*, y.*`). Rodada de exemplo: 534 linhas em 168
     combinações, 0 ausentes, 0 divergências; smoke com `--tuplas`: 168 em
     168. Seis testes Python (`test_compare.py`).
+12. #18 (BENCH-009), rodada definitiva. Feita com o código do commit
+    `49be2d4`, numa cópia limpa (`git archive`), compilada com `make` e rodada
+    sozinha na máquina: escala 1, LRU e MRU, 3 a 10 repetições, M = 32 e
+    M = 2, semente 20261122; o manifesto grava o SHA completo, o compilador e
+    as flags. Resultado: 563 linhas medidas em 168 combinações, 0 ausentes e
+    0 divergências no SQLite; o `verificar_matriz.py` aprova (60 células por
+    política, 54 executadas e 6 não aplicáveis pelo caso 3, porte conferido
+    em 370 execuções). Reprodução num clone limpo do repositório, no mesmo
+    commit: as 176 linhas da 1ª repetição bateram uma a uma (blocos, linhas,
+    checksum); só o total de repetições mudou (560), porque o critério de
+    parada inclui o tempo. Diferenças em relação à rodada de 13/11: 34 das 168
+    combinações; o sort-merge de Aluno ⋈ Inscrição com heaps sobe de 10.483
+    para 11.723 blocos (+11,8%), porque a lista de runs ocupa 3 molduras e a
+    intercalação final, que aceita 29 runs, recebe 30 (Aluno passa a precisar
+    de um passe); o mesmo com hash primário, de 11.662 para 12.902; no BNL
+    com MRU, a economia sobre a LRU cai de 0,6–2,3% para 0,5–1,7% (molduras
+    do diretório retidas); o resto varia menos de 0,3%. `resultados_exemplo/`
+    foi regenerado (com `parametros.csv` e `verificacao_matriz.txt`), e os
+    READMEs trazem os números novos e os comandos de reprodução. O projeto
+    gera tabelas, não gráficos.
+
+### Validação executada (16 e 17/11)
+
+- Cada commit desta entrada foi verificado numa cópia limpa, como o CI faz:
+  build Release e `ctest` (suíte principal e `testes_memoria`), build com
+  ASan/UBSan e a suíte inteira, testes Python, smoke `--rapido --tuplas`
+  conferido com o SQLite e com o verificador de cobertura do smoke, e a
+  comparação de E/S contra o commit anterior. Alertas: 8 no CBD-004 (BNL
+  com MRU, +0,9% a +8,3%), nenhum nos demais.
+- RED/GREEN registrados nos commits 1, 2, 3, 4, 7.
+- No push automático, o CI do commit 5 (Linux, GCC 13) reprovou um teste de
+  memória com limite absoluto que dependia da biblioteca padrão. Como o 5
+  já estava no remoto, a correção entrou num commit novo logo depois dele,
+  e os commits 6 a 12, ainda locais, foram reaplicados por cima: o código
+  deles é o que foi verificado, mais o teste corrigido. A rodada definitiva
+  foi refeita com o SHA novo do código (`49be2d4`), e as contagens de blocos
+  saíram iguais às da rodada anterior; só o tempo, as repetições e as
+  medianas das seleções pontuais (cujo lote muda a cada repetição) mudaram.
+
+### Não afirmado
+
+- GCC 13 e GoogleTest real não foram executados localmente; ficam para o CI
+  de cada push.
+- O LeakSanitizer não foi validado (`detect_leaks=0`).
+- O build CMake mostra um aviso pré-existente (`-Wmissing-field-initializers`
+  em `test_layer3.cpp:201`), que o `make` suprime nos testes.
