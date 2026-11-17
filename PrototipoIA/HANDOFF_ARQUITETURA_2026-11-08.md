@@ -294,7 +294,7 @@ Origem: `PROBLEMAS_IDENTIFICADOS_CBD_2026-11-10.md` (P01 a P15), conferido contr
 - **Emendas e registros desta revisão:**
   - **143** (blocos densos): a blocagem é a do tamanho médio real dos registros (`TableStats.bfr_medio`), e não a do R máximo. Em Detalhes, com VarChar, o máximo supunha 1.334 blocos contra 542 reais (P08).
   - **Estimativas de seleção** (P08): a faixa na B+ e no clustering usa a fração dos blocos de dados reais. O clustering sobre hash usa o nº de valores da faixa × a cadeia média do bucket.
-  - **132** (repetições): a parada pelo teto deixa de passar por convergência e fica registrada em `convergencia.csv` (P07).
+  - **132** (repetições): a parada pelo teto deixa de passar por convergência e fica registrada em `convergencia.csv` (P07). O critério está em `src/layer1/convergencia.hpp` (`repeat_until_stable`), que a bancada e os testes usam (BENCH-007).
   - **168** (blocos livres): `BufferPool::fetch` passa a recusar bloco marcado como livre no bitmap (P06).
   - **Registros novos:** `caminhos.csv` guarda o acesso que cada algoritmo executou (P09). A tabela "Cobertura da matriz" do `tabelas.py` mostra cada célula do enunciado; as opcionais ausentes aparecem como "não implementada" (P15).
 

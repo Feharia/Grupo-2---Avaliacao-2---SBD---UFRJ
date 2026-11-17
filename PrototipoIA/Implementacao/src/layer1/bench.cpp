@@ -2,6 +2,7 @@
 // repetições e grava resultados, ocupação, fases, lotes, constantes e manifesto (129–133).
 // Desvio do handoff: a especificação fica neste arquivo (spec_padrao), porque toml++ não está
 // disponível no ambiente do protótipo; o formato TOML continua sendo a meta (129).
+#include "convergencia.hpp"   // mesmo diretório: o driver também compila contra a biblioteca da referência (CI de E/S)
 #include "layer2/monitor.hpp"
 
 #include <algorithm>
@@ -548,47 +549,18 @@ std::vector<std::string> result_row(const std::string& pol, const std::string& o
     return c;
 }
 
-// Resumo da convergência de uma combinação (P07): quantas repetições rodaram, a dispersão das
-// últimas min_reps e se cada critério ficou abaixo da tolerância. Parar no teto não é convergir.
-struct Convergence {
-    bool executed = false;
-    int reps = 0;
-    double io_spread = 0, time_spread = 0;
-    bool io_ok = false, time_ok = false;
-    const char* stop() const {
-        if (!executed) return "nao_executada";
-        return io_ok && time_ok ? "convergiu" : "teto";
-    }
-};
-
-// repete até a variação ficar abaixo da tolerância (mín. min_reps, máx. max_reps) (132, emendada):
-// as contagens de blocos são determinísticas fora dos lotes, então a regra vale também para o tempo
+// Resumo da convergência de uma combinação (P07): Convergence e o critério de parada estão em
+// layer1/convergencia.hpp, testados com séries determinísticas (BENCH-007). Parar no teto não é
+// convergir. As contagens de blocos são determinísticas fora dos lotes, então a regra vale também
+// para o tempo (132, emendada).
 Convergence repeat(const Spec& spec, const std::function<Measured(int rep)>& once,
                    const std::function<void(int, const Measured&)>& record) {
-    std::vector<double> io, ms;
-    auto spread = [&](const std::vector<double>& v) {
-        const auto [mn, mx] = std::minmax_element(v.end() - spec.min_reps, v.end());
-        const double mean = std::accumulate(v.end() - spec.min_reps, v.end(), 0.0) / spec.min_reps;
-        return mean == 0 ? 0.0 : (*mx - *mn) / mean;
-    };
-    Convergence c;
-    for (int rep = 1; rep <= spec.max_reps; ++rep) {
+    return repeat_until_stable(spec.min_reps, spec.max_reps, spec.tolerance, [&](int rep) {
         const Measured m = once(rep);
         record(rep, m);
-        c.reps = rep;
-        if (!m.ok) return c;
-        c.executed = true;
-        io.push_back(static_cast<double>(m.r.delta.global.reads() + m.r.delta.global.writes()));
-        ms.push_back(static_cast<double>(m.r.wall_time.count()));
-        if (rep >= spec.min_reps) {
-            c.io_spread = spread(io);
-            c.time_spread = spread(ms);
-            c.io_ok = c.io_spread < spec.tolerance;
-            c.time_ok = c.time_spread < spec.tolerance;
-            if (c.io_ok && c.time_ok) return c;
-        }
-    }
-    return c;
+        return Sample{m.ok, static_cast<double>(m.r.delta.global.reads() + m.r.delta.global.writes()),
+                      static_cast<double>(m.r.wall_time.count())};
+    });
 }
 
 std::vector<std::string> convergence_row(const std::string& pol, const std::string& op, const std::string& variant,

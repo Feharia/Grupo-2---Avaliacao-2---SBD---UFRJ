@@ -1028,3 +1028,17 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    suja, a operação contava 4 gravações (expulsões sujas das páginas da
    carga) e o flush de fim gravava 5; GREEN: tudo em `prep_writes`, delta e
    flush de fim zerados.
+8. #16 (BENCH-007), convergência testável. O critério de parada saiu do
+   `bench.cpp` para `src/layer1/convergencia.hpp` (`Convergence`,
+   `repeat_until_stable`), sem mudar o comportamento: a bancada só adapta
+   cada repetição para uma amostra (executou, blocos, tempo). A bancada inclui
+   o header pelo próprio diretório (`"convergencia.hpp"`), porque a
+   comparação de E/S do CI compila o driver do candidato com os headers da
+   referência, que ainda não têm esse arquivo. Testes C++
+   com séries determinísticas (`tests/test_convergencia.cpp`): série
+   estável converge em 3; tempo alternando 10 e 20 para no teto de 10 com
+   dispersão 0,6 e `parada = teto`; E/S variável também para no teto;
+   aquecimento converge na 4ª; falha na 1ª dá `nao_executada`; teto igual ao
+   mínimo não converge sem cumprir o critério. Teste Python
+   (`test_tabelas_convergencia.py`): a tabela 15 lista só os grupos que
+   pararam no teto e conta os que pararam só pelo tempo.
