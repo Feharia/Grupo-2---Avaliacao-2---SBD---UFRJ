@@ -67,6 +67,89 @@ TEST(SlottedPage, SlotsNaoSaoRenumerados) {
     EXPECT_EQ(read_header(page).live, 3);
 }
 
+// CBD-008 (issue #3): a auditoria reproduziu, com ASan, leitura fora do bloco numa página de 4.096 B
+// com nslots = 65535. Os metadados lidos do disco são conferidos antes de qualquer acesso ao
+// diretório; página malformada vira std::out_of_range em todas as funções da SlottedPage.
+TEST(SlottedPage, PaginaMalformadaFalhaSemAcessoInvalido) {
+    std::vector<std::byte> page(4096);
+    sp_init(page, PageType::Heap);
+    const std::vector<std::byte> rec(70, std::byte{1});
+    ASSERT_TRUE(sp_insert(page, rec).has_value());
+    ASSERT_TRUE(sp_insert(page, rec).has_value());
+    auto with_header = [&](auto change) {
+        std::vector<std::byte> p = page;
+        PageHeader h = read_header(p);
+        change(h);
+        write_header(p, h);
+        return p;
+    };
+    auto with_slot = [&](std::uint16_t i, std::uint16_t off, std::uint16_t len) {
+        std::vector<std::byte> p = page;
+        std::memcpy(p.data() + kPageHeader + kSlotEntry * i, &off, 2);
+        std::memcpy(p.data() + kPageHeader + kSlotEntry * i + 2, &len, 2);
+        return p;
+    };
+    const auto key_of = [](std::span<const std::byte> r) { return Key{static_cast<std::int32_t>(r.size())}; };
+    const std::vector<std::vector<std::byte>> bad{
+        with_header([](PageHeader& h) { h.nslots = 65535; }),           // o caso da auditoria
+        with_header([](PageHeader& h) { h.free_lo = 4000; h.free_hi = 100; }),
+        with_header([](PageHeader& h) { h.free_hi = 5000; }),
+        with_header([](PageHeader& h) { h.live = 9; }),
+        with_slot(0, 4090, 100),                                         // registro passa do fim do bloco
+        with_slot(0, 10, 70),                                            // registro dentro do diretório
+        with_slot(1, 100, 3996)};                                        // soma dos registros > bloco
+    for (std::size_t c = 0; c < bad.size(); ++c) {
+        std::vector<std::byte> p = bad[c];
+        const bool slot_case = c >= 4;   // cabeçalho válido: sp_nslots não precisa recusar
+        if (!slot_case) EXPECT_THROW(sp_nslots(p), std::out_of_range);
+        EXPECT_THROW(sp_used_bytes(p), std::out_of_range);
+        EXPECT_THROW(sp_free_bytes(p), std::out_of_range);
+        EXPECT_THROW(sp_fits(p, 10), std::out_of_range);
+        EXPECT_THROW(sp_insert(p, rec), std::out_of_range);
+        EXPECT_THROW(sp_compact(p), std::out_of_range);
+        if (c != 6) {   // no último caso, cada slot isolado está dentro do bloco: ler não sai dele
+            EXPECT_THROW(sorted_slots(p, key_of), std::out_of_range);
+            EXPECT_THROW(sp_record(p, 0), std::out_of_range);
+            EXPECT_THROW(sp_erase(p, 0), std::out_of_range);
+            EXPECT_THROW(sp_replace(p, 0, rec), std::out_of_range);
+        }
+    }
+}
+
+// Casos-limite que continuam corretos com a verificação do CBD-008: diretório cheio, slot apagado e
+// reaproveitado, registros de tamanhos diferentes e compactação por sp_replace que cresce.
+TEST(SlottedPage, CasosLimiteContinuamValidos) {
+    std::vector<std::byte> page(4096);
+    sp_init(page, PageType::Heap);
+    auto balance = [&] {   // cabeçalho + usados + slots mortos + livre = bloco
+        std::uint32_t dead = 0;
+        for (std::uint16_t i = 0; i < sp_nslots(page); ++i) dead += sp_record(page, i).empty() ? 1 : 0;
+        return kPageHeader + sp_used_bytes(page) + kSlotEntry * dead + sp_free_bytes(page);
+    };
+    std::uint16_t n = 0;
+    for (std::size_t len = 1;; len = len % 37 + 1) {   // registros de 1 a 37 bytes até encher
+        const std::vector<std::byte> r(len, std::byte{static_cast<unsigned char>(len)});
+        if (!sp_insert(page, r)) break;
+        ++n;
+    }
+    while (sp_insert(page, std::vector<std::byte>(1, std::byte{1}))) ++n;   // completa com 1 byte
+    EXPECT_EQ(sp_nslots(page), n);
+    EXPECT_FALSE(sp_fits(page, 1));
+    EXPECT_EQ(balance(), 4096u);
+    for (std::uint16_t i = 0; i < n; i += 3) sp_erase(page, i);
+    EXPECT_EQ(balance(), 4096u);
+    const std::vector<std::byte> big(60, std::byte{0x5A});
+    ASSERT_TRUE(sp_replace(page, 1, big));   // cresce: libera o antigo e compacta
+    EXPECT_EQ(sp_record(page, 1).size(), 60u);
+    EXPECT_TRUE(sp_record(page, 1)[59] == std::byte{0x5A});
+    const auto again = sp_insert(page, std::vector<std::byte>(5, std::byte{7}));
+    ASSERT_TRUE(again.has_value());
+    EXPECT_EQ(*again % 3, 0);                 // reaproveita um slot apagado
+    sp_compact(page);
+    EXPECT_EQ(balance(), 4096u);
+    EXPECT_EQ(sp_record(page, 2).size(), 3u);  // o 3º registro inserido (3 bytes) não mudou de slot
+}
+
 TEST(Record, NuloVarCharEVerificacaoSempreLigada) {
     const Schema s = make_schema({{"id", FieldType::Int32, 0, true}, {"nome", FieldType::Char, 10, false, true},
                                   {"nota", FieldType::Int64}, {"bio", FieldType::VarChar, 20, false, true},

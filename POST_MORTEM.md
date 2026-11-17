@@ -884,3 +884,19 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    `SortMergeRejeitaUniqueViolado` contra `b60c03d` devolveu 10 pares onde
    o certo seria 100 (ou erro); GREEN depois. NOT UNIQUE 10 × 10 dá 100 pares
    e o UNIQUE válido continua com grupo zero.
+2. #3 (CBD-008), página com slots malformada. As funções `sp_*` usavam o
+   `nslots` e os slots lidos do disco sem conferir os limites; com
+   `nslots = 65535` numa página de 4.096 B, `sp_used_bytes` lia fora do
+   bloco, e uma soma de registros inválida dava underflow em `sp_free_bytes`
+   (o que deixaria o `sp_insert` gravar fora da página). Agora um cabeçalho
+   validado (`kPageHeader + 4·nslots ≤ free_lo ≤ free_hi ≤ bloco`,
+   `live ≤ nslots`) e cada slot vivo (dentro da área de registros) são
+   conferidos antes de qualquer acesso, e a soma dos registros não pode
+   passar do bloco. O erro é `std::out_of_range`, como o que o `sp_record`
+   já usava. O `read_header` puro não muda, porque os nós internos da B+ têm
+   outro layout e checagem própria. RED: `PaginaMalformadaFalhaSemAcessoInvalido`
+   contra `5fdc364` com ASan parou em heap-buffer-overflow em `slot_at`
+   (chamado por `sp_used_bytes`); GREEN depois, com 7 páginas malformadas.
+   `CasosLimiteContinuamValidos` cobre diretório cheio, slot apagado e
+   reaproveitado, registros de tamanhos diferentes e compactação. Fecha
+   também o teste de acesso malformado do P0-3 da revisão de 06/11.
