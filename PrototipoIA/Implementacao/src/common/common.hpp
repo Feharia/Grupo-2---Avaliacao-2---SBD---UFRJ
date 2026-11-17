@@ -169,7 +169,7 @@ struct IoCounts {
 struct Counters {
     IoCounts global;
     std::array<IoCounts, 4> per_kind{};                  // indexado por FileKind
-    std::unordered_map<FileId, IoCounts> per_file;
+    std::unordered_map<FileId, IoCounts> per_file;       // sem os temporários (CBD-005)
     friend Counters operator-(Counters a, const Counters& b);
 };
 

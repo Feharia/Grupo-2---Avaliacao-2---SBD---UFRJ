@@ -952,3 +952,40 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    10 leituras sem retenção, 11 com ela, que é a conta à mão (4 + 6 + 1). Com
    LRU o caso não distingue: as páginas do novo chunk expulsam a interna, que
    inunda o cache nos dois casos.
+5. #7 (CBD-005), memória auxiliar do sort-merge e do partition-hash. Testes
+   no `testes_memoria` (sort externo com muitas runs, hash recursivo, skew,
+   grupo de duplicatas maior que `group_pages`) mostraram três fontes de heap
+   fora das molduras, todas corrigidas:
+   - cada run ou partição guardava uma cópia própria do esquema (165): agora
+     o operador faz uma cópia por entrada e a compartilha (`create_temp` com
+     `shared_ptr`);
+   - a camada 4 contava E/S por arquivo também para os temporários (dois
+     mapas, cerca de 340 B por arquivo), contagem que nada lê: os temporários
+     passam a ser contados só no total e por tipo, e a E/S não muda;
+   - a tabela de arquivos guardava, para sempre, a entrada de cada
+     temporário apagado, com o caminho completo: a memória crescia com o
+     total de runs e partições criadas no processo. Agora o caminho não é
+     guardado (sai de `dir / nome`), a entrada apagada libera nome e bitmap,
+     e as entradas de temporários apagados são reaproveitadas. O detector de
+     leitura sequencial esquece o arquivo apagado (o acesso seguinte, a
+     outro arquivo, já não era sequencial). Com M = 4, o hash recursivo caiu
+     de 304 KB para 11 KB de pico; 500 temporários criados e apagados deixam
+     16 B.
+   Decisão do usuário: a lista de runs do sort-merge é cobrada em M. O plano
+   conta as runs das duas entradas e a saída de um passe, reserva
+   `desc_frames = ⌈runs × sizeof(TempFile) / bloco⌉` molduras, tiradas do
+   rascunho, do fan-in e da intercalação final, e repete até o número parar
+   de subir. Essas molduras ficam retidas durante a junção (`hold_frames`,
+   como as do diretório do BNL), e `make_runs` reserva o vetor com o número
+   planejado e lança `DoesNotFit` se passar dele. Com 60.000 registros (cerca de 900 páginas):
+   M = 32 dá 55 runs e 2 molduras para a lista; M = 16, 151 runs e 4
+   molduras; M = 8 fica inviável (a lista não cabe). O mínimo do sort-merge
+   com grupo de duplicatas passou de 4 para 5 molduras, e o teste
+   `EsDosTemporariosFicaDentroDaMedicao` passou a usar M = 5. Segunda decisão
+   do usuário, depois da medição: os descritores das partições do hash ficam
+   fora de M, declarados. São até 2(m − 1) por nível e até 6 níveis, um
+   limite que não depende de b. No pior caso da bancada (Inscrição como build,
+   M = 32, dois níveis) o pico do heap foi de 44,7 KB, cerca de 20 KB deles
+   em descritores de partição (perto de 5 molduras). No hash, as partições do
+   primeiro nível passam a ser apagadas logo depois de usadas, como a recursão
+   já fazia.

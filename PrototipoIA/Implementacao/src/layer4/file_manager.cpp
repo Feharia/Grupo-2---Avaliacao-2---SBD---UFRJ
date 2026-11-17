@@ -40,14 +40,21 @@ std::uint32_t FileManager::bitmap_capacity() const { return (block_size_ - kHead
 
 FileId FileManager::create(const std::string& name, FileKind kind) {
     OpenFile of;
-    of.path = dir_ / name;
     of.name = name;
     of.kind = kind;
-    of.fd = create_excl(of.path);
+    of.fd = create_excl(dir_ / name);
     of.alive = true;
     of.blocks = 1;              // bloco 0 = cabeçalho (temporários também o reservam, sem gravá-lo)
     of.free_map.assign(1, false);
     ftruncate_to(of.fd.get(), offset_of(1));
+    // CBD-005: um temporário reaproveita a entrada de um temporário já apagado, para a tabela de
+    // arquivos não crescer com o total de runs e partições criadas, só com as vivas ao mesmo tempo
+    if (kind == FileKind::Temp && !free_temp_ids_.empty()) {
+        const FileId id = free_temp_ids_.back();
+        free_temp_ids_.pop_back();
+        files_[id] = std::move(of);
+        return id;
+    }
     files_.push_back(std::move(of));
     const FileId id = static_cast<FileId>(files_.size() - 1);
     if (kind != FileKind::Temp) write_header(id);   // inicializa e grava o bloco 0 (161)
@@ -57,10 +64,9 @@ FileId FileManager::create(const std::string& name, FileKind kind) {
 FileId FileManager::open(const std::string& name, FileKind kind) {
     if (kind == FileKind::Temp) throw std::logic_error("temporários só são criados, nunca reabertos");
     OpenFile of;
-    of.path = dir_ / name;
     of.name = name;
     of.kind = kind;
-    of.fd = open_existing(of.path);
+    of.fd = open_existing(dir_ / name);
     of.alive = true;
     files_.push_back(std::move(of));
     const FileId id = static_cast<FileId>(files_.size() - 1);
@@ -149,9 +155,15 @@ void FileManager::remove(FileId id) noexcept {
     OpenFile& of = files_[id];
     of.fd.reset();
     std::error_code ec;
-    std::filesystem::remove(of.path, ec);
+    std::filesystem::remove(dir_ / of.name, ec);
     of.alive = false;
-    of.free_map.clear();
+    // CBD-005: a entrada apagada não guarda mais nome nem bitmap; a de um temporário volta
+    // para a lista de reaproveitamento. O detector de leitura sequencial esquece o arquivo: o próximo
+    // acesso, a outro arquivo, já não seria sequencial, então as contagens não mudam.
+    std::string{}.swap(of.name);
+    std::vector<bool>{}.swap(of.free_map);
+    if (last_.valid && last_.file == id) last_.valid = false;
+    if (of.kind == FileKind::Temp) free_temp_ids_.push_back(id);
 }
 
 void FileManager::count(BlockId b, bool write) {
@@ -162,7 +174,7 @@ void FileManager::count(BlockId b, bool write) {
     };
     bump(io_.global);
     bump(io_.per_kind[static_cast<std::size_t>(files_[b.file].kind)]);
-    bump(io_.per_file[b.file]);
+    if (files_[b.file].kind != FileKind::Temp) bump(io_.per_file[b.file]);   // (CBD-005)
     last_.file = b.file;
     last_.block = b.block;
     last_.valid = true;

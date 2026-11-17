@@ -26,6 +26,10 @@ inline std::uint32_t dense_blocks(const TableStats& t) {
     return bfr ? static_cast<std::uint32_t>((t.n + bfr - 1) / bfr) : t.b;
 }
 
+// Bytes de cada descritor da lista de runs do sort-merge, cobrados em M pelo plano (desc_frames,
+// CBD-005). Os metadados do arquivo na camada 4 (tabela de arquivos) ficam fora, declarados (173).
+inline constexpr std::size_t kRunDescriptorBytes = sizeof(TempFile);
+
 Cost estimate_join  (const JoinPlan&, const TableStats& outer, const TableStats& inner);
 Cost estimate_select(const SelectPlan&, const TableStats&, const StructureStats* structure);
 

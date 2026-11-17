@@ -300,8 +300,13 @@ PinnedRecord StorageManager::fetch(TableId t, RID rid, Intent i, const Reservati
 
 // ----------------------------------------------------------------------- memória de trabalho
 TempFile StorageManager::create_temp(const Schema& s, const Reservation& r) {
+    return create_temp(std::make_shared<const Schema>(s), r);   // cópia do esquema (165)
+}
+
+TempFile StorageManager::create_temp(std::shared_ptr<const Schema> s, const Reservation& r) {
+    if (!s) throw std::invalid_argument("create_temp sem esquema");
     const FileId f = pool_.create(next_name("tmp", "tmp"), FileKind::Temp);
-    return TempFile(&pool_, f, std::make_shared<const Schema>(s), r.id());   // cópia do esquema (165)
+    return TempFile(&pool_, f, std::move(s), r.id());
 }
 
 ScratchSpace StorageManager::create_scratch(const Schema& s, const Reservation& r, std::size_t pages) {

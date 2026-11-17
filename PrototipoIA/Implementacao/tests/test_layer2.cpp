@@ -178,12 +178,14 @@ TEST(Monitor, BnlRetemAsMoldurasDoDiretorio) {
 // páginas sujas de temporários são expulsas durante a operação. Toda essa E/S precisa cair dentro
 // do delta medido: o delta é a soma das fases, nada fica sujo depois (flush final grava 0), e as
 // expulsões sujas e as gravações de temporários estão contadas nas gravações do operador.
+// M = 5: com a lista de runs cobrada em M (CBD-005), o sort-merge com grupo de duplicatas precisa de
+// uma moldura para a lista, duas para o grupo e duas para a intercalação final.
 TEST(Monitor, EsDosTemporariosFicaDentroDaMedicao) {
     Monitor m(test_config("mon_fronteira"));
     Db db = build(m);
     std::uint64_t expulsoes = 0;
     for (auto alg : {JoinAlgorithm::SortMerge, JoinAlgorithm::Hash}) {
-        const OpResult r = ok(join(m, db, alg, "a_heap", PathKind::Scan, "b_heap", PathKind::Scan, 4));
+        const OpResult r = ok(join(m, db, alg, "a_heap", PathKind::Scan, "b_heap", PathKind::Scan, 5));
         expulsoes += r.delta.global.dirty_evictions;
         EXPECT_EQ(r.rows, 1200u);
         const auto& g = r.delta.global;

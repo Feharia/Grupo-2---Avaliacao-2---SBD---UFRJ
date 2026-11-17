@@ -41,6 +41,8 @@ public:
 
     // memória de trabalho e temporários
     TempFile      create_temp(const Schema&, const Reservation&);
+    // CBD-005: runs e partições de um mesmo operador compartilham uma única cópia do esquema (165)
+    TempFile      create_temp(std::shared_ptr<const Schema>, const Reservation&);
     ScratchSpace  create_scratch(const Schema&, const Reservation&, std::size_t pages);
     ScratchSpace  create_rid_scratch(const Reservation&, std::size_t pages);
     // Retém n molduras anônimas da reserva enquanto o vetor viver: uma estrutura auxiliar cobrada em

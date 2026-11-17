@@ -110,8 +110,9 @@ BufferPool::Region& BufferPool::region_of(const Frame& fr) {
 
 void BufferPool::bump(FileId f, std::uint64_t IoCounts::*field) {
     counters_.global.*field += 1;
-    counters_.per_kind[static_cast<std::size_t>(files_.kind(f))].*field += 1;
-    counters_.per_file[f].*field += 1;
+    const FileKind k = files_.kind(f);
+    counters_.per_kind[static_cast<std::size_t>(k)].*field += 1;
+    if (k != FileKind::Temp) counters_.per_file[f].*field += 1;   // temporários: só global e por tipo (CBD-005)
 }
 
 FileId BufferPool::create(const std::string& name, FileKind k) { return files_.create(name, k); }

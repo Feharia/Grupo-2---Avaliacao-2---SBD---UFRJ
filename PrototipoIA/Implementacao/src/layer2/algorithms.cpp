@@ -73,13 +73,17 @@ private:
     std::size_t best_ = 0;
 };
 
-// Gera runs ordenadas: run_pages de ScratchSpace + 1 página de entrada + 1 de saída = m.
-std::vector<TempFile> make_runs(StorageManager& sm, const JoinInput& in, std::size_t run_pages, const Reservation& res) {
-    const Schema& schema = sm.schema(in.path.table);
+// Gera runs ordenadas: run_pages de ScratchSpace + 1 página de entrada + 1 de saída + desc_frames = m.
+// A lista de runs é cobrada em M (CBD-005): o plano conta as runs e reserva desc_frames molduras para
+// os descritores; o vetor é reservado com esse número e nunca cresce além dele.
+std::vector<TempFile> make_runs(StorageManager& sm, const JoinInput& in, std::size_t run_pages, std::size_t max_runs,
+                                const Reservation& res, const std::shared_ptr<const Schema>& schema) {
     std::vector<TempFile> runs;
-    ScratchSpace sc = sm.create_scratch(schema, res, run_pages);
+    runs.reserve(max_runs);
+    ScratchSpace sc = sm.create_scratch(*schema, res, run_pages);
     auto flush_run = [&] {
         if (sc.size() == 0) return;
+        if (runs.size() == max_runs) throw DoesNotFit("lista de runs passou do número previsto pelo plano");
         sc.sort_by(in.field);
         TempFile t = sm.create_temp(schema, res);
         for (std::size_t i = 0; i < sc.size(); ++i) t.append(sc.at(i));
@@ -102,9 +106,10 @@ std::vector<TempFile> make_runs(StorageManager& sm, const JoinInput& in, std::si
 }
 
 // Um passe de intercalação: grupos de fan_in runs viram uma run cada (fan_in + 1 molduras).
-std::vector<TempFile> merge_pass(StorageManager& sm, const Schema& schema, std::vector<TempFile> runs, FieldId field,
-                                 std::size_t fan_in, const Reservation& res) {
+std::vector<TempFile> merge_pass(StorageManager& sm, const std::shared_ptr<const Schema>& schema,
+                                 std::vector<TempFile> runs, FieldId field, std::size_t fan_in, const Reservation& res) {
     std::vector<TempFile> out;
+    out.reserve((runs.size() + fan_in - 1) / fan_in);   // entrada e saída do passe estão no desc_frames do plano
     for (std::size_t i = 0; i < runs.size(); i += fan_in) {
         const std::size_t end = std::min(runs.size(), i + fan_in);
         TempFile merged = sm.create_temp(schema, res);
@@ -192,11 +197,14 @@ void bnl_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inner
 // ======================================================================= sort-merge
 void sort_merge_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inner, const JoinPlan& plan,
                      const Reservation& res, ResultSink& sink, PhaseRecorder& ph) {
-    const Schema& so = sm.schema(outer.path.table);
-    const Schema& si = sm.schema(inner.path.table);
+    // as molduras da lista de runs ficam retidas durante a junção (CBD-005), como as do diretório do BNL
+    const std::vector<PageGuard> retidas = sm.hold_frames(res, plan.desc_frames);
+    // uma cópia do esquema de cada entrada para todas as runs do operador (165, CBD-005)
+    const auto so = std::make_shared<const Schema>(sm.schema(outer.path.table));
+    const auto si = std::make_shared<const Schema>(sm.schema(inner.path.table));
     std::vector<TempFile> ro, ri;
-    if (plan.sort_outer) { ph.begin("runs_externa"); ro = make_runs(sm, outer, plan.run_pages, res); }
-    if (plan.sort_inner) { ph.begin("runs_interna"); ri = make_runs(sm, inner, plan.run_pages, res); }
+    if (plan.sort_outer) { ph.begin("runs_externa"); ro = make_runs(sm, outer, plan.run_pages, plan.runs_outer, res, so); }
+    if (plan.sort_inner) { ph.begin("runs_interna"); ri = make_runs(sm, inner, plan.run_pages, plan.runs_inner, res, si); }
     ph.begin("passes");
     auto count = [](const std::vector<TempFile>& r, bool sorted) { return sorted ? r.size() : std::size_t{1}; };
     while (count(ro, plan.sort_outer) + count(ri, plan.sort_inner) > plan.final_fan_in) {
@@ -214,7 +222,7 @@ void sort_merge_join(StorageManager& sm, const JoinInput& outer, const JoinInput
     std::unique_ptr<SortedSource> I = plan.sort_inner ? runs_source(ri, inner.field)
         : std::make_unique<SearchSource>(sm.find(inner.path, all_inner, kSeqOnce, res));
     std::optional<ScratchSpace> group;
-    if (plan.group_pages > 0) group.emplace(sm.create_scratch(si, res, plan.group_pages));
+    if (plan.group_pages > 0) group.emplace(sm.create_scratch(*si, res, plan.group_pages));
     while (O->cur() && I->cur()) {
         const Key ko = O->cur()->key(outer.field);
         const Key ki = I->cur()->key(inner.field);
@@ -262,6 +270,9 @@ void hash_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inne
                const Reservation& res, ResultSink& sink, PhaseRecorder& ph) {
     const Schema& so = sm.schema(outer.path.table);
     const Schema& si = sm.schema(inner.path.table);
+    // uma cópia do esquema de cada entrada para todas as partições do operador (165, CBD-005)
+    const auto so_ptr = std::make_shared<const Schema>(so);
+    const auto si_ptr = std::make_shared<const Schema>(si);
     std::size_t extra_passes = 0, bailouts = 0;
 
     auto probe_with = [&](const ScratchSpace& sc, const HashSource& p) {
@@ -313,7 +324,7 @@ void hash_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inne
         flush();
     };
 
-    auto partition = [&](const HashSource& src, FieldId field, const Schema& s, std::size_t parts,
+    auto partition = [&](const HashSource& src, FieldId field, const std::shared_ptr<const Schema>& s, std::size_t parts,
                          const std::function<std::size_t(const Key&)>& part_of) {
         std::vector<TempFile> out;
         out.reserve(parts);
@@ -343,8 +354,8 @@ void hash_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inne
                          : plan.m - 1;
             const std::uint64_t seed = plan.partition_seed + 0x9E3779B97F4A7C15ull * (passes + 1);
             auto part_of = [seed, parts](const Key& k) { return static_cast<std::size_t>(hash_key(k, seed) % parts); };
-            std::vector<TempFile> sb = partition(b, outer.field, so, parts, part_of);
-            std::vector<TempFile> sp = partition(p, inner.field, si, parts, part_of);
+            std::vector<TempFile> sb = partition(b, outer.field, so_ptr, parts, part_of);
+            std::vector<TempFile> sp = partition(p, inner.field, si_ptr, parts, part_of);
             for (std::size_t i = 0; i < parts; ++i) {
                 const HashSource cb{[&sb, i] { return sb[i].scan_blocks(kSeqOnce); }, sb[i].blocks()};
                 const HashSource cp{[&sp, i] { return sp[i].scan_blocks(kSeqOnce); }, sp[i].blocks()};
@@ -368,8 +379,8 @@ void hash_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inne
             return static_cast<std::size_t>(hash_key(k, plan.partition_seed) % P);
         };
         std::vector<TempFile> po, pi;
-        if (!plan.prepartitioned_outer) { ph.begin("particiona_externa"); po = partition(whole_outer, outer.field, so, P, part0); }
-        if (!plan.prepartitioned_inner) { ph.begin("particiona_interna"); pi = partition(whole_inner, inner.field, si, P, part0); }
+        if (!plan.prepartitioned_outer) { ph.begin("particiona_externa"); po = partition(whole_outer, outer.field, so_ptr, P, part0); }
+        if (!plan.prepartitioned_inner) { ph.begin("particiona_interna"); pi = partition(whole_inner, inner.field, si_ptr, P, part0); }
         ph.begin("build_probe");   // inclui a E/S dos passes recursivos e dos bailouts
         const std::uint32_t nb = prepath ? prepath->hash_partitioned_by->buckets : 0;
         auto buckets_of = [&](const AccessPath& path, std::size_t p) {
@@ -386,6 +397,10 @@ void hash_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inne
                                      ? buckets_of(inner.path, p)
                                      : HashSource{[&pi, p] { return pi[p].scan_blocks(kSeqOnce); }, pi[p].blocks()};
             process(b, q, 1);
+            // apaga as partições já usadas, como a recursão faz (CBD-005): descartar um temporário
+            // selado não grava nada, e o arquivo e os metadados dele não esperam o fim da junção
+            if (!plan.prepartitioned_outer) { TempFile drop = std::move(po[p]); }
+            if (!plan.prepartitioned_inner) { TempFile drop = std::move(pi[p]); }
         }
     }
     // resumo da execução, numa fase final sem E/S (aparece em fases.csv)

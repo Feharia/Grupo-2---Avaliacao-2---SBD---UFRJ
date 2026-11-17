@@ -113,8 +113,8 @@ std::size_t JoinPlan::frames_used() const {
     switch (alg) {
         case JoinAlgorithm::Bnl:   // chunk + 1 da interna + as molduras retidas do diretório (173, CBD-004)
             return chunk + 1 + dir_frames;
-        case JoinAlgorithm::SortMerge:
-            return std::max({run_pages + 2, fan_in + 1, final_fan_in + group_pages});
+        case JoinAlgorithm::SortMerge:   // + as molduras da lista de runs (CBD-005)
+            return std::max({run_pages + 2, fan_in + 1, final_fan_in + group_pages}) + desc_frames;
         case JoinAlgorithm::Hash:
             return std::max(partitions > 1 ? partitions + 1 : std::size_t{2}, build_pages + 1);
     }
@@ -183,16 +183,32 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
             };
             p.sort_outer = !ordered(outer);
             p.sort_inner = !ordered(inner);
-            p.run_pages = m - 2;
-            p.fan_in = m - 1;
             p.group_pages = p.inner_unique ? 0 : params.group_pages;
             if (p.group_pages + 2 > m) return NotApplicable{"group_pages não deixa espaço para a intercalação", NotApplicable::Kind::Inviavel};
-            p.final_fan_in = m - p.group_pages;
-            // runs: quantos registros cabem em m − 2 páginas de rascunho com o diretório cobrado (173)
-            const std::size_t cap_o = ScratchSpace::capacity_for(so, p.run_pages, storage_.block_size());
-            const std::size_t cap_i = ScratchSpace::capacity_for(si, p.run_pages, storage_.block_size());
-            std::size_t ro = p.sort_outer ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(to.n), cap_o)) : 1;
-            std::size_t ri = p.sort_inner ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(ti.n), cap_i)) : 1;
+            // A lista de runs cresce com b/m e é cobrada em M (CBD-005): desc_frames molduras guardam os
+            // descritores das runs das duas entradas e da saída de um passe de intercalação, e saem do
+            // rascunho, do fan-in e da intercalação final. Mais molduras para a lista deixam as runs
+            // menores e mais numerosas; repete até o número de molduras parar de subir.
+            const std::size_t bs = storage_.block_size();
+            std::size_t ro = 1, ri = 1, d = 0;
+            for (int it = 0;; ++it) {
+                if (d + 3 > m || p.group_pages + 2 + d > m || it > 16)
+                    return NotApplicable{"lista de runs não cabe em m", NotApplicable::Kind::Inviavel};
+                p.run_pages = m - 2 - d;
+                p.fan_in = m - 1 - d;
+                p.final_fan_in = m - p.group_pages - d;
+                // runs: quantos registros cabem no rascunho com o diretório cobrado (173)
+                const std::size_t cap_o = ScratchSpace::capacity_for(so, p.run_pages, storage_.block_size());
+                const std::size_t cap_i = ScratchSpace::capacity_for(si, p.run_pages, storage_.block_size());
+                ro = p.sort_outer ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(to.n), cap_o)) : 1;
+                ri = p.sort_inner ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(ti.n), cap_i)) : 1;
+                const std::size_t lista = (p.sort_outer ? ro + ceil_div(ro, p.fan_in) : 0) +
+                                          (p.sort_inner ? ri + ceil_div(ri, p.fan_in) : 0);
+                const std::size_t nd = ceil_div(lista * kRunDescriptorBytes, bs);
+                if (nd <= d) break;
+                d = nd;
+            }
+            p.desc_frames = d;
             p.runs_outer = ro;
             p.runs_inner = ri;
             while (ro + ri > p.final_fan_in) {
