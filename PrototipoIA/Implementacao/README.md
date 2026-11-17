@@ -25,8 +25,11 @@ Rodada completa, com conferência e tabelas:
 ./build/bancada --saida saida
 python3 -I tools/reference.py saida
 python3 -I tools/compare.py saida
+python3 -I tools/verificar_matriz.py saida   # matriz obrigatória do enunciado; código 1 se faltar algo
 python3 -I tools/tabelas.py saida     # saida/tabelas.md e saida/tabelas/*.csv
 ```
+
+O `verificar_matriz.py` reprova a rodada se faltar uma célula obrigatória em LRU ou MRU, se uma célula obrigatória vier não aplicável sem fundamento (só a igualdade em UNIQUE com 1% ou 50% pode, pelo caso 3), se o porte de uma junção não conferir com os blocos reais e o m, ou se a rodada for reduzida (escala menor que 1 ou menos de 3 repetições). Células inviáveis aparecem como aviso. O inventário vem de `tools/matriz.py`, o mesmo da tabela de cobertura (BENCH-005).
 
 O `tabelas.py` aceita `--politica MRU` (as tabelas principais saem com a outra política), `--md ARQUIVO`, `--csv PASTA` e `--sem-csv`.
 
@@ -70,6 +73,7 @@ cmake -S . -B build-cmake && cmake --build build-cmake && ctest --test-dir build
 | 1 | `src/layer1/bench.cpp` | gerador da base, especificação padrão, constantes por quantis, lotes, repetições, CSVs, manifesto |
 | — | `tools/reference.py`, `tools/compare.py` | conferência com o SQLite (147, 166) |
 | — | `tools/tabelas.py` | tabelas de análise a partir de uma saída (Markdown e CSV) |
+| — | `tools/matriz.py`, `tools/verificar_matriz.py` | inventário da matriz obrigatória e verificador que reprova lacunas (BENCH-005) |
 | — | `tests/` | 67 testes das camadas 2, 3 e 4 |
 
 ## Saídas da bancada

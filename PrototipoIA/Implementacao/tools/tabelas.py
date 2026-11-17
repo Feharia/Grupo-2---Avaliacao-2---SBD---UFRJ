@@ -21,6 +21,12 @@ import re
 import statistics
 import sys
 from collections import Counter, OrderedDict, defaultdict
+import importlib.util
+
+# inventário da matriz e estado das células, os mesmos do verificador (BENCH-005)
+_spec = importlib.util.spec_from_file_location("matriz", os.path.join(os.path.dirname(os.path.abspath(__file__)), "matriz.py"))
+matriz = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(matriz)
 
 KEY = ("politica", "operacao", "tipo", "tamanho", "config", "seletividade",
        "variante", "algoritmo", "externa", "interna", "m")
@@ -714,23 +720,11 @@ def t_convergencia(b):
 
 def estado_celula(b, tipo, tamanho, config, selet, alg):
     """Estado de uma célula da matriz do enunciado no resultados.csv (política escolhida)."""
-    rs = [r for r in b.brutos if r["politica"] == b.politica and r["tipo"] == tipo and r["config"] == config
-          and r["tamanho"] == tamanho and r["seletividade"] == selet and r["algoritmo"] == alg]
-    ok = {r["variante"].replace(" (papeis trocados)", "") for r in rs if r["status"] == "ok"}
-    if ok:
-        return "ok" if len(ok) == 1 else f"ok ({len(ok)} variantes)", "ok"
-    for st in ("inviavel", "nao_aplicavel"):
-        motivo = next((r["motivo"] for r in rs if r["status"] == st), None)
-        if motivo is not None:
-            caso = motivo.split(":")[0] if motivo.startswith("caso") else ""
-            return ("inviável" if st == "inviavel" else "n/a") + (f" ({caso})" if caso else ""), st
-    return None, "ausente"
+    return matriz.estado_celula(b.brutos, b.politica, tipo, tamanho, config, selet, alg)
 
 
 def t_cobertura(b):
-    """P15: a matriz do enunciado v2 célula por célula, gerada do resultados.csv."""
-    configs = ("a", "b", "c", "d", "e")
-    tamanhos = ("menor_menor", "menor_maior", "maior_maior")
+    """P15: a matriz do enunciado v2 célula por célula, gerada do resultados.csv (inventário em matriz.py)."""
     cont = Counter()
     linhas, brutas = [], []
 
@@ -749,16 +743,11 @@ def t_cobertura(b):
                 brutas.append([grupo, obrig, *args, st if st != "ausente" or obrig == "obrigatória" else "nao_implementado"])
             linhas.append(lin)
 
-    algs = ("bnl", "sort_merge", "hash")
-    for tipo, obrig in (("natural_join", "obrigatória"), ("equijoin_unique", "opcional"),
-                        ("equijoin_not_unique", "opcional")):
-        celulas = [((tam, cfg), [(tipo, tam, cfg, "", a) for a in algs]) for tam in tamanhos for cfg in configs]
-        bloco(f"{TIPO[tipo]} ({obrig})", obrig, lambda k: f"{TAMANHO[k[0]]}, config. {k[1]}", celulas, algs)
-    for tipo, obrig in (("igualdade_unique", "obrigatória"), ("faixa_not_unique", "obrigatória"),
-                        ("faixa_unique", "opcional")):
-        selets = ("pontual", "1%", "50%") if tipo.startswith("igualdade") else (None, "1%", "50%")
-        celulas = [(cfg, [None if s is None else (tipo, "", cfg, s, "") for s in selets]) for cfg in ("a", "b", "c")]
-        bloco(f"{TIPO[tipo]} ({obrig})", obrig, lambda k: f"config. {k}", celulas, selets)
+    for tipo, obrig in matriz.JUNCOES:
+        bloco(f"{TIPO[tipo]} ({obrig})", obrig, lambda k: f"{TAMANHO[k[0]]}, config. {k[1]}",
+              matriz.celulas_juncao(tipo), matriz.ALGORITMOS)
+    for tipo, obrig in matriz.SELECOES:
+        bloco(f"{TIPO[tipo]} ({obrig})", obrig, lambda k: f"config. {k}", matriz.celulas_selecao(tipo), None)
     tot = lambda o: sum(n for (ob, _), n in cont.items() if ob == o)
     resumo = "; ".join(
         f"{rot}: {tot(o)} células, {cont[(o, 'ok')]} executadas, {cont[(o, 'nao_aplicavel')]} não aplicáveis, "

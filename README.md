@@ -108,6 +108,12 @@ Células da matriz do enunciado que não fazem sentido, como uma faixa sobre has
    python3 -I tools/compare.py saida
    ```
 
+   Confira também a cobertura da matriz obrigatória do enunciado. O verificador termina com código 1 se faltar uma célula, se uma célula obrigatória vier não aplicável sem fundamento, se o porte de uma junção não conferir ou se a rodada for reduzida.
+
+   ```bash
+   python3 -I tools/verificar_matriz.py saida
+   ```
+
 7. Gere as tabelas de análise, em `saida/tabelas.md` e `saida/tabelas/*.csv`:
 
    ```bash

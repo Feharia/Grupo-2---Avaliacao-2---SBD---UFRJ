@@ -1056,3 +1056,17 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    valor calculado no comentário. Os dois desvios grandes que restam (hash
    com Inscrição como build, +29%, pelo termo 4·n_h; clustering sobre hash
    com 50%, −44%, por colisões) continuam explicados na §4.5 do README.
+10. #14 (BENCH-005), verificador da matriz obrigatória. O inventário e o
+    estado das células saíram do `tabelas.py` para `tools/matriz.py`, usado
+    pela tabela de cobertura (que saiu idêntica) e pelo novo
+    `tools/verificar_matriz.py`. Ele termina com código 1 se faltar uma das
+    60 células obrigatórias em LRU ou MRU; se uma junção obrigatória vier
+    não aplicável, ou uma seleção obrigatória fora do caso 3; se o porte de
+    uma junção executada não conferir com os blocos reais
+    (`estatisticas.csv`) e o m da operação; ou se a rodada for reduzida
+    (escala menor que 1, menos de 3 repetições, sem uma das políticas).
+    Células inviáveis aparecem como aviso. Na rodada de exemplo: aprovada,
+    com 108 células executadas, 12 não aplicáveis (caso 3) e porte conferido
+    em 347 execuções; uma rodada `--rapido` é reprovada pela escala e pelas
+    repetições. Dez testes Python, oito deles negativos
+    (`test_verificar_matriz.py`).
