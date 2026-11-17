@@ -989,3 +989,13 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    em descritores de partição (perto de 5 molduras). No hash, as partições do
    primeiro nível passam a ser apagadas logo depois de usadas, como a recursão
    já fazia.
+   Correção depois do 1º CI no Linux (commit seguinte, já com o 5 enviado):
+   `TabelaDeArquivosReaproveitaTemporariosApagados` falhou no GCC/libstdc++
+   com 104 B vivos (limite 64) e 1.243 B de pico (limite 1.024). Não era
+   vazamento: a libstdc++ aloca o vetor de buckets da tabela de páginas do
+   buffer pool na 1ª inserção, que caía dentro do escopo medido, e monta
+   cada caminho com uma lista de componentes. O teste tinha limites
+   absolutos que dependiam da biblioteca padrão; agora o aquecimento passa
+   pelo `append`, e ele compara 50 e 500 temporários criados e apagados (o
+   que fica vivo e o pico não podem crescer com o número deles). No macOS:
+   0 B vivos e 440 B de pico nos dois casos.

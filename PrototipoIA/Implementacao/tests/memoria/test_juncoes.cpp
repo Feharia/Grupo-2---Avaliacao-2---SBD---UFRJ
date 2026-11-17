@@ -163,25 +163,31 @@ TEST(MemoriaAuxiliar, HashInscricaoComoBuildEmM32) {
 
 // A tabela de arquivos da camada 4 não cresce com os temporários já apagados: antes, cada um
 // deixava a entrada com o caminho completo, e a memória crescia com o total de runs e partições
-// criadas desde o início do processo.
+// criadas desde o início do processo. O teste compara 50 e 500 temporários criados e apagados:
+// o que fica vivo e o pico não podem crescer com o número deles. Não há limite absoluto, porque
+// as estruturas de uso único e as alocações passageiras dependem da biblioteca: no Linux, a
+// libstdc++ aloca o vetor de buckets da tabela de páginas na 1ª inserção e monta cada caminho
+// com uma lista de componentes (o 1º CI deste teste mediu 104 B vivos e 1.243 B de pico).
 TEST(MemoriaAuxiliar, TabelaDeArquivosReaproveitaTemporariosApagados) {
     StorageManager sm(test_config("mem_tabela_arquivos"));
     const auto s = std::make_shared<const Schema>(make_schema({{"k", FieldType::Int32}}));
     auto res = sm.reserve(2);
     const auto rec = encode_record(*s, {std::int64_t{1}});
-    { TempFile aquece = sm.create_temp(s, res); }   // a primeira entrada pode fazer a tabela crescer
-    std::size_t vivos = 0, pico = 0;
-    {
+    auto ciclo = [&] {   // cria, grava uma página, sela e apaga
+        TempFile t = sm.create_temp(s, res);
+        t.append(detail::make_view(rec, s.get()));
+        t.seal();
+    };
+    ciclo();   // aquecimento: as estruturas de uso único (tabela de arquivos, tabela de páginas) crescem aqui
+    auto mede = [&](int n) {
         contador::Escopo e;
-        for (int i = 0; i < 500; ++i) {
-            TempFile t = sm.create_temp(s, res);
-            t.append(detail::make_view(rec, s.get()));
-            t.seal();
-        }
-        vivos = e.vivos();
-        pico = e.pico();
-    }
-    std::cout << "  [memoria] 500 temporários criados e apagados: " << vivos << " B vivos, pico " << pico << " B\n";
-    EXPECT_LE(vivos, 64u);     // nada acumula
-    EXPECT_LE(pico, 1024u);    // um temporário vivo de cada vez
+        for (int i = 0; i < n; ++i) ciclo();
+        return std::pair<std::size_t, std::size_t>{e.vivos(), e.pico()};
+    };
+    const auto [vivos50, pico50] = mede(50);
+    const auto [vivos500, pico500] = mede(500);
+    std::cout << "  [memoria] temporários criados e apagados: 50 deixam " << vivos50 << " B vivos (pico " << pico50
+              << " B); 500 deixam " << vivos500 << " B vivos (pico " << pico500 << " B)\n";
+    EXPECT_LE(vivos500, vivos50 + 64);   // nada acumula por temporário (8 B cada já dariam 3.600 B)
+    EXPECT_LE(pico500, pico50 + 64);     // um temporário vivo de cada vez
 }
