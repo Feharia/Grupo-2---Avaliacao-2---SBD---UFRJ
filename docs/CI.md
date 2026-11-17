@@ -16,9 +16,13 @@ vez de trocar silenciosamente para o shim local. Essa opção requer CMake
 3.22+, disponível no runner escolhido. O projeto continua aceitando seu
 fluxo local anterior; o gate não muda o CMake nem o motor.
 
-O CTest registra um executável (`testes`), que atualmente contém **59 casos
-GoogleTest**. O XML `gtest.xml` permite consultar cada caso. O outro XML,
-`ctest.xml`, representa o executável registrado no CTest. Há também 30 testes
+O CTest registra dois executáveis: `testes`, com a suíte principal, e
+`testes_memoria`, que troca o `operator new` global para contar as
+alocações reais das estruturas auxiliares (issue CBD-003) e por isso fica
+separado. O GoogleTest grava um XML por executável em `gtest/`
+(`gtest/testes.xml` e `gtest/testes_memoria.xml`), que permite consultar
+cada caso. O outro XML, `ctest.xml`, representa os executáveis registrados
+no CTest. Há também 30 testes
 Python do guard de cobertura e das ferramentas de comparação de I/O,
 mais regressões dirigidas do workflow, sem dependências externas.
 

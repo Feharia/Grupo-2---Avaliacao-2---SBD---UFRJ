@@ -900,3 +900,23 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    `CasosLimiteContinuamValidos` cobre diretório cheio, slot apagado e
    reaproveitado, registros de tamanhos diferentes e compactação. Fecha
    também o teste de acesso malformado do P0-3 da revisão de 06/11.
+3. #5 (CBD-003), memória auxiliar do `ScratchSpace` medida por alocações
+   reais. Novo executável `testes_memoria` (`tests/memoria/`), que troca o
+   `operator new`/`delete` globais por versões que contam bytes vivos e pico
+   num escopo armado; fica separado da suíte principal para não mudar o
+   comportamento dela sob ASan. Registrado no CMake (GTest e shim) e no
+   Makefile; o CI o roda pelo `ctest`. O `GTEST_OUTPUT` do workflow passou a
+   apontar para um diretório (`evidencias/gtest/`), com um XML por executável;
+   com um arquivo só, o segundo executável sobrescreveria o primeiro. O teste arma o contador só nas
+   chamadas do operador (add, sort_by, build_hash, probe) e exige
+   `bytes dos registros + pico do heap ≤ páginas × bloco`. Resultados no
+   branch: E03 (Int32, 2 páginas) 448 registros, 2.688 B + 5.376 B de pico
+   para 8.192 B; 1 página 1.344 + 2.688 para 4.096; registro de 204 B
+   7.598 + 544 para 8.192; RIDs 1.840 + 1.408 para 4.096. Com chave VarChar,
+   a comparação e a sonda decodificam a chave numa `std::string`
+   temporária (no máximo três vivas): o teste admite essa folga O(1), que a
+   decisão 173 passa a declarar. RED: o mesmo teste contra `4091762` (antes
+   do P01) mediu, no E03, 1.364 registros e pico de 62.752 B de heap para
+   8.192 B de orçamento, e todos os casos estouraram. Um erro do próprio
+   teste: a primeira versão do autoteste do contador usava um vetor sem uso,
+   cuja alocação o clang suprimiu; passou a chamar `::operator new` direto.
