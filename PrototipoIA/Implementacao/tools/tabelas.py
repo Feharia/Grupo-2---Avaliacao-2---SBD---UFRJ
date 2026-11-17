@@ -160,6 +160,8 @@ class Base:
         self.ocup = ler_csv(os.path.join(saida, "ocupacao.csv"))
         self.convergencia = ler_csv(os.path.join(saida, "convergencia.csv"))
         self.caminhos = ler_csv(os.path.join(saida, "caminhos.csv"))
+        self.parametros = {(r["politica"], r["operacao"], r["variante"], r["algoritmo"]): r["parametros"]
+                           for r in ler_csv(os.path.join(saida, "parametros.csv"))}   # BENCH-008
         self.manifesto = ler_manifesto(os.path.join(saida, "manifesto.txt"))
         conf = os.path.join(saida, "conferencia.txt")
         self.conferencia = open(conf, encoding="utf-8").read().strip() if os.path.exists(conf) else ""
@@ -535,16 +537,21 @@ def t_estimativa(b):
             onde = f"config. {pior['config']}: {operandos(b, pior)}"
         else:
             onde = f"config. {pior['config']}: {caminho(pior['variante'], b.campo_selecao(pior['operacao']))}"
+        params = b.parametros.get((pior["politica"], pior["operacao"], pior["variante"], pior["algoritmo"]), "")
         linhas.append([f, fmt_int(len(cs)), fmt_pct(statistics.median(abs_err), False), f"{dentro} de {len(cs)}",
-                       fmt_pct(pior.erro), f"{b.rotulo_op(pior['operacao'], pior['tipo'])} ({onde})"])
-        brutas.append([f, len(cs), statistics.median(abs_err), dentro, pior.erro, pior["operacao"], pior["variante"]])
+                       fmt_pct(pior.erro), f"{b.rotulo_op(pior['operacao'], pior['tipo'])} ({onde})", params or "—"])
+        brutas.append([f, len(cs), statistics.median(abs_err), dentro, pior.erro, pior["operacao"], pior["variante"],
+                       params])
     return Tabela(
         "09_estimado_x_medido", "Custo estimado × medido",
         "Erro = (estimado − medido) / medido, em blocos transferidos. As fórmulas são as dos livros (Elmasri e "
-        "Silberschatz), com os parâmetros medidos pela própria bancada.",
-        ["Família", "Combinações", "Mediana do erro absoluto", "Erro absoluto ≤ 10%", "Maior erro", "Onde"],
+        "Silberschatz), com os parâmetros medidos pela própria bancada. A última coluna traz os parâmetros que "
+        "entraram na fórmula da pior combinação; os de todas estão em parametros.csv.",
+        ["Família", "Combinações", "Mediana do erro absoluto", "Erro absoluto ≤ 10%", "Maior erro", "Onde",
+         "Parâmetros da pior"],
         linhas, brutas,
-        ["familia", "combinacoes", "mediana_abs_erro_pct", "ate_10pct", "maior_erro_pct", "operacao", "variante"])
+        ["familia", "combinacoes", "mediana_abs_erro_pct", "ate_10pct", "maior_erro_pct", "operacao", "variante",
+         "parametros"])
 
 
 def t_fases(b):

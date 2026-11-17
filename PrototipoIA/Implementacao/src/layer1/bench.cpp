@@ -592,6 +592,46 @@ std::string executed_access(const AccessPath& p, JoinAlgorithm alg, bool sorts, 
     return base;
 }
 
+// Parâmetros que entram na estimativa de cada combinação (BENCH-008): os mesmos que estimate_join e
+// estimate_select recebem, para a tabela de custo estimado × medido mostrar de onde vem cada número.
+std::string join_params(const JoinPlan& p) {
+    std::ostringstream os;
+    os << "m=" << p.m << "; b_ext=" << p.b_outer << "; b_int=" << p.b_inner << "; d_ext=" << p.d_outer
+       << "; d_int=" << p.d_inner;
+    switch (p.alg) {
+        case JoinAlgorithm::Bnl:
+            os << "; chunk=" << p.chunk << "; dir_frames=" << p.dir_frames;
+            break;
+        case JoinAlgorithm::SortMerge:
+            os << "; ordena_ext=" << (p.sort_outer ? "sim" : "nao") << "; ordena_int=" << (p.sort_inner ? "sim" : "nao")
+               << "; run_pages=" << p.run_pages << "; runs_ext=" << p.runs_outer << "; runs_int=" << p.runs_inner
+               << "; fan_in=" << p.fan_in << "; passes_ext=" << p.merge_passes_outer << "; passes_int="
+               << p.merge_passes_inner << "; group_pages=" << p.group_pages << "; desc_frames=" << p.desc_frames;
+            break;
+        case JoinAlgorithm::Hash:
+            os << "; particoes=" << p.partitions << "; niveis=" << p.levels << "; build_pages=" << p.build_pages
+               << "; pre_ext=" << (p.prepartitioned_outer ? "sim" : "nao") << "; pre_int="
+               << (p.prepartitioned_inner ? "sim" : "nao");
+            break;
+    }
+    return os.str();
+}
+
+std::string select_params(const TableStats& t, const AccessPath& path, double batch, double expected_rows) {
+    std::ostringstream os;
+    os << "n=" << t.n << "; b=" << t.b << "; bfr=" << t.bfr << "; bfr_medio=" << t.bfr_medio << "; lote=" << batch
+       << "; linhas_esperadas=" << expected_rows;
+    for (const auto& s : t.structures) {
+        if (s.id != path.id) continue;
+        if (s.height) os << "; h=" << *s.height;
+        if (s.distinct) os << "; distintos=" << *s.distinct;
+        if (s.chain_avg) os << "; cadeia_media=" << fmt(*s.chain_avg, 2);
+    }
+    if (path.kind == PathKind::SecondaryBTreeClustering && !t.structures.empty() && t.structures.front().chain_avg)
+        os << "; cadeia_media_primaria=" << fmt(*t.structures.front().chain_avg, 2);
+    return os.str();
+}
+
 std::string executed_access(const AccessPath& p) {   // seleção: o caminho pedido é o executado
     switch (p.kind) {
         case PathKind::Scan: return "varredura do heap com filtro";
@@ -764,6 +804,8 @@ int main(int argc, char** argv) {
               "convergiu_io", "convergiu_tempo", "parada"});
     Csv access(out_dir / "caminhos.csv");     // P09
     access.row({"politica", "operacao", "config", "variante", "algoritmo", "acesso_externa", "acesso_interna"});
+    Csv params(out_dir / "parametros.csv");   // BENCH-008
+    params.row({"politica", "operacao", "variante", "algoritmo", "parametros"});
 
     for (Policy pol : spec.policies) {
         const std::string pname = to_string(pol);
@@ -809,6 +851,11 @@ int main(int argc, char** argv) {
                     SelectParams sp;
                     sp.m = spec.m_select;
                     access.row({pname, op.id, ref.config, variant, "", executed_access(path), ""});
+                    {   // parâmetros da estimativa (sem E/S: o catálogo já tem as estatísticas, 160)
+                        const double lote = op.kind == OpKind::Points ? static_cast<double>(batches.at({op.id, 1}).size()) : 1.0;
+                        const double esperadas = op.kind == OpKind::Points ? lote : static_cast<double>(ranges.at(op.id).expected);
+                        params.row({pname, op.id, variant, "", select_params(mon.stats(t), path, lote, esperadas)});
+                    }
                     const Convergence cv = repeat(spec,
                            [&](int rep) {
                                prepare();
@@ -871,6 +918,7 @@ int main(int argc, char** argv) {
                             if (const auto* p = std::get_if<JoinPlan>(&planned)) {
                                 ae = executed_access(outer.path, alg, p->sort_outer, p->prepartitioned_outer, p->partitions > 1);
                                 ai = executed_access(inner.path, alg, p->sort_inner, p->prepartitioned_inner, p->partitions > 1);
+                                params.row({pname, op.id, vname, to_string(alg), join_params(*p)});
                             }
                             access.row({pname, op.id, jc.config, vname, to_string(alg), ae, ai});
                         }

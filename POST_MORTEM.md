@@ -1042,3 +1042,17 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    mínimo não converge sem cumprir o critério. Teste Python
    (`test_tabelas_convergencia.py`): a tabela 15 lista só os grupos que
    pararam no teto e conta os que pararam só pelo tempo.
+9. #17 (BENCH-008), parâmetros das estimativas. A bancada grava
+   `parametros.csv`, uma linha por combinação, com os parâmetros que entram
+   na fórmula: nas junções, os do mesmo plano que gera o `caminhos.csv` (b e
+   d de cada lado, m, chunk e dir_frames; runs, fan-in, passes, group_pages
+   e desc_frames; partições, níveis e build); nas seleções, n, b, bfr, lote,
+   linhas esperadas, altura, distintos e cadeias. A tabela "Custo estimado ×
+   medido" mostra os parâmetros da pior combinação de cada família. Testes
+   (`tests/test_estimativas.cpp`): BNL, sort-merge com um passe e entrada
+   ordenada (e com blocagem média), hash sem partição, com um e dois níveis e
+   pré-particionado, B+ pontual h + 1 e faixa pela fração das folhas,
+   clustering sobre hash, hashes, B+ secundária e varredura, cada um com o
+   valor calculado no comentário. Os dois desvios grandes que restam (hash
+   com Inscrição como build, +29%, pelo termo 4·n_h; clustering sobre hash
+   com 50%, −44%, por colisões) continuam explicados na §4.5 do README.
