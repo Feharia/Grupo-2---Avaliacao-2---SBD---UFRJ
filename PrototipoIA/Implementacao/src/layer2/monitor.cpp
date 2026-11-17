@@ -299,6 +299,9 @@ template <class Exec, class Est>
 Outcome Monitor::measured(std::size_t m, std::size_t frames, bool swapped, const ResultShape& shape, Exec&& exec,
                           Est&& est) {
     if (frames > m) throw std::logic_error("orçamento do plano excede m (148)");
+    // CBD-010: o que o preparo deixou sujo é gravado antes do 1º snapshot e contado à parte, para
+    // não cair no delta da operação se uma expulsão o gravar, nem no flush de fim
+    const std::uint64_t prep = storage_.flush_all();              // 2b: preparo
     Reservation res = storage_.reserve(m);                        // 3
     ResultSink sink(shape, swapped);
     const auto t0 = std::chrono::steady_clock::now();
@@ -314,6 +317,7 @@ Outcome Monitor::measured(std::size_t m, std::size_t frames, bool swapped, const
     auto ph = phases.finish();
     const auto t1 = std::chrono::steady_clock::now();
     OpResult r;
+    r.prep_writes = prep;
     r.delta = s1 - s0;
     if (r.delta.global.data_area_requests != 0)
         throw std::logic_error("página de dados pedida sem reserva durante a operação medida (159)");

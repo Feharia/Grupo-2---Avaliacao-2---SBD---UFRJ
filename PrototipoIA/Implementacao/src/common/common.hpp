@@ -233,6 +233,7 @@ struct OpResult {
     std::uint64_t      rows = 0;
     std::uint64_t      checksum = 0;
     Counters           delta;          // snapshot final − inicial, antes do flush de fim
+    std::uint64_t      prep_writes = 0;    // preparo: páginas sujas gravadas antes do 1º snapshot (CBD-010)
     std::uint64_t      flush_writes = 0;
     Cost               estimate;
     std::vector<Phase> phases;

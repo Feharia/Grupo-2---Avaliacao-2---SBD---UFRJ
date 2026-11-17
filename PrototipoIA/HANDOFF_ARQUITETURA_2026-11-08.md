@@ -171,7 +171,7 @@ Texto final, já com todas as revisões. A camada ou fronteira está entre colch
 - **124. Algoritmo × caminho de acesso** [2] — O BNL não usa índices (as configurações a a e só diferem pelo b de cada organização). O sort-merge pula a ordenação de entrada com ordered_by. O hash join usa um arquivo hash como partições já prontas, por scan_buckets, e particiona a outra entrada com bucket_of. As condições para aproveitar ordem e partições estão na 164.
 - **125. Seleções** [2→1] — select_points (lote de cerca de 1.000 chaves, gravado em arquivo antes da execução) e select_range, ambos devolvendo Outcome.
 - **126. Destino do resultado** [2] — ResultSink: conta as linhas e calcula o checksum canônico; a gravação da saída não entra no custo, como nas fórmulas dos livros (decisões 142 e 152).
-- **127. Conteúdo do OpResult** [2→1] — Linhas, checksum, delta (antes do flush de fim), flush_writes (verificação, deve ser zero), custo estimado, fases (PhaseRecorder) e tempo de relógio.
+- **127. Conteúdo do OpResult** [2→1] — Linhas, checksum, delta (antes do flush de fim), prep_writes (o preparo gravado antes do 1º snapshot, CBD-010), flush_writes (verificação, deve ser zero), custo estimado, fases (PhaseRecorder) e tempo de relógio.
 - **128. Célula inaplicável** [2→1] — NotApplicable com o motivo, nunca troca silenciosa de caminho. Casos: faixa em UNIQUE pelo índice secundário (só existe hash), faixa no hash primário, plano inviável em M e falta de espaço na execução (decisão 151). Desde a 170, distingue a célula que não existe (nao_aplicavel) da que não cabe em M (inviavel).
 - **129. Especificação do experimento** [1] — Baseline, variações OFAT, tabelas, operações (com o SQL equivalente) e sementes, versionados e citados no relatório. No protótipo, a especificação é a função spec_padrao() da bancada, e o hash dela vai para o manifesto; o TOML fica opcional, porque não muda o resultado (emendada em 08/11).
 - **130. Gerador e constantes** [1] — Um CSV por tabela, com semente; CR em int32 × 100 e textos sem preenchimento. As constantes de faixa e as linhas esperadas saem dos quantis dos CSVs e são gravadas em constantes.csv.
@@ -539,6 +539,7 @@ private:
 Passos das primitivas medidas:
 1. Resolve o plano. Se for NotApplicable, devolve-o sem executar nada. O plano só lê estatísticas do catálogo e não faz E/S (160).
 2. Verifica plan.frames_used() ≤ m.
+2b. Chama flush_all e guarda o retorno em prep_writes: o que o preparo (carga, manutenção) deixou sujo é gravado antes do snapshot inicial e não entra no delta nem no flush de fim (CBD-010). A bancada já grava e esvazia o pool antes de cada repetição (e avisa se esse flush gravar algo), então prep_writes é 0 nela.
 3. Reserva m molduras.
 4. Tira o snapshot inicial e cria o PhaseRecorder.
 5. Executa o algoritmo ou a busca, mandando os resultados ao ResultSink. Se o algoritmo lançar DoesNotFit, libera a reserva e devolve NotApplicable{"não cabe em M"}.
@@ -1464,6 +1465,7 @@ struct OpResult {
     std::uint64_t      rows;
     std::uint64_t      checksum;
     Counters           delta;          // snapshot final − inicial, antes do flush de fim
+    std::uint64_t      prep_writes;    // preparo gravado antes do 1º snapshot (CBD-010)
     std::uint64_t      flush_writes;   // verificação: deve ser 0
     Cost               estimate;
     std::vector<Phase> phases;
@@ -1637,7 +1639,7 @@ Estas decisões continuam registradas, porque o enunciado pede que o grupo as to
 - **Registro (158):** registros fixos e com VarChar de tamanhos diferentes, com e sem NULL, lidos antes e depois de remoções e compactação na mesma página; get com tipo de tamanho errado e offset de VarChar corrompido lançam sem ler fora do registro; o checksum com NULL coincide com o do reference.py.
 - **Caminho sem reserva (159):** data_area_requests = 0 em toda operação medida; pedir uma página de dados sem reserva no meio de uma operação faz o Monitor lançar logic_error.
 - **Plano sem E/S (160):** dois snapshots em volta de plan_join e plan_select dão diferença zero; stats() depois de um insert lança logic_error.
-- **Intervalo de medição (149):** sujar N páginas depois do snapshot final faz flush_writes = N e não muda o delta. *(Ainda não implementado no protótipo.)*
+- **Intervalo de medição (149, CBD-010):** `SequenciaManualDeEs` confere, a frio, um BNL (3 × 2 páginas, M = 4: 7 leituras) e um sort-merge (fases de runs e intercalação) contados à mão; `PreparoFlushEOperacaoSeparados` deixa a carga suja antes da operação e confere que ela vai para prep_writes, sem entrar no delta nem no flush de fim; `EsDosTemporariosFicaDentroDaMedicao` confere que as gravações e expulsões de temporários caem no delta.
 - **Criação e abertura (161):** open de arquivo inexistente e create de arquivo existente lançam; open com block_size diferente lança; um cabeçalho truncado faz o pread_full lançar em vez de travar.
 - **Heap (162):** esvaziar um bloco do meio do heap e varrer não devolve registro apagado; a inserção seguinte vai para o fim; depois do reorganize, o arquivo não tem blocos vazios.
 - **Partições (164):** duas tabelas hash pelo campo da junção, com nº de buckets diferente: o plano aproveita só a maior, e o checksum é igual ao do BNL.

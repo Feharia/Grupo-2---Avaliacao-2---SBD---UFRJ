@@ -4,6 +4,7 @@
 #include "layer3/page.hpp"
 #include "mini_test.hpp"
 
+#include <functional>
 #include <map>
 
 using namespace cbd;
@@ -204,6 +205,99 @@ TEST(Monitor, EsDosTemporariosFicaDentroDaMedicao) {
         EXPECT_EQ(m.flush_all(), 0u);                   // nada do operador ficou para depois
     }
     EXPECT_GT(expulsoes, 0u);                           // o cenário força expulsões de páginas sujas
+}
+
+namespace {
+// tabelas de páginas cheias com registros de 204 B: 19 por página (sp_capacity(4096, 204))
+TableId tabela_paginas(Monitor& m, const std::string& name, const Schema& s, std::size_t pages,
+                       const std::function<std::int64_t(std::size_t)>& key) {
+    std::vector<std::vector<Value>> rows;
+    for (std::size_t i = 0; i < pages * sp_capacity(4096, s.record_size); ++i) rows.push_back({key(i), std::string("p")});
+    const TableId t = m.create_table(name, s, PrimarySpec{});
+    RowsStream rs(m, t, rows);
+    m.bulk_load(t, rs);
+    return t;
+}
+std::uint64_t fase(const OpResult& r, const std::string& nome, bool escritas) {
+    for (const auto& ph : r.phases)
+        if (ph.name == nome) return escritas ? ph.delta.global.writes() : ph.delta.global.reads();
+    return 0;
+}
+}  // namespace
+
+// CBD-010 (issue #9): sequências pequenas, a frio, com a E/S calculada à mão.
+TEST(Monitor, SequenciaManualDeEs) {
+    Monitor m(test_config("mon_manual"));
+    const Schema s = make_schema({{"k", FieldType::Int32}, {"pad", FieldType::Char, 200}});
+    const Schema su = make_schema({{"k", FieldType::Int32, 0, true}, {"pad", FieldType::Char, 200}});
+    const std::size_t pp = sp_capacity(4096, s.record_size);
+    ASSERT_EQ(pp, 19u);
+    const TableId a = tabela_paginas(m, "a", s, 3, [](std::size_t i) { return std::int64_t(i % 30); });
+    const TableId b = tabela_paginas(m, "b", s, 2, [](std::size_t i) { return std::int64_t(i % 30); });
+    const TableId c = tabela_paginas(m, "c", s, 4, [](std::size_t i) { return std::int64_t(i % 19); });
+    const TableId u = tabela_paginas(m, "u", su, 1, [](std::size_t i) { return std::int64_t(i); });
+    m.flush_all();
+    auto in = [&](TableId t, std::uint8_t op) { return JoinInput{path(m, t, PathKind::Scan), 0, op}; };
+
+    // BNL, M = 4, LRU: chunk = ⌊4/2⌋ = 2 (3 + 2 > 4), diretório em 1 moldura (2 × 19 × 24 B < 4 KB),
+    // 1 moldura para a interna. Rodadas: ⌈3/2⌉ = 2, e a interna é relida em cada uma:
+    // leituras = b_r + 2 · b_s = 3 + 2 · 2 = 7, todas faltas; nenhuma gravação.
+    m.flush_all();
+    m.invalidate_all();
+    const OpResult bnl = ok(m.join(JoinAlgorithm::Bnl, in(a, 0), in(b, 1), 4, ResultShape{}));
+    EXPECT_EQ(bnl.delta.global.reads(), 7u);
+    EXPECT_EQ(bnl.delta.global.requests, 7u);
+    EXPECT_EQ(bnl.delta.global.misses, 7u);
+    EXPECT_EQ(bnl.delta.global.writes(), 0u);
+    EXPECT_EQ(bnl.flush_writes, 0u);
+    EXPECT_EQ(bnl.prep_writes, 0u);
+
+    // Sort-merge, M = 5, interna UNIQUE (sem grupo): lista de runs em 1 moldura (6 descritores de
+    // 88 B), run_pages = 5 − 2 − 1 = 2, final_fan_in = 5 − 0 − 1 = 4. A externa (76 registros)
+    // vira ⌈76 / cap⌉ runs, a interna (19) uma run; cada run de r registros ocupa ⌈r / 19⌉ páginas.
+    const JoinPlan p = std::get<JoinPlan>(m.plan_join(JoinAlgorithm::SortMerge, in(c, 0), in(u, 1), 5, JoinParams{}));
+    ASSERT_EQ(p.desc_frames, 1u);
+    ASSERT_EQ(p.run_pages, 2u);
+    ASSERT_EQ(p.group_pages, 0u);
+    const std::size_t cap = ScratchSpace::capacity_for(s, 2, 4096);
+    const std::size_t runs_c = (76 + cap - 1) / cap;
+    ASSERT_EQ(p.runs_outer, runs_c);
+    ASSERT_TRUE(runs_c + 1 <= p.final_fan_in);   // sem passe intermediário
+    std::size_t w_c = 0;
+    for (std::size_t left = 76; left > 0; left -= std::min(left, cap)) w_c += (std::min(left, cap) + pp - 1) / pp;
+    m.flush_all();
+    m.invalidate_all();
+    const OpResult sm = ok(m.join(JoinAlgorithm::SortMerge, in(c, 0), in(u, 1), 5, ResultShape{}));
+    EXPECT_EQ(sm.rows, 76u);
+    EXPECT_EQ(fase(sm, "runs_externa", false), 4u);        // lê C uma vez
+    EXPECT_EQ(fase(sm, "runs_externa", true), w_c);        // grava as runs de C
+    EXPECT_EQ(fase(sm, "runs_interna", false), 1u);
+    EXPECT_EQ(fase(sm, "runs_interna", true), 1u);
+    EXPECT_EQ(fase(sm, "intercalacao_final", false), w_c + 1);   // relê cada página de run uma vez
+    EXPECT_EQ(fase(sm, "intercalacao_final", true), 0u);
+    EXPECT_EQ(sm.delta.global.reads(), 4u + 1u + w_c + 1u);
+    EXPECT_EQ(sm.delta.global.writes(), w_c + 1u);
+    EXPECT_EQ(sm.flush_writes, 0u);
+}
+
+// CBD-010: preparo, operação e flush de fim ficam separados. O que a carga deixou sujo é gravado
+// antes do 1º snapshot e contado em prep_writes; não cai no delta (se a operação expulsasse a
+// página) nem no flush de fim (se ela continuasse suja).
+TEST(Monitor, PreparoFlushEOperacaoSeparados) {
+    Monitor m(test_config("mon_preparo"));
+    const Schema s = make_schema({{"k", FieldType::Int32}, {"pad", FieldType::Char, 200}});
+    const TableId a = tabela_paginas(m, "a", s, 3, [](std::size_t i) { return std::int64_t(i % 30); });
+    const TableId b = tabela_paginas(m, "b", s, 2, [](std::size_t i) { return std::int64_t(i % 30); });
+    // sem flush: a carga deixa páginas sujas no pool
+    const JoinInput ia{path(m, a, PathKind::Scan), 0, 0}, ib{path(m, b, PathKind::Scan), 0, 1};
+    const OpResult r = ok(m.join(JoinAlgorithm::Bnl, ia, ib, 4, ResultShape{}));
+    EXPECT_GT(r.prep_writes, 0u);
+    EXPECT_EQ(r.delta.global.writes(), 0u);
+    EXPECT_EQ(r.delta.global.dirty_evictions, 0u);
+    EXPECT_EQ(r.flush_writes, 0u);
+    const OpResult again = ok(m.join(JoinAlgorithm::Bnl, ia, ib, 4, ResultShape{}));
+    EXPECT_EQ(again.prep_writes, 0u);
+    EXPECT_EQ(again.delta.global.writes(), 0u);
 }
 
 // P02 da auditoria de 10/11 (decisão 172): M conta também as páginas de índice. Numa seleção pela

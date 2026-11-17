@@ -1013,3 +1013,18 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    `docs/IO.md` (alertas por commit: 8 no CBD-004, todos de BNL com MRU, de
    +0,9% a +8,3%; 0 nos demais). A entrada anterior dava a #4 como atendida;
    isso valia para o código, não para o texto da 173.
+7. #9 (CBD-010), fronteiras da medição. `Monitor::measured` passa a gravar,
+   antes do 1º snapshot, o que o preparo deixou sujo, e guarda o número em
+   `OpResult::prep_writes`, separado do delta (operação) e do `flush_writes`
+   (verificação de fim). A bancada já grava e esvazia o pool antes de cada
+   repetição, então `prep_writes` é 0 nela, e o CSV e a E/S não mudam. A
+   bancada não confere o campo: a comparação de E/S do CI compila o driver
+   do candidato contra a biblioteca da referência, que não o tem. Testes:
+   `SequenciaManualDeEs`, a frio, com a E/S contada à mão (BNL de 3 × 2
+   páginas com M = 4: chunk 2, 2 rodadas, 7 leituras e 7 faltas; sort-merge
+   com M = 5 e interna UNIQUE: leituras e gravações de cada fase pela
+   capacidade das runs e 19 registros por página), e
+   `PreparoFlushEOperacaoSeparados`. RED: contra `12f861b`, com a carga
+   suja, a operação contava 4 gravações (expulsões sujas das páginas da
+   carga) e o flush de fim gravava 5; GREEN: tudo em `prep_writes`, delta e
+   flush de fim zerados.
