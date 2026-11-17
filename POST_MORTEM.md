@@ -1129,3 +1129,12 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
 - O LeakSanitizer não foi validado (`detect_leaks=0`).
 - O build CMake mostra um aviso pré-existente (`-Wmissing-field-initializers`
   em `test_layer3.cpp:201`), que o `make` suprime nos testes.
+- No PR para a main (#19), a etapa "Medir e comparar I/O" falhou: num
+  `pull_request`, a referência é a base do PR (`4091762`), e o driver do
+  candidato é compilado contra a biblioteca dela, que não tem
+  `JoinPlan::dir_frames`, `JoinPlan::desc_frames` nem `TableStats::bfr_medio`
+  (usados pelo `parametros.csv` da #17). Nos pushes, a referência era o
+  commit anterior, que já os tinha. Correção: as duas funções que gravam os
+  parâmetros viraram templates e só usam esses campos se existirem
+  (`if constexpr (requires ...)`). Localmente, a comparação contra a main
+  passou: 168 cenários e 29 alertas (os já descritos no `docs/IO.md`).

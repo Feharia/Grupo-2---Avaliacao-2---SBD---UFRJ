@@ -594,19 +594,25 @@ std::string executed_access(const AccessPath& p, JoinAlgorithm alg, bool sorts, 
 
 // Parâmetros que entram na estimativa de cada combinação (BENCH-008): os mesmos que estimate_join e
 // estimate_select recebem, para a tabela de custo estimado × medido mostrar de onde vem cada número.
-std::string join_params(const JoinPlan& p) {
+// A comparação de E/S do CI compila este driver também contra a biblioteca da referência (num PR, a
+// base, que pode ser bem mais antiga): os campos que ela pode não ter entram só se existirem. Por isso
+// as duas funções são templates, e o `requires` dentro delas depende do tipo.
+template <class Plan>
+std::string join_params(const Plan& p) {
     std::ostringstream os;
     os << "m=" << p.m << "; b_ext=" << p.b_outer << "; b_int=" << p.b_inner << "; d_ext=" << p.d_outer
        << "; d_int=" << p.d_inner;
     switch (p.alg) {
         case JoinAlgorithm::Bnl:
-            os << "; chunk=" << p.chunk << "; dir_frames=" << p.dir_frames;
+            os << "; chunk=" << p.chunk;
+            if constexpr (requires { p.dir_frames; }) os << "; dir_frames=" << p.dir_frames;   // P03
             break;
         case JoinAlgorithm::SortMerge:
             os << "; ordena_ext=" << (p.sort_outer ? "sim" : "nao") << "; ordena_int=" << (p.sort_inner ? "sim" : "nao")
                << "; run_pages=" << p.run_pages << "; runs_ext=" << p.runs_outer << "; runs_int=" << p.runs_inner
                << "; fan_in=" << p.fan_in << "; passes_ext=" << p.merge_passes_outer << "; passes_int="
-               << p.merge_passes_inner << "; group_pages=" << p.group_pages << "; desc_frames=" << p.desc_frames;
+               << p.merge_passes_inner << "; group_pages=" << p.group_pages;
+            if constexpr (requires { p.desc_frames; }) os << "; desc_frames=" << p.desc_frames;   // CBD-005
             break;
         case JoinAlgorithm::Hash:
             os << "; particoes=" << p.partitions << "; niveis=" << p.levels << "; build_pages=" << p.build_pages
@@ -617,10 +623,12 @@ std::string join_params(const JoinPlan& p) {
     return os.str();
 }
 
-std::string select_params(const TableStats& t, const AccessPath& path, double batch, double expected_rows) {
+template <class Stats>
+std::string select_params(const Stats& t, const AccessPath& path, double batch, double expected_rows) {
     std::ostringstream os;
-    os << "n=" << t.n << "; b=" << t.b << "; bfr=" << t.bfr << "; bfr_medio=" << t.bfr_medio << "; lote=" << batch
-       << "; linhas_esperadas=" << expected_rows;
+    os << "n=" << t.n << "; b=" << t.b << "; bfr=" << t.bfr;
+    if constexpr (requires { t.bfr_medio; }) os << "; bfr_medio=" << t.bfr_medio;   // P08
+    os << "; lote=" << batch << "; linhas_esperadas=" << expected_rows;
     for (const auto& s : t.structures) {
         if (s.id != path.id) continue;
         if (s.height) os << "; h=" << *s.height;

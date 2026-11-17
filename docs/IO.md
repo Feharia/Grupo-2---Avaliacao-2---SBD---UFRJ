@@ -42,6 +42,15 @@ commit foi comparado com o anterior, como o CI faz num push:
   mas, na escala reduzida, as runs a mais não mudam a contagem (alguns
   sort-merge caem 2 blocos, −0,3%).
 
+**PR para a main.** Num `pull_request`, a referência é a base do PR (a main,
+`4091762`), e o driver do candidato é compilado também contra a biblioteca
+dela. Por isso o driver só usa os campos novos (`dir_frames`, `desc_frames`,
+`bfr_medio`) quando eles existem. Contra a main, são 168 cenários pareados e
+29 alertas, que somam os efeitos acima: 12 de sort-merge (+0,7% a +1,1%) e 2
+de hash join (+0,6%), pelo diretório e pela lista de runs cobrados em M; 7
+nas seleções por índice (+0,4% a +98%), pelas páginas de índice dentro de M;
+e 8 de BNL com MRU (+0,9% a +8,3%), pelas molduras do diretório retidas.
+
 ## Protocolo
 
 - Escala 0,1; semente 20261122; uma repetição; lote de 100 chaves;
