@@ -1070,3 +1070,16 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
     em 347 execuções; uma rodada `--rapido` é reprovada pela escala e pelas
     repetições. Dez testes Python, oito deles negativos
     (`test_verificar_matriz.py`).
+11. #15 (BENCH-006), conferência com o SQLite sem ausências silenciosas. O
+    `compare.py` passa a dizer quantas linhas e combinações conferiu e
+    quantas estão ausentes, e reprova se houver alguma: operação declarada
+    (`operacoes.csv` ou `referencia.csv`) sem linha no `resultados.csv`;
+    linha medida sem referência; com `--tuplas`, linha medida sem o dump do
+    motor (o nome segue o `shape_for` da bancada) ou dump sem a referência,
+    caso em que antes o script parava com `FileNotFoundError`. A conta é
+    relativa ao que a rodada declarou, e por isso vale para o smoke do CI; a
+    completude da matriz fica com o verificador da #14. O cabeçalho do
+    script e o README registram que o motor e o SQL mantêm as duas colunas
+    da junção (`SELECT x.*, y.*`). Rodada de exemplo: 534 linhas em 168
+    combinações, 0 ausentes, 0 divergências; smoke com `--tuplas`: 168 em
+    168. Seis testes Python (`test_compare.py`).

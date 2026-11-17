@@ -101,7 +101,7 @@ Células da matriz do enunciado que não fazem sentido, como uma faixa sobre has
    ./build/bancada --saida saida
    ```
 
-6. Gere a referência no SQLite (uns 5 s) e confira as linhas e os checksums. O `compare.py` termina com código 1 se alguma linha divergir.
+6. Gere a referência no SQLite (uns 5 s) e confira as linhas e os checksums. O `compare.py` diz quantas combinações conferiu e termina com código 1 se alguma linha divergir ou se faltar algo para conferir (operação sem linha, linha sem referência; com `--tuplas`, dump ausente). O motor e o SQL de referência mantêm as duas colunas da junção (`SELECT x.*, y.*`), e a conferência vale para essa forma.
 
    ```bash
    python3 -I tools/reference.py saida

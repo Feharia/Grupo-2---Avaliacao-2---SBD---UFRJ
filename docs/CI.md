@@ -22,8 +22,11 @@ alocações reais das estruturas auxiliares (decisão 173, issues CBD-003 a
 CBD-005) e por isso fica separado. O GoogleTest grava um XML por
 executável em `gtest/` (`gtest/testes.xml` e `gtest/testes_memoria.xml`),
 que permite consultar cada caso. O outro XML, `ctest.xml`, representa os
-executáveis registrados no CTest. Há também 30 testes Python do guard de cobertura e das ferramentas de comparação de I/O,
-mais regressões dirigidas do workflow, sem dependências externas.
+executáveis registrados no CTest. Há também 48 testes Python, sem
+dependências externas: o guard de cobertura do smoke, as ferramentas de
+comparação de I/O, a conferência com o SQLite (`compare.py`), o verificador
+da matriz obrigatória, a tabela de convergência e regressões dirigidas do
+workflow.
 
 Os cinco diretórios de build/testes/evidências são inicializados em um step,
 usando `RUNNER_TEMP` e `GITHUB_ENV`. O contexto `runner` não é permitido no
@@ -40,6 +43,9 @@ verifica ASan/UBSan e não valida vazamentos com LeakSanitizer.
 O comando é `bancada --rapido --tuplas --saida DIRETORIO_NOVO`. Depois, a
 referência SQLite é gerada, o inventário de execuções é verificado e
 `compare.py --tuplas` compara contagens, checksums e multiconjuntos de tuplas.
+Ele também conta as combinações conferidas e as ausentes (operação declarada
+sem linha, linha medida sem referência, linha sem dump, dump sem referência) e
+reprova se houver alguma ausente (BENCH-006).
 
 O contrato mínimo de CI, em **ambas as políticas LRU e MRU**, exige:
 
