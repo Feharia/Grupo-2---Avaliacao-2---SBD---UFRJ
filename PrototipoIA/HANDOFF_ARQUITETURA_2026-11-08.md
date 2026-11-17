@@ -270,11 +270,18 @@ Origem: `PROBLEMAS_IDENTIFICADOS_CBD_2026-11-10.md` (P01 a P15), conferido contr
   - `SelectPlan::frames_used` conta 2 molduras quando a página do índice fica fixada junto com a de dados (probe e clustering). Um plano que não caiba em m vira `inviavel`.
   - **Efeito:** a B+ primária pontual passa de 1.045 para 3.041 blocos (1.000 chaves, M = 2), e a fórmula h + 1 passa a bater (−1,3%, antes +187%). O hash secundário pontual passa de 1.901 para cerca de 2.000.
   - **Motivo:** decisão do grupo sobre o P02 da auditoria. M passa a ser toda a memória de páginas do operador, e as comparações não dependem de um cache de índices fora do orçamento.
-- **173. Estruturas auxiliares dentro de M** [P01, P03] — Altera 140 e a §7. As estruturas auxiliares do operador passam a ser cobradas das molduras da reserva: frames_used = páginas fixadas + ⌈bytes auxiliares / bloco⌉ ≤ m.
-  - **ScratchSpace:** o diretório (slot, chain e head, 12 B por registro, mais a folga do vetor de slots) é cobrado das próprias páginas. A ordenação é no lugar, e a tabela hash tem n cabeças. `capacity_for` aplica a mesma regra, e o plano a usa para contar runs e decidir se o build cabe.
+- **173. Estruturas auxiliares dentro de M** [P01, P03; emendada em 16/11 pelas issues CBD-002 a CBD-005] — Altera 140 e a §7. Critério (§7.1 do enunciado): toda estrutura auxiliar cujo tamanho cresce com a entrada fica dentro de M, em molduras da própria reserva que o subpool não pode usar como cache. O que é limitado por uma página ou por m fica fora, com o tamanho medido e declarado. frames_used = páginas fixadas + molduras retidas pelas estruturas auxiliares ≤ m, e não basta para provar o uso total de RAM: os limites de fora estão abaixo, conferidos pelo executável `testes_memoria`, que conta as alocações reais.
+  - **ScratchSpace:** o diretório (slot, chain e head, 12 B por registro, mais a folga do vetor de slots) é cobrado das próprias páginas, que são molduras anônimas fixadas. A ordenação é no lugar, e a tabela hash tem n cabeças. `capacity_for` aplica a mesma regra, e o plano a usa para contar runs e decidir se o build cabe. Medido no E03 da auditoria (Int32, 2 páginas): 448 registros, 2.688 B nas páginas e 5.376 B de heap, dentro de 8.192 B.
   - **BNL:** o diretório do chunk guarda só RecordView e ocupa dir_frames = ⌈registros do chunk × 24 B / bloco⌉ molduras, retidas durante a junção (`hold_frames`), para o subpool não usá-las como cache (CBD-004). As demais das m − 1 − chunk ficam de cache para a interna, onde a política de substituição faz diferença. O plano reduz o chunk quando o diretório não cabe nas m − 1 − chunk molduras, estimando os registros por página pela média. Na execução, se uma página acima da média encher o diretório, a rodada fecha ali, e o resto da página e as páginas seguintes, ainda fixadas, abrem a próxima rodada (CBD-004): uma passada a mais na interna, nunca além de M. Com M = 32, as tabelas da base mantêm chunk de 16 páginas.
-  - **Overhead declarado, fora de M:** descritores de tamanho O(m), como a lista de runs, as fontes do merge e o vetor de partições, e o lote de chaves da seleção pontual, que é entrada da consulta.
-  - **Motivo:** o §7.1 do enunciado chama atenção para estruturas auxiliares não contabilizadas. No E03 da auditoria, a ordenação de 2 páginas alocava 54.560 B fora das 8.192 B da reserva.
+  - **Lista de runs do sort-merge** (decisão do usuário, CBD-005): cresce com b/m. O plano reserva desc_frames = ⌈(runs das duas entradas + saídas de um passe) × sizeof(TempFile) / bloco⌉ molduras, retidas durante a junção e tiradas do rascunho, do fan-in e da intercalação final; `make_runs` não passa do número planejado. Com cerca de 900 páginas: 55 runs e 2 molduras com M = 32; com M = 8, o plano é inviável. O sort-merge com grupo de duplicatas precisa de M ≥ 5.
+  - **Fora de M, declarado e medido:**
+    - descritores das partições do hash (o TempFile e a entrada na tabela de arquivos): até 2(m − 1) por nível e até 6 níveis (171), um limite que não depende de b. No pior caso da bancada (Inscrição como build, M = 32, dois níveis), cerca de 20 KB, perto de 5 molduras (decisão do usuário);
+    - `sorted_slots`: a cópia ordenada (chave, slot) da folha corrente nas leituras da B+ (`LeafRangeSearch`, `EntryIter` e a leitura em ordem do StorageManager), cerca de 40 B por entrada, de uma folha por vez. Pode passar de uma página, mas não cresce com a tabela nem altera a E/S;
+    - chaves VarChar decodificadas em std::string temporárias nas comparações e sondas: no máximo três vivas;
+    - a tabela de arquivos da camada 4, que faz o papel do sistema de arquivos: cerca de 100 B por temporário vivo; a entrada de um temporário apagado é reaproveitada (CBD-005);
+    - controle O(m): fontes do merge (até fan_in), vetor das páginas do chunk do BNL, índice da política de substituição do subpool (uma entrada por moldura), buffer da tupla e nomes das fases. No BNL com M = 32, cerca de 3 KB, o mesmo com 12.000 e 24.000 registros;
+    - o lote de chaves da seleção pontual, que é entrada da consulta; o plano e o catálogo.
+  - **Motivo:** o §7.1 do enunciado chama atenção para estruturas auxiliares não contabilizadas. No E03 da auditoria, a ordenação de 2 páginas alocava 54.560 B fora das 8.192 B da reserva; o teste instrumentado mediu 62.752 B de pico no código de antes do P01. A issue CBD-002 pede o contrato explícito e verificável, sem supor que frames_used ≤ M prova o uso total de RAM.
 - **174. Seletividade baixa de 1%, com faixas feitas de grupos de valores** [P04] — Altera 130 e os níveis da 170.
   - O enunciado de 04/11 pede 1% e 50%.
   - A faixa é feita de grupos inteiros de valores iguais, e o nº de grupos é o que deixa a contagem mais perto do alvo. Num campo discreto como curso (200 valores), 1% são dois valores (1,03%).
@@ -302,7 +309,7 @@ O diagrama vigente é o diagrama_camadas_v5.png, com as decisões até a 171 e a
 - Tipos da interface 1 → 2, no cabeçalho público da camada 2: JoinInput, ResultShape, JoinParams e SelectParams.
 
 **Camada 2 — Mini monitor de execução.** Monitor (serviço), JoinPlan e SelectPlan (planos), ResultSink, PhaseRecorder, funções dos algoritmos e das estimativas.
-- Chama a camada 3 para acesso (scan_blocks, scan_buckets, bucket_of, find, probe, fetch, schema, create_temp, create_scratch, create_rid_scratch) e para controle, por repasse da camada 4 (reserve, snapshot, flush_all, invalidate_all).
+- Chama a camada 3 para acesso (scan_blocks, scan_buckets, bucket_of, find, probe, fetch, schema, create_temp, create_scratch, create_rid_scratch, hold_frames) e para controle, por repasse da camada 4 (reserve, snapshot, flush_all, invalidate_all).
 - Recebe BlockScan, SearchCursor, RidCursor, PinnedRecord, TempFile, ScratchSpace e a Reservation, opaca.
 
 **Camada 3 — Gerente de armazenamento.** StorageManager (fachada), cursores (BlockScan, BlockCursor, SearchCursor, RidCursor), RecordView, PinnedRecord, TempFile, ScratchSpace e, por dentro, Catalog, PrimaryFile (HeapFile, BPlusTreeFile, HashFile), SecondaryIndex, MoveListener (IndexMaintainer) e BPlusEngine, o motor B+ comum à B+ primária e aos índices B+ secundários.
@@ -326,9 +333,10 @@ Toda operação medida usa uma reserva de m molduras. O plano calcula cada parce
 - Uso simultâneo: chunk páginas da externa + 1 da interna + dir_frames ≤ m. As molduras que sobram são cache da interna.
 
 **Sort-merge**
-- Geração de runs: run_pages = m − 2 páginas de ScratchSpace, mais 1 página de entrada e 1 página de saída = m. Número de runs de cada entrada: ⌈n / capacity_for(run_pages)⌉, com o diretório cobrado das páginas (173).
-- Passes intermediários: fan_in = m − 1 runs de entrada mais 1 página de saída = m. Cada passe divide o número de runs por fan_in.
-- Intercalação final, que é a própria junção: group_pages páginas de ScratchSpace para o grupo de duplicatas da interna (0 se o campo da interna for unique no esquema, decisão 157). final_fan_in = m − group_pages. Os passes intermediários continuam até que runs da externa + runs da interna ≤ final_fan_in.
+- Lista de runs (173, CBD-005): desc_frames = ⌈(runs das duas entradas + saídas de um passe) × sizeof(TempFile) / bloco⌉ molduras, retidas durante toda a junção. Menos rascunho dá mais runs; o plano repete o cálculo até o número de molduras parar de subir, e o plano é inviável se a lista não couber.
+- Geração de runs: run_pages = m − 2 − desc_frames páginas de ScratchSpace, mais 1 página de entrada e 1 página de saída. Número de runs de cada entrada: ⌈n / capacity_for(run_pages)⌉, com o diretório cobrado das páginas (173).
+- Passes intermediários: fan_in = m − 1 − desc_frames runs de entrada mais 1 página de saída. Cada passe divide o número de runs por fan_in.
+- Intercalação final, que é a própria junção: group_pages páginas de ScratchSpace para o grupo de duplicatas da interna (0 se o campo da interna for unique no esquema, decisão 157). final_fan_in = m − group_pages − desc_frames. Os passes intermediários continuam até que runs da externa + runs da interna ≤ final_fan_in.
 - Uma entrada já ordenada pelo campo da junção (ordered_by, nas condições da 164) conta como uma única run na intercalação final.
 - merge_passes_outer e merge_passes_inner vão para o plano e para a estimativa.
 
@@ -551,7 +559,7 @@ struct JoinPlan {
     bool          swapped = false;                      // externa é o operando 1
     // BNL
     std::size_t   chunk = 0;
-    std::size_t   dir_frames = 0;                       // diretório do chunk: as m − 1 − chunk molduras restantes (173)
+    std::size_t   dir_frames = 0;                       // diretório do chunk: ⌈registros × 24 B / bloco⌉ molduras retidas (173)
     std::size_t   dir_entries = 0;                      // RecordViews que cabem nessas molduras
     // sort-merge
     bool          sort_outer = true, sort_inner = true;
@@ -559,7 +567,9 @@ struct JoinPlan {
     std::size_t   fan_in = 0;                           // m − 1
     std::size_t   group_pages = 0;                      // 0 se o campo da interna for unique (157)
     std::size_t   final_fan_in = 0;                     // m − group_pages
+    std::size_t   runs_outer = 0, runs_inner = 0;           // runs geradas (limite do vetor de cada lado)
     std::size_t   merge_passes_outer = 0, merge_passes_inner = 0;
+    std::size_t   desc_frames = 0;                      // lista de runs cobrada em M (CBD-005)
     // hash join (externa = build)
     bool          prepartitioned_outer = false, prepartitioned_inner = false;
     std::size_t   partitions = 0;                       // ≤ m − 1
@@ -687,8 +697,13 @@ public:
 
     // memória de trabalho e temporários
     TempFile      create_temp(const Schema&, const Reservation&);
+    // CBD-005: runs e partições de um mesmo operador compartilham uma única cópia do esquema (165)
+    TempFile      create_temp(std::shared_ptr<const Schema>, const Reservation&);
     ScratchSpace  create_scratch(const Schema&, const Reservation&, std::size_t pages);
     ScratchSpace  create_rid_scratch(const Reservation&, std::size_t pages);
+    // Retém n molduras anônimas da reserva enquanto o vetor viver: uma estrutura auxiliar cobrada em
+    // molduras (173) tira essas molduras do subpool, que não pode usá-las como cache (CBD-004).
+    std::vector<PageGuard> hold_frames(const Reservation&, std::size_t n);
 
     // estatística e ocupação
     TableStats    stats(TableId) const;                 // só lê o catálogo, sem E/S (160)
@@ -756,9 +771,10 @@ Acesso
 - **fetch(tabela, RID, intent, reserva)** — Fixa o bloco do RID pela reserva e devolve um PinnedRecord.
 
 Memória de trabalho e temporários
-- **create_temp(esquema, reserva)** — Cria um arquivo temporário (create, 161), fora do catálogo, e devolve um TempFile que guarda o id da reserva e uma cópia do esquema em shared_ptr (165).
+- **create_temp(esquema, reserva)** — Cria um arquivo temporário (create, 161), fora do catálogo, e devolve um TempFile que guarda o id da reserva e uma cópia do esquema em shared_ptr (165). A sobrecarga com shared_ptr deixa as runs e partições de um operador compartilharem a mesma cópia (CBD-005).
 - **create_scratch(esquema, reserva, páginas)** — Pede as molduras anônimas com BufferPool::scratch e devolve um ScratchSpace para registros do esquema, com uma cópia dele (165).
 - **create_rid_scratch(reserva, páginas)** — O mesmo, com o esquema sintético de RID (140).
+- **hold_frames(reserva, n)** — Fixa n molduras anônimas da reserva e as devolve num vetor de PageGuard. Uma estrutura auxiliar cobrada em molduras (o diretório do BNL, a lista de runs) as retém enquanto vive, e o subpool não pode usá-las como cache (173, CBD-004).
 
 Estatística e ocupação
 - **stats(tabela)** — N, R, bfr e b (blocos do arquivo de dados, decisão 119), e as estatísticas de cada estrutura, incluindo altura e blocos internos da B+. Só lê o catálogo, sem E/S. As estatísticas são medidas ao fim de bulk_load e de reorganize; insert e erase as marcam como desatualizadas, e então stats() lança logic_error (160).
@@ -1231,7 +1247,7 @@ public:
 private:
     struct OpenFile {
         UniqueFd              fd;
-        std::filesystem::path path;
+        std::string           name;                // o caminho é dir_ / name (CBD-005: não guarda cópia)
         FileKind              kind;
         std::uint32_t         blocks = 0;          // inclui o cabeçalho
         std::vector<bool>     free_map;            // espelho do bitmap do bloco 0
@@ -1244,6 +1260,7 @@ private:
     std::uint32_t block_size_;
     std::uint32_t extent_blocks_;
     std::vector<OpenFile> files_;
+    std::vector<FileId>   free_temp_ids_;  // entradas de temporários apagados, reaproveitadas (CBD-005)
     struct { FileId file; std::uint32_t block; bool valid = false; } last_;
     Counters io_;
 };
@@ -1357,7 +1374,7 @@ struct IoCounts {
 struct Counters {
     IoCounts global;
     std::array<IoCounts, 4> per_kind;                   // indexado por FileKind
-    std::unordered_map<FileId, IoCounts> per_file;
+    std::unordered_map<FileId, IoCounts> per_file;       // sem os temporários (CBD-005)
     friend Counters operator-(Counters a, const Counters& b);
 };
 ```
@@ -1552,7 +1569,7 @@ public:
 - Nós internos da B+ e páginas de índice ficam dentro de M durante a operação (172). Só a carga, a manutenção e o catálogo (página fixada, sem E/S nas operações) usam áreas próprias. As estruturas auxiliares do operador também ficam dentro de M (173).
 - Com prefetch ligado, a leitura antecipada expulsa páginas não fixadas do subpool.
 - Página pedida pela reserva que esteja em outra região migra para o subpool e conta como acerto.
-- Os diretórios do ScratchSpace e do BNL são cobrados das molduras da reserva (173). Descritores de controle de tamanho O(m), como a lista de runs e as fontes do merge, ficam fora, como overhead declarado de menos de 1 moldura. O lote de chaves da seleção pontual é parâmetro de entrada da consulta (a tabela "lote" do SQL de referência), não memória de trabalho.
+- Os diretórios do ScratchSpace e do BNL e a lista de runs do sort-merge ficam dentro de M, em molduras retidas da reserva (173). Ficam fora, declarados e medidos pelo `testes_memoria`: os descritores das partições do hash (até 2(m − 1) por nível e 6 níveis; cerca de 20 KB, perto de 5 molduras, no pior caso da bancada), o `sorted_slots` das leituras da B+ (uma folha por vez), até três chaves VarChar temporárias, a tabela de arquivos da camada 4 (cerca de 100 B por temporário vivo) e o controle O(m) (cerca de 3 KB no BNL com M = 32). O lote de chaves da seleção pontual é parâmetro de entrada da consulta (a tabela "lote" do SQL de referência), não memória de trabalho.
 - O LeakSanitizer não foi validado: o CI e o `make asan` rodam com `detect_leaks=0` (P13 da auditoria de 10/11).
 - Temporários são gravados e retirados do pool no seal, então a releitura é sempre física.
 - A área de dados só é usada fora das operações medidas.

@@ -30,6 +30,18 @@ sem o cache da área de índices:
   cadeia de overflow.
 Reverter o commit do P02 volta aos 22 alertas.
 
+**Alertas esperados nas correções das issues abertas (16/11/2026).** Cada
+commit foi comparado com o anterior, como o CI faz num push:
+- CBD-007, CBD-008 e CBD-003 (#1, #3, #5): 0 alertas.
+- CBD-004 (#6): 8 alertas, todos de BNL com MRU, de +0,9% a +8,3% (o maior
+  é Aluno ⋈ Inscrição com os papéis trocados, 725 → 785 leituras). As
+  molduras do diretório do chunk passaram a ficar retidas durante a junção;
+  antes, o subpool as usava como cache da interna, e a MRU aproveitava esse
+  cache a mais. Com LRU, nada muda.
+- CBD-005 (#7): 0 alertas. A lista de runs passou a ocupar molduras de M,
+  mas, na escala reduzida, as runs a mais não mudam a contagem (alguns
+  sort-merge caem 2 blocos, −0,3%).
+
 ## Protocolo
 
 - Escala 0,1; semente 20261122; uma repetição; lote de 100 chaves;

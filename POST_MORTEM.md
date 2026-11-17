@@ -999,3 +999,17 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    pelo `append`, e ele compara 50 e 500 temporários criados e apagados (o
    que fica vivo e o pico não podem crescer com o número deles). No macOS:
    0 B vivos e 440 B de pico nos dois casos.
+6. #4 (CBD-002), contrato de M. Só documentação. A decisão 173 do handoff
+   foi reescrita com o critério (§7.1 do enunciado): o que cresce com a
+   entrada fica dentro de M, em molduras retidas da reserva (diretórios do
+   ScratchSpace e do BNL, lista de runs); o que é limitado por uma página ou
+   por m fica fora, com o tamanho medido pelo `testes_memoria` (descritores
+   das partições do hash, `sorted_slots`, chaves VarChar temporárias, tabela
+   de arquivos, controle O(m)). Também foram atualizados a §7 (orçamento do
+   sort-merge com `desc_frames`), a §9 (a frase "menos de 1 moldura" não
+   valia), os blocos copiados dos headers (`JoinPlan`, `StorageManager`,
+   `FileManager`, `Counters`), o README (memória de trabalho), o
+   `METODOS_DE_INTERFACE` (`create_temp`, `hold_frames`, `plan_join`) e o
+   `docs/IO.md` (alertas por commit: 8 no CBD-004, todos de BNL com MRU, de
+   +0,9% a +8,3%; 0 nos demais). A entrada anterior dava a #4 como atendida;
+   isso valia para o código, não para o texto da 173.

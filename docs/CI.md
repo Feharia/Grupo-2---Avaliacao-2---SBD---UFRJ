@@ -18,12 +18,11 @@ fluxo local anterior; o gate não muda o CMake nem o motor.
 
 O CTest registra dois executáveis: `testes`, com a suíte principal, e
 `testes_memoria`, que troca o `operator new` global para contar as
-alocações reais das estruturas auxiliares (issue CBD-003) e por isso fica
-separado. O GoogleTest grava um XML por executável em `gtest/`
-(`gtest/testes.xml` e `gtest/testes_memoria.xml`), que permite consultar
-cada caso. O outro XML, `ctest.xml`, representa os executáveis registrados
-no CTest. Há também 30 testes
-Python do guard de cobertura e das ferramentas de comparação de I/O,
+alocações reais das estruturas auxiliares (decisão 173, issues CBD-003 a
+CBD-005) e por isso fica separado. O GoogleTest grava um XML por
+executável em `gtest/` (`gtest/testes.xml` e `gtest/testes_memoria.xml`),
+que permite consultar cada caso. O outro XML, `ctest.xml`, representa os
+executáveis registrados no CTest. Há também 30 testes Python do guard de cobertura e das ferramentas de comparação de I/O,
 mais regressões dirigidas do workflow, sem dependências externas.
 
 Os cinco diretórios de build/testes/evidências são inicializados em um step,
