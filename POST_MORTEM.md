@@ -733,3 +733,408 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   hospedada do commit documental final e ativação de status obrigatório.
   O helper foi preparado para executar essas etapas em sequência; este
   registro não declara que já ocorreram.
+
+## 2026-11-16 — Correções da auditoria de 10/11 (P01–P15) com o Claude
+
+### Origem, escopo e decisões
+
+- Fonte: `PROBLEMAS_IDENTIFICADOS_CBD_2026-11-10.md` (P01 a P15), auditoria
+  do commit `b61b87b`, conferida em 13/11 contra a main `4091762` e contra o
+  enunciado de 04/11/2026 (v2: seletividade baixa de 1%, NATURAL JOIN
+  obrigatório, equijoins e faixa em UNIQUE opcionais, política escolhida por
+  teste).
+- Ferramenta: Claude (Claude Code, modelo Opus 5.5). Trabalho no branch local
+  `fix/auditoria-p01-p15`, um commit por item, sem push até esta entrada.
+- O CBD-001 da main não é o P01 da auditoria: o CBD-001 corrigiu a ocupação
+  da B+ no bulk load; o P01 é a memória auxiliar do `ScratchSpace`, que
+  continuava sem correção.
+- Decisões do usuário: M inclui as páginas de índice (P02); os equijoins
+  opcionais já implementados ficam; o P02 vai num commit isolado, para poder
+  ser revertido sozinho; os commits sobem um por vez, por autorização.
+- Relação com a revisão de 06/11 (`revisao_interfaces_claude_cbd_2026-11-06.md`):
+  ela foi tratada em 08/11 (decisões 157 a 169), exceto o P0-2 (cota única de
+  M), aceito só em parte na época (159). A auditoria reencontrou o problema
+  (P01, P02, P03), e ele foi resolvido agora (decisões 172 e 173). O P0-4 da
+  revisão deixou o resíduo do P06; o teste de "acesso malformado" do P0-3
+  continua pendente (issue #3, CBD-008).
+- Issues do GitHub: #2, #4, #8, #10, #11, #12 e #13 têm os critérios de aceite
+  atendidos; #5, #6, #7, #9, #14, #15, #16, #17 e #18 só em parte (ver "Não
+  afirmado"); #1 (CBD-007) e #3 (CBD-008) não foram tratadas.
+
+### Commits e evidências
+
+1. `66205e3` (portabilidade): `test_bplus_bulk_load_integration.cpp` chamava
+   `::mkdtemp` sem `<unistd.h>`. Os testes da main não compilavam no macOS; no
+   glibc a declaração vem de `stdlib.h`, por isso o CI passava.
+2. `2ff46c5` (P06): `BufferPool::fetch` passa a recusar bloco livre no bitmap.
+   RED: `FetchDeBlocoLivreLanca` falhou na baseline com "allocate: bloco novo
+   já estava no pool" (o bloco liberado tinha voltado ao pool); GREEN depois.
+3. `f151672` (P07, P09): `convergencia.csv` registra repetições, dispersões e
+   parada por convergência ou pelo teto; `caminhos.csv` registra o acesso
+   executado. O `resultados.csv` não mudou, porque o CI o lê.
+4. `ffb3411` (P01): o diretório do `ScratchSpace` (12 B por registro) passou a
+   ser cobrado das páginas, com ordenação no lugar. No pior caso do E03 (2
+   páginas, registros de um Int32), a capacidade caiu de 1.364 para 448
+   registros, e `record_bytes() + aux_bytes() <= 8.192`. Na escala 1, sort-merge
+   e hash mudaram até 1,3%; BNL e seleções, nada.
+5. `41a402a` (P03): o diretório do BNL guarda só `RecordView` nas m − 1 − chunk
+   molduras restantes. Com registros pequenos (teste `DiretorioDoBnlCabeEmM`),
+   o chunk cai abaixo de 16; com M = 32, as tabelas da base mantêm 16.
+6. `42146fa` (P04): seletividade baixa de 1%, com faixas de grupos inteiros de
+   valores. Efetivas na escala 1: 1,00% (dre), 1,00% (cr), 1,03% (curso); 50%
+   entre 49,84% e 50,00%.
+7. `0827d0f` (P05, P15): as 8 células que faltavam no NATURAL JOIN. Cobertura
+   na escala 1: 60 células obrigatórias, 54 executadas, 6 não aplicáveis
+   (caso 3), nenhuma ausente. Inventário do CI de E/S de 108 para 168
+   identidades, só acréscimos.
+8. `bb6f5cc` (P08): premissas das estimativas. Aluno ⋈ Detalhes: hash de
+   +257,4% para +1,7%, sort-merge de +60,6% para −5,1%; faixa de 50% na B+ de
+   −32,2% para −0,2%; clustering sobre hash com 50% de −51,5% para −43,7%
+   (colisões de buckets não modeladas). Não houve calibração.
+9. `b9e1c1a` (P10, P12): clustering sobre hash contra oráculo (30 chaves em 3
+   buckets, antes e depois de manutenção e reorganize) e E/S dos temporários
+   dentro da medição com M = 4. Os dois passaram: não havia bug.
+10. `b3826e6` e `97f4903` (documentação): resultados de exemplo, READMEs,
+    handoff (decisões 173 a 175, blocos copiados dos headers reais, nota do
+    LSan), catálogos de decisões e enunciado v2 no repositório.
+11. `02bd998` (P02, decisão 172): as páginas de índice vêm da reserva durante
+    a operação. RED intermediário: a primeira versão precisou de 3 molduras na
+    B+ secundária com posting list em overflow, e
+    `RidsEstaveisComDivisoesEReorganize` falhou com "todas as molduras da
+    região estão fixadas"; a folha passou a ser solta durante a cadeia de
+    overflow. Efeito na escala 1: B+ primária pontual de 1.045 para 3.041
+    blocos, com a estimativa h + 1 passando de +187,1% para −1,3%; hash
+    secundário pontual de 1.901 para 1.992; junções iguais.
+
+### Erros da IA corrigidos durante o trabalho
+
+- Erro de sintaxe ao editar `fmt_vezes` no `tools/tabelas.py` (aspas não
+  fechadas), visto na compilação do script.
+- Número errado na mensagem do commit do P08 (+0,3% em vez de +1,7%),
+  corrigido com `--amend` antes de qualquer push.
+- O primeiro teste do P12 usou `c_heap`, cujo grupo de duplicatas é inviável
+  de propósito no sort-merge; foi trocado por A ⋈ B.
+- O primeiro teste do P02 exigia leituras de índice por chave; numa B+ de
+  altura 2 a raiz fica nas 2 molduras, e o certo era contar pedidos.
+- A primeira tabela de cobertura mostrava uma coluna "pontual" nas faixas,
+  que não tem sentido, e contava os papéis trocados como variante.
+- O README afirmou que a configuração d custa o mesmo que a b em todos os
+  tamanhos; isso só vale quando as duas têm a mesma organização (P×P e G×G).
+- Uma tag local criada sem pedido foi removida antes de qualquer push.
+
+### Validação executada
+
+- macOS, Apple clang 21, `make` e CMake/Ninja (do CLion): 67 testes com o
+  shim, também com ASan/UBSan (`detect_leaks=0`); 30 testes Python.
+- Rodada integral (escala 1, LRU e MRU): 555 linhas conferidas com o SQLite
+  sem o P02 e 534 com o P02, zero divergências. Smoke `--rapido --tuplas`:
+  168 execuções, cobertura do CI completa.
+- Comparação de E/S do CI rodada localmente contra `4091762`: 168 cenários
+  pareados; 22 alertas sem o P02 (+0,2% a +1,1%, sort-merge e hash) e 29 com
+  o P02 (mais 7 nas seleções por índice); nenhuma falha de protocolo.
+- A árvore resultante de reverter o P02 é a do `97f4903`: compila e passa nos
+  65 testes daquele ponto.
+
+### Não afirmado
+
+- GCC 13 e GoogleTest real não foram executados localmente; ficam para o CI
+  de cada commit.
+- O LeakSanitizer não foi validado.
+- Critérios parciais das issues: #5 mede a memória auxiliar pela capacidade
+  dos vetores, não por alocações instrumentadas; #6 não testa registros
+  variáveis isoladamente; #7 não tem testes dirigidos de skew e recursão; #9
+  não usa uma sequência calculada à mão; #14 é uma tabela, não um verificador
+  que reprova, e não tem testes negativos; #15 não conta combinações
+  ausentes no `compare.py`; #16 não tem teste determinístico de série que
+  não converge; #17 não tem testes dos estimadores com valores manuais; #18
+  tem manifesto com "b3826e6 + P02" e precisa ser regenerado com o SHA final.
+- Os resultados desta entrada são locais; a validação hospedada de cada
+  commit ainda não ocorreu.
+
+## 2026-11-16 — Correções das issues abertas, um commit por issue, com o Claude
+
+### Origem e escopo
+
+- Ponto de partida: o branch `fix/auditoria-p01-p15` em `b60c03d`, já
+  enviado. Nele, #2, #8, #10, #11, #12 e #13 têm os critérios de aceite
+  atendidos. A #4, que a entrada anterior dava como atendida, fica aberta:
+  a decisão 173 dizia que tudo o que ficava fora de M era O(m) e ocupava
+  menos de 1 moldura, o que não vale para a lista de runs.
+- Plano aprovado pelo usuário: um commit por issue, na ordem #1, #3, #5,
+  #6, #7, #4, #9, #16, #17, #14, #15 e #18. Cada mensagem termina com
+  `Closes #N`; a issue só fecha quando o PR entrar na `main`.
+- Decisões do usuário: a lista de runs do sort-merge passa a ser cobrada
+  dentro de M; o `sorted_slots` (cópia ordenada da folha corrente nas
+  leituras da B+) fica fora de M, declarado como overhead limitado a uma
+  folha.
+- Ferramenta: Claude (Claude Code, modelo Opus 5.5). Sem push: os envios
+  ficam com o usuário, um commit por vez.
+
+### Commits e evidências
+
+1. #1 (CBD-007), sort-merge com `group_pages = 0`. O plano usa grupo zero
+   quando o campo da interna é declarado UNIQUE, mas, sem estrutura que o
+   indexe, o UNIQUE não é verificado na inserção (157). No ramo sem grupo, o
+   executor emitia os pares com o primeiro registro da interna e descartava
+   as repetições. Agora ele confere a chave seguinte da interna e lança
+   `std::logic_error` (não `DoesNotFit`, para não virar célula inviável).
+   Custo: uma comparação em memória por registro da interna, sem E/S. O
+   planejador continua confiando no UNIQUE declarado; exigir unicidade
+   garantida por estrutura mudaria o plano das variantes heap. RED:
+   `SortMergeRejeitaUniqueViolado` contra `b60c03d` devolveu 10 pares onde
+   o certo seria 100 (ou erro); GREEN depois. NOT UNIQUE 10 × 10 dá 100 pares
+   e o UNIQUE válido continua com grupo zero.
+2. #3 (CBD-008), página com slots malformada. As funções `sp_*` usavam o
+   `nslots` e os slots lidos do disco sem conferir os limites; com
+   `nslots = 65535` numa página de 4.096 B, `sp_used_bytes` lia fora do
+   bloco, e uma soma de registros inválida dava underflow em `sp_free_bytes`
+   (o que deixaria o `sp_insert` gravar fora da página). Agora um cabeçalho
+   validado (`kPageHeader + 4·nslots ≤ free_lo ≤ free_hi ≤ bloco`,
+   `live ≤ nslots`) e cada slot vivo (dentro da área de registros) são
+   conferidos antes de qualquer acesso, e a soma dos registros não pode
+   passar do bloco. O erro é `std::out_of_range`, como o que o `sp_record`
+   já usava. O `read_header` puro não muda, porque os nós internos da B+ têm
+   outro layout e checagem própria. RED: `PaginaMalformadaFalhaSemAcessoInvalido`
+   contra `5fdc364` com ASan parou em heap-buffer-overflow em `slot_at`
+   (chamado por `sp_used_bytes`); GREEN depois, com 7 páginas malformadas.
+   `CasosLimiteContinuamValidos` cobre diretório cheio, slot apagado e
+   reaproveitado, registros de tamanhos diferentes e compactação. Fecha
+   também o teste de acesso malformado do P0-3 da revisão de 06/11.
+3. #5 (CBD-003), memória auxiliar do `ScratchSpace` medida por alocações
+   reais. Novo executável `testes_memoria` (`tests/memoria/`), que troca o
+   `operator new`/`delete` globais por versões que contam bytes vivos e pico
+   num escopo armado; fica separado da suíte principal para não mudar o
+   comportamento dela sob ASan. Registrado no CMake (GTest e shim) e no
+   Makefile; o CI o roda pelo `ctest`. O `GTEST_OUTPUT` do workflow passou a
+   apontar para um diretório (`evidencias/gtest/`), com um XML por executável;
+   com um arquivo só, o segundo executável sobrescreveria o primeiro. O teste arma o contador só nas
+   chamadas do operador (add, sort_by, build_hash, probe) e exige
+   `bytes dos registros + pico do heap ≤ páginas × bloco`. Resultados no
+   branch: E03 (Int32, 2 páginas) 448 registros, 2.688 B + 5.376 B de pico
+   para 8.192 B; 1 página 1.344 + 2.688 para 4.096; registro de 204 B
+   7.598 + 544 para 8.192; RIDs 1.840 + 1.408 para 4.096. Com chave VarChar,
+   a comparação e a sonda decodificam a chave numa `std::string`
+   temporária (no máximo três vivas): o teste admite essa folga O(1), que a
+   decisão 173 passa a declarar. RED: o mesmo teste contra `4091762` (antes
+   do P01) mediu, no E03, 1.364 registros e pico de 62.752 B de heap para
+   8.192 B de orçamento, e todos os casos estouraram. Um erro do próprio
+   teste: a primeira versão do autoteste do contador usava um vetor sem uso,
+   cuja alocação o clang suprimiu; passou a chamar `::operator new` direto.
+4. #6 (CBD-004), memória auxiliar do BNL, com M mínimo e registros densos
+   e variáveis, no `testes_memoria`. O `bnl_join` roda direto no
+   `StorageManager`, com o contador armado só nele, e o plano vem do
+   `Monitor` com os mesmos dados. Resultados: o diretório do chunk cabe nas
+   suas molduras em todos os casos (por exemplo, m = 32 com registros de
+   8 B: 86.016 B em 21 molduras); o resto do heap é controle O(m), até
+   4,3 KB com m = 32 (vetor das páginas do chunk, índice da política de
+   substituição do subpool, uma entrada por moldura ocupada, e strings de
+   chaves VarChar), e não cresce com os dados (4.180 B e 4.268 B com 12.000
+   e 24.000 registros). Abaixo do M mínimo, o plano é inviável, como
+   esperado. O teste revelou um defeito fora do que o plano previa para este
+   commit: o plano estima os registros por página pela média (n / b), e com
+   chaves VarChar de 1 a 24 caracteres, em m = 32, uma página acima da média
+   enchia o diretório e o BNL parava com `DoesNotFit`, embora o plano
+   dissesse que cabia. Correção local no `bnl_join`: quando o diretório
+   enche, a rodada fecha ali, e o resto da página e as páginas seguintes,
+   ainda fixadas, abrem a próxima. Sem estouro, as rodadas são as mesmas de
+   antes (mesma E/S); com estouro, há uma passada a mais na interna, em vez
+   de erro. Um erro do próprio teste: a primeira versão comparava 6.000 e
+   12.000 registros, e o caso menor não enchia as 32 molduras, o que fazia o
+   índice da política parecer crescer com os dados.
+   Segundo defeito, achado ao montar a sequência manual da #9: desde o P03, o
+   plano cobrava as m − 1 − chunk molduras restantes pelo diretório, mas
+   nenhuma era tirada do subpool, que continuava usando-as como cache. Na
+   prática, o operador tinha as m molduras para páginas mais o diretório. Agora
+   o diretório ocupa ⌈registros do chunk × 24 B / bloco⌉ molduras, retidas
+   durante a junção (`StorageManager::hold_frames`), e as demais ficam de cache
+   para a interna, como pretendia o chunk de m/2. RED/GREEN em
+   `BnlRetemAsMoldurasDoDiretorio` (M = 8, chunk 2, interna de 6 páginas, MRU):
+   10 leituras sem retenção, 11 com ela, que é a conta à mão (4 + 6 + 1). Com
+   LRU o caso não distingue: as páginas do novo chunk expulsam a interna, que
+   inunda o cache nos dois casos.
+5. #7 (CBD-005), memória auxiliar do sort-merge e do partition-hash. Testes
+   no `testes_memoria` (sort externo com muitas runs, hash recursivo, skew,
+   grupo de duplicatas maior que `group_pages`) mostraram três fontes de heap
+   fora das molduras, todas corrigidas:
+   - cada run ou partição guardava uma cópia própria do esquema (165): agora
+     o operador faz uma cópia por entrada e a compartilha (`create_temp` com
+     `shared_ptr`);
+   - a camada 4 contava E/S por arquivo também para os temporários (dois
+     mapas, cerca de 340 B por arquivo), contagem que nada lê: os temporários
+     passam a ser contados só no total e por tipo, e a E/S não muda;
+   - a tabela de arquivos guardava, para sempre, a entrada de cada
+     temporário apagado, com o caminho completo: a memória crescia com o
+     total de runs e partições criadas no processo. Agora o caminho não é
+     guardado (sai de `dir / nome`), a entrada apagada libera nome e bitmap,
+     e as entradas de temporários apagados são reaproveitadas. O detector de
+     leitura sequencial esquece o arquivo apagado (o acesso seguinte, a
+     outro arquivo, já não era sequencial). Com M = 4, o hash recursivo caiu
+     de 304 KB para 11 KB de pico; 500 temporários criados e apagados deixam
+     16 B.
+   Decisão do usuário: a lista de runs do sort-merge é cobrada em M. O plano
+   conta as runs das duas entradas e a saída de um passe, reserva
+   `desc_frames = ⌈runs × sizeof(TempFile) / bloco⌉` molduras, tiradas do
+   rascunho, do fan-in e da intercalação final, e repete até o número parar
+   de subir. Essas molduras ficam retidas durante a junção (`hold_frames`,
+   como as do diretório do BNL), e `make_runs` reserva o vetor com o número
+   planejado e lança `DoesNotFit` se passar dele. Com 60.000 registros (cerca de 900 páginas):
+   M = 32 dá 55 runs e 2 molduras para a lista; M = 16, 151 runs e 4
+   molduras; M = 8 fica inviável (a lista não cabe). O mínimo do sort-merge
+   com grupo de duplicatas passou de 4 para 5 molduras, e o teste
+   `EsDosTemporariosFicaDentroDaMedicao` passou a usar M = 5. Segunda decisão
+   do usuário, depois da medição: os descritores das partições do hash ficam
+   fora de M, declarados. São até 2(m − 1) por nível e até 6 níveis, um
+   limite que não depende de b. No pior caso da bancada (Inscrição como build,
+   M = 32, dois níveis) o pico do heap foi de 44,7 KB, cerca de 20 KB deles
+   em descritores de partição (perto de 5 molduras). No hash, as partições do
+   primeiro nível passam a ser apagadas logo depois de usadas, como a recursão
+   já fazia.
+   Correção depois do 1º CI no Linux (commit seguinte, já com o 5 enviado):
+   `TabelaDeArquivosReaproveitaTemporariosApagados` falhou no GCC/libstdc++
+   com 104 B vivos (limite 64) e 1.243 B de pico (limite 1.024). Não era
+   vazamento: a libstdc++ aloca o vetor de buckets da tabela de páginas do
+   buffer pool na 1ª inserção, que caía dentro do escopo medido, e monta
+   cada caminho com uma lista de componentes. O teste tinha limites
+   absolutos que dependiam da biblioteca padrão; agora o aquecimento passa
+   pelo `append`, e ele compara 50 e 500 temporários criados e apagados (o
+   que fica vivo e o pico não podem crescer com o número deles). No macOS:
+   0 B vivos e 440 B de pico nos dois casos.
+6. #4 (CBD-002), contrato de M. Só documentação. A decisão 173 do handoff
+   foi reescrita com o critério (§7.1 do enunciado): o que cresce com a
+   entrada fica dentro de M, em molduras retidas da reserva (diretórios do
+   ScratchSpace e do BNL, lista de runs); o que é limitado por uma página ou
+   por m fica fora, com o tamanho medido pelo `testes_memoria` (descritores
+   das partições do hash, `sorted_slots`, chaves VarChar temporárias, tabela
+   de arquivos, controle O(m)). Também foram atualizados a §7 (orçamento do
+   sort-merge com `desc_frames`), a §9 (a frase "menos de 1 moldura" não
+   valia), os blocos copiados dos headers (`JoinPlan`, `StorageManager`,
+   `FileManager`, `Counters`), o README (memória de trabalho), o
+   `METODOS_DE_INTERFACE` (`create_temp`, `hold_frames`, `plan_join`) e o
+   `docs/IO.md` (alertas por commit: 8 no CBD-004, todos de BNL com MRU, de
+   +0,9% a +8,3%; 0 nos demais). A entrada anterior dava a #4 como atendida;
+   isso valia para o código, não para o texto da 173.
+7. #9 (CBD-010), fronteiras da medição. `Monitor::measured` passa a gravar,
+   antes do 1º snapshot, o que o preparo deixou sujo, e guarda o número em
+   `OpResult::prep_writes`, separado do delta (operação) e do `flush_writes`
+   (verificação de fim). A bancada já grava e esvazia o pool antes de cada
+   repetição, então `prep_writes` é 0 nela, e o CSV e a E/S não mudam. A
+   bancada não confere o campo: a comparação de E/S do CI compila o driver
+   do candidato contra a biblioteca da referência, que não o tem. Testes:
+   `SequenciaManualDeEs`, a frio, com a E/S contada à mão (BNL de 3 × 2
+   páginas com M = 4: chunk 2, 2 rodadas, 7 leituras e 7 faltas; sort-merge
+   com M = 5 e interna UNIQUE: leituras e gravações de cada fase pela
+   capacidade das runs e 19 registros por página), e
+   `PreparoFlushEOperacaoSeparados`. RED: contra `12f861b`, com a carga
+   suja, a operação contava 4 gravações (expulsões sujas das páginas da
+   carga) e o flush de fim gravava 5; GREEN: tudo em `prep_writes`, delta e
+   flush de fim zerados.
+8. #16 (BENCH-007), convergência testável. O critério de parada saiu do
+   `bench.cpp` para `src/layer1/convergencia.hpp` (`Convergence`,
+   `repeat_until_stable`), sem mudar o comportamento: a bancada só adapta
+   cada repetição para uma amostra (executou, blocos, tempo). A bancada inclui
+   o header pelo próprio diretório (`"convergencia.hpp"`), porque a
+   comparação de E/S do CI compila o driver do candidato com os headers da
+   referência, que ainda não têm esse arquivo. Testes C++
+   com séries determinísticas (`tests/test_convergencia.cpp`): série
+   estável converge em 3; tempo alternando 10 e 20 para no teto de 10 com
+   dispersão 0,6 e `parada = teto`; E/S variável também para no teto;
+   aquecimento converge na 4ª; falha na 1ª dá `nao_executada`; teto igual ao
+   mínimo não converge sem cumprir o critério. Teste Python
+   (`test_tabelas_convergencia.py`): a tabela 15 lista só os grupos que
+   pararam no teto e conta os que pararam só pelo tempo.
+9. #17 (BENCH-008), parâmetros das estimativas. A bancada grava
+   `parametros.csv`, uma linha por combinação, com os parâmetros que entram
+   na fórmula: nas junções, os do mesmo plano que gera o `caminhos.csv` (b e
+   d de cada lado, m, chunk e dir_frames; runs, fan-in, passes, group_pages
+   e desc_frames; partições, níveis e build); nas seleções, n, b, bfr, lote,
+   linhas esperadas, altura, distintos e cadeias. A tabela "Custo estimado ×
+   medido" mostra os parâmetros da pior combinação de cada família. Testes
+   (`tests/test_estimativas.cpp`): BNL, sort-merge com um passe e entrada
+   ordenada (e com blocagem média), hash sem partição, com um e dois níveis e
+   pré-particionado, B+ pontual h + 1 e faixa pela fração das folhas,
+   clustering sobre hash, hashes, B+ secundária e varredura, cada um com o
+   valor calculado no comentário. Os dois desvios grandes que restam (hash
+   com Inscrição como build, +29%, pelo termo 4·n_h; clustering sobre hash
+   com 50%, −44%, por colisões) continuam explicados na §4.5 do README.
+10. #14 (BENCH-005), verificador da matriz obrigatória. O inventário e o
+    estado das células saíram do `tabelas.py` para `tools/matriz.py`, usado
+    pela tabela de cobertura (que saiu idêntica) e pelo novo
+    `tools/verificar_matriz.py`. Ele termina com código 1 se faltar uma das
+    60 células obrigatórias em LRU ou MRU; se uma junção obrigatória vier
+    não aplicável, ou uma seleção obrigatória fora do caso 3; se o porte de
+    uma junção executada não conferir com os blocos reais
+    (`estatisticas.csv`) e o m da operação; ou se a rodada for reduzida
+    (escala menor que 1, menos de 3 repetições, sem uma das políticas).
+    Células inviáveis aparecem como aviso. Na rodada de exemplo: aprovada,
+    com 108 células executadas, 12 não aplicáveis (caso 3) e porte conferido
+    em 347 execuções; uma rodada `--rapido` é reprovada pela escala e pelas
+    repetições. Dez testes Python, oito deles negativos
+    (`test_verificar_matriz.py`).
+11. #15 (BENCH-006), conferência com o SQLite sem ausências silenciosas. O
+    `compare.py` passa a dizer quantas linhas e combinações conferiu e
+    quantas estão ausentes, e reprova se houver alguma: operação declarada
+    (`operacoes.csv` ou `referencia.csv`) sem linha no `resultados.csv`;
+    linha medida sem referência; com `--tuplas`, linha medida sem o dump do
+    motor (o nome segue o `shape_for` da bancada) ou dump sem a referência,
+    caso em que antes o script parava com `FileNotFoundError`. A conta é
+    relativa ao que a rodada declarou, e por isso vale para o smoke do CI; a
+    completude da matriz fica com o verificador da #14. O cabeçalho do
+    script e o README registram que o motor e o SQL mantêm as duas colunas
+    da junção (`SELECT x.*, y.*`). Rodada de exemplo: 534 linhas em 168
+    combinações, 0 ausentes, 0 divergências; smoke com `--tuplas`: 168 em
+    168. Seis testes Python (`test_compare.py`).
+12. #18 (BENCH-009), rodada definitiva. Feita com o código do commit
+    `49be2d4`, numa cópia limpa (`git archive`), compilada com `make` e rodada
+    sozinha na máquina: escala 1, LRU e MRU, 3 a 10 repetições, M = 32 e
+    M = 2, semente 20261122; o manifesto grava o SHA completo, o compilador e
+    as flags. Resultado: 563 linhas medidas em 168 combinações, 0 ausentes e
+    0 divergências no SQLite; o `verificar_matriz.py` aprova (60 células por
+    política, 54 executadas e 6 não aplicáveis pelo caso 3, porte conferido
+    em 370 execuções). Reprodução num clone limpo do repositório, no mesmo
+    commit: as 176 linhas da 1ª repetição bateram uma a uma (blocos, linhas,
+    checksum); só o total de repetições mudou (560), porque o critério de
+    parada inclui o tempo. Diferenças em relação à rodada de 13/11: 34 das 168
+    combinações; o sort-merge de Aluno ⋈ Inscrição com heaps sobe de 10.483
+    para 11.723 blocos (+11,8%), porque a lista de runs ocupa 3 molduras e a
+    intercalação final, que aceita 29 runs, recebe 30 (Aluno passa a precisar
+    de um passe); o mesmo com hash primário, de 11.662 para 12.902; no BNL
+    com MRU, a economia sobre a LRU cai de 0,6–2,3% para 0,5–1,7% (molduras
+    do diretório retidas); o resto varia menos de 0,3%. `resultados_exemplo/`
+    foi regenerado (com `parametros.csv` e `verificacao_matriz.txt`), e os
+    READMEs trazem os números novos e os comandos de reprodução. O projeto
+    gera tabelas, não gráficos.
+
+### Validação executada (16 e 17/11)
+
+- Cada commit desta entrada foi verificado numa cópia limpa, como o CI faz:
+  build Release e `ctest` (suíte principal e `testes_memoria`), build com
+  ASan/UBSan e a suíte inteira, testes Python, smoke `--rapido --tuplas`
+  conferido com o SQLite e com o verificador de cobertura do smoke, e a
+  comparação de E/S contra o commit anterior. Alertas: 8 no CBD-004 (BNL
+  com MRU, +0,9% a +8,3%), nenhum nos demais.
+- RED/GREEN registrados nos commits 1, 2, 3, 4, 7.
+- No push automático, o CI do commit 5 (Linux, GCC 13) reprovou um teste de
+  memória com limite absoluto que dependia da biblioteca padrão. Como o 5
+  já estava no remoto, a correção entrou num commit novo logo depois dele,
+  e os commits 6 a 12, ainda locais, foram reaplicados por cima: o código
+  deles é o que foi verificado, mais o teste corrigido. A rodada definitiva
+  foi refeita com o SHA novo do código (`49be2d4`), e as contagens de blocos
+  saíram iguais às da rodada anterior; só o tempo, as repetições e as
+  medianas das seleções pontuais (cujo lote muda a cada repetição) mudaram.
+
+### Não afirmado
+
+- GCC 13 e GoogleTest real não foram executados localmente; ficam para o CI
+  de cada push.
+- O LeakSanitizer não foi validado (`detect_leaks=0`).
+- O build CMake mostra um aviso pré-existente (`-Wmissing-field-initializers`
+  em `test_layer3.cpp:201`), que o `make` suprime nos testes.
+- No PR para a main (#19), a etapa "Medir e comparar I/O" falhou: num
+  `pull_request`, a referência é a base do PR (`4091762`), e o driver do
+  candidato é compilado contra a biblioteca dela, que não tem
+  `JoinPlan::dir_frames`, `JoinPlan::desc_frames` nem `TableStats::bfr_medio`
+  (usados pelo `parametros.csv` da #17). Nos pushes, a referência era o
+  commit anterior, que já os tinha. Correção: as duas funções que gravam os
+  parâmetros viraram templates e só usam esses campos se existirem
+  (`if constexpr (requires ...)`). Localmente, a comparação contra a main
+  passou: 168 cenários e 29 alertas (os já descritos no `docs/IO.md`).

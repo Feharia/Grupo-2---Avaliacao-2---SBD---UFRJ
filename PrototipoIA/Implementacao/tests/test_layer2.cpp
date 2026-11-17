@@ -1,8 +1,10 @@
 // Testes da camada 2: junções, seleções, inaplicáveis, políticas, orçamento e partições (§10, 151, 152, 164).
 #include "helpers.hpp"
 #include "layer2/monitor.hpp"
+#include "layer3/page.hpp"
 #include "mini_test.hpp"
 
+#include <functional>
 #include <map>
 
 using namespace cbd;
@@ -112,6 +114,220 @@ TEST(Monitor, PapeisTrocadosNaoMudamOChecksum) {   // (152)
         EXPECT_EQ(x.checksum, y.checksum);
         EXPECT_EQ(x.rows, y.rows);
     }
+}
+
+// P03 da auditoria de 10/11: com registros pequenos (como Turma, 145 por página), o diretório
+// do BNL com chunk de m/2 páginas guardava cerca de 56 B por registro fora das molduras. Agora
+// ele cabe nas m − 1 − chunk molduras restantes, e o chunk diminui quando não cabe (decisão 173).
+TEST(Monitor, DiretorioDoBnlCabeEmM) {
+    Monitor m(test_config("mon_bnl_dir"));
+    const Schema s = make_schema({{"k", FieldType::Int32}, {"v", FieldType::Int32}});
+    std::vector<std::vector<Value>> rows;
+    for (std::int64_t i = 0; i < 40000; ++i) rows.push_back({i % 500, i});
+    const TableId t = m.create_table("pequenos", s, PrimarySpec{});
+    RowsStream rs(m, t, rows);
+    m.bulk_load(t, rs);
+    const TableStats st = m.stats(t);
+    ASSERT_TRUE(st.b + 2 > 32);   // não cabe em M: o BNL usa chunk
+    const JoinInput in0{path(m, t, PathKind::Scan), 0, 0}, in1{path(m, t, PathKind::Scan), 0, 1};
+    const auto planned = m.plan_join(JoinAlgorithm::Bnl, in0, in1, 32, JoinParams{});
+    const JoinPlan& p = std::get<JoinPlan>(planned);
+    const std::size_t por_pagina = (st.n + st.b - 1) / st.b;
+    EXPECT_LE(p.frames_used(), 32u);
+    EXPECT_LE(p.chunk * por_pagina, p.dir_entries);
+    EXPECT_LE(p.dir_entries * sizeof(RecordView), p.dir_frames * 4096);
+    EXPECT_LT(p.chunk, 16u);                  // m/2 não deixaria espaço para o diretório
+    m.flush_all();
+    m.invalidate_all();
+    const OpResult r = ok(m.join(JoinAlgorithm::Bnl, in0, in1, 32, ResultShape{}));
+    EXPECT_EQ(r.rows, 40000u * 80u);          // 500 grupos de 80 registros: 80 × 80 pares por grupo
+}
+
+// CBD-004: as molduras do diretório do BNL são retidas durante a junção, e o subpool não as usa
+// como cache. M = 8, chunk = 2 (externa de 4 páginas: 2 rodadas), diretório em 1 moldura: sobram 5
+// molduras para as 6 páginas da interna. Com MRU, a 1ª rodada lê as 6 (B6 expulsa B5); na 2ª, A3 e
+// A4 expulsam A2 e A1, e só B5 é relida: 4 + 6 + 1 = 11. Antes, com o diretório só cobrado no plano,
+// as 6 páginas cabiam nas 8 − 2 molduras, e a 2ª rodada não lia nada (10).
+TEST(Monitor, BnlRetemAsMoldurasDoDiretorio) {
+    Monitor m(test_config("mon_bnl_retem", Policy::Mru));
+    const Schema s = make_schema({{"k", FieldType::Int32}, {"pad", FieldType::Char, 100}});
+    const std::size_t por_pagina = sp_capacity(4096, s.record_size);
+    auto add = [&](const std::string& name, std::size_t pages) {
+        std::vector<std::vector<Value>> rows;
+        for (std::size_t i = 0; i < pages * por_pagina; ++i) rows.push_back({std::int64_t(i % 50), std::string("p")});
+        const TableId t = m.create_table(name, s, PrimarySpec{});
+        RowsStream rs(m, t, rows);
+        m.bulk_load(t, rs);
+        return t;
+    };
+    const TableId ext = add("externa", 4), inn = add("interna", 6);
+    ASSERT_EQ(m.stats(ext).b, 4u);
+    ASSERT_EQ(m.stats(inn).b, 6u);
+    const JoinInput o{path(m, ext, PathKind::Scan), 0, 0}, i{path(m, inn, PathKind::Scan), 0, 1};
+    JoinParams jp;
+    jp.chunk = 2;
+    const JoinPlan p = std::get<JoinPlan>(m.plan_join(JoinAlgorithm::Bnl, o, i, 8, jp));
+    ASSERT_EQ(p.chunk, 2u);
+    ASSERT_EQ(p.dir_frames, 1u);
+    m.flush_all();
+    m.invalidate_all();
+    const OpResult r = ok(m.join(JoinAlgorithm::Bnl, o, i, 8, ResultShape{}, jp));
+    EXPECT_EQ(r.delta.global.reads(), 4u + 6u + 1u);
+}
+
+// P12 da auditoria de 10/11: com M pequeno, o sort-merge grava runs e o hash grava partições, e
+// páginas sujas de temporários são expulsas durante a operação. Toda essa E/S precisa cair dentro
+// do delta medido: o delta é a soma das fases, nada fica sujo depois (flush final grava 0), e as
+// expulsões sujas e as gravações de temporários estão contadas nas gravações do operador.
+// M = 5: com a lista de runs cobrada em M (CBD-005), o sort-merge com grupo de duplicatas precisa de
+// uma moldura para a lista, duas para o grupo e duas para a intercalação final.
+TEST(Monitor, EsDosTemporariosFicaDentroDaMedicao) {
+    Monitor m(test_config("mon_fronteira"));
+    Db db = build(m);
+    std::uint64_t expulsoes = 0;
+    for (auto alg : {JoinAlgorithm::SortMerge, JoinAlgorithm::Hash}) {
+        const OpResult r = ok(join(m, db, alg, "a_heap", PathKind::Scan, "b_heap", PathKind::Scan, 5));
+        expulsoes += r.delta.global.dirty_evictions;
+        EXPECT_EQ(r.rows, 1200u);
+        const auto& g = r.delta.global;
+        const auto& tmp = r.delta.per_kind[static_cast<std::size_t>(FileKind::Temp)];
+        std::uint64_t fases_l = 0, fases_g = 0;
+        for (const auto& ph : r.phases) {
+            fases_l += ph.delta.global.reads();
+            fases_g += ph.delta.global.writes();
+        }
+        EXPECT_GT(tmp.writes(), 0u);                    // houve runs ou partições gravadas
+        EXPECT_EQ(g.writes(), tmp.writes());            // só temporários são gravados numa junção
+        EXPECT_LE(g.dirty_evictions, g.writes());       // expulsões sujas já estão nas gravações
+        EXPECT_EQ(fases_l, g.reads());
+        EXPECT_EQ(fases_g, g.writes());
+        EXPECT_EQ(r.flush_writes, 0u);
+        EXPECT_EQ(m.flush_all(), 0u);                   // nada do operador ficou para depois
+    }
+    EXPECT_GT(expulsoes, 0u);                           // o cenário força expulsões de páginas sujas
+}
+
+namespace {
+// tabelas de páginas cheias com registros de 204 B: 19 por página (sp_capacity(4096, 204))
+TableId tabela_paginas(Monitor& m, const std::string& name, const Schema& s, std::size_t pages,
+                       const std::function<std::int64_t(std::size_t)>& key) {
+    std::vector<std::vector<Value>> rows;
+    for (std::size_t i = 0; i < pages * sp_capacity(4096, s.record_size); ++i) rows.push_back({key(i), std::string("p")});
+    const TableId t = m.create_table(name, s, PrimarySpec{});
+    RowsStream rs(m, t, rows);
+    m.bulk_load(t, rs);
+    return t;
+}
+std::uint64_t fase(const OpResult& r, const std::string& nome, bool escritas) {
+    for (const auto& ph : r.phases)
+        if (ph.name == nome) return escritas ? ph.delta.global.writes() : ph.delta.global.reads();
+    return 0;
+}
+}  // namespace
+
+// CBD-010 (issue #9): sequências pequenas, a frio, com a E/S calculada à mão.
+TEST(Monitor, SequenciaManualDeEs) {
+    Monitor m(test_config("mon_manual"));
+    const Schema s = make_schema({{"k", FieldType::Int32}, {"pad", FieldType::Char, 200}});
+    const Schema su = make_schema({{"k", FieldType::Int32, 0, true}, {"pad", FieldType::Char, 200}});
+    const std::size_t pp = sp_capacity(4096, s.record_size);
+    ASSERT_EQ(pp, 19u);
+    const TableId a = tabela_paginas(m, "a", s, 3, [](std::size_t i) { return std::int64_t(i % 30); });
+    const TableId b = tabela_paginas(m, "b", s, 2, [](std::size_t i) { return std::int64_t(i % 30); });
+    const TableId c = tabela_paginas(m, "c", s, 4, [](std::size_t i) { return std::int64_t(i % 19); });
+    const TableId u = tabela_paginas(m, "u", su, 1, [](std::size_t i) { return std::int64_t(i); });
+    m.flush_all();
+    auto in = [&](TableId t, std::uint8_t op) { return JoinInput{path(m, t, PathKind::Scan), 0, op}; };
+
+    // BNL, M = 4, LRU: chunk = ⌊4/2⌋ = 2 (3 + 2 > 4), diretório em 1 moldura (2 × 19 × 24 B < 4 KB),
+    // 1 moldura para a interna. Rodadas: ⌈3/2⌉ = 2, e a interna é relida em cada uma:
+    // leituras = b_r + 2 · b_s = 3 + 2 · 2 = 7, todas faltas; nenhuma gravação.
+    m.flush_all();
+    m.invalidate_all();
+    const OpResult bnl = ok(m.join(JoinAlgorithm::Bnl, in(a, 0), in(b, 1), 4, ResultShape{}));
+    EXPECT_EQ(bnl.delta.global.reads(), 7u);
+    EXPECT_EQ(bnl.delta.global.requests, 7u);
+    EXPECT_EQ(bnl.delta.global.misses, 7u);
+    EXPECT_EQ(bnl.delta.global.writes(), 0u);
+    EXPECT_EQ(bnl.flush_writes, 0u);
+    EXPECT_EQ(bnl.prep_writes, 0u);
+
+    // Sort-merge, M = 5, interna UNIQUE (sem grupo): lista de runs em 1 moldura (6 descritores de
+    // 88 B), run_pages = 5 − 2 − 1 = 2, final_fan_in = 5 − 0 − 1 = 4. A externa (76 registros)
+    // vira ⌈76 / cap⌉ runs, a interna (19) uma run; cada run de r registros ocupa ⌈r / 19⌉ páginas.
+    const JoinPlan p = std::get<JoinPlan>(m.plan_join(JoinAlgorithm::SortMerge, in(c, 0), in(u, 1), 5, JoinParams{}));
+    ASSERT_EQ(p.desc_frames, 1u);
+    ASSERT_EQ(p.run_pages, 2u);
+    ASSERT_EQ(p.group_pages, 0u);
+    const std::size_t cap = ScratchSpace::capacity_for(s, 2, 4096);
+    const std::size_t runs_c = (76 + cap - 1) / cap;
+    ASSERT_EQ(p.runs_outer, runs_c);
+    ASSERT_TRUE(runs_c + 1 <= p.final_fan_in);   // sem passe intermediário
+    std::size_t w_c = 0;
+    for (std::size_t left = 76; left > 0; left -= std::min(left, cap)) w_c += (std::min(left, cap) + pp - 1) / pp;
+    m.flush_all();
+    m.invalidate_all();
+    const OpResult sm = ok(m.join(JoinAlgorithm::SortMerge, in(c, 0), in(u, 1), 5, ResultShape{}));
+    EXPECT_EQ(sm.rows, 76u);
+    EXPECT_EQ(fase(sm, "runs_externa", false), 4u);        // lê C uma vez
+    EXPECT_EQ(fase(sm, "runs_externa", true), w_c);        // grava as runs de C
+    EXPECT_EQ(fase(sm, "runs_interna", false), 1u);
+    EXPECT_EQ(fase(sm, "runs_interna", true), 1u);
+    EXPECT_EQ(fase(sm, "intercalacao_final", false), w_c + 1);   // relê cada página de run uma vez
+    EXPECT_EQ(fase(sm, "intercalacao_final", true), 0u);
+    EXPECT_EQ(sm.delta.global.reads(), 4u + 1u + w_c + 1u);
+    EXPECT_EQ(sm.delta.global.writes(), w_c + 1u);
+    EXPECT_EQ(sm.flush_writes, 0u);
+}
+
+// CBD-010: preparo, operação e flush de fim ficam separados. O que a carga deixou sujo é gravado
+// antes do 1º snapshot e contado em prep_writes; não cai no delta (se a operação expulsasse a
+// página) nem no flush de fim (se ela continuasse suja).
+TEST(Monitor, PreparoFlushEOperacaoSeparados) {
+    Monitor m(test_config("mon_preparo"));
+    const Schema s = make_schema({{"k", FieldType::Int32}, {"pad", FieldType::Char, 200}});
+    const TableId a = tabela_paginas(m, "a", s, 3, [](std::size_t i) { return std::int64_t(i % 30); });
+    const TableId b = tabela_paginas(m, "b", s, 2, [](std::size_t i) { return std::int64_t(i % 30); });
+    // sem flush: a carga deixa páginas sujas no pool
+    const JoinInput ia{path(m, a, PathKind::Scan), 0, 0}, ib{path(m, b, PathKind::Scan), 0, 1};
+    const OpResult r = ok(m.join(JoinAlgorithm::Bnl, ia, ib, 4, ResultShape{}));
+    EXPECT_GT(r.prep_writes, 0u);
+    EXPECT_EQ(r.delta.global.writes(), 0u);
+    EXPECT_EQ(r.delta.global.dirty_evictions, 0u);
+    EXPECT_EQ(r.flush_writes, 0u);
+    const OpResult again = ok(m.join(JoinAlgorithm::Bnl, ia, ib, 4, ResultShape{}));
+    EXPECT_EQ(again.prep_writes, 0u);
+    EXPECT_EQ(again.delta.global.writes(), 0u);
+}
+
+// P02 da auditoria de 10/11 (decisão 172): M conta também as páginas de índice. Numa seleção pela
+// B+ primária com M = 2, cada descida pede os nós pela reserva, e não há mais o cache da área de
+// índices. Um caminho com índice e dados juntos não cabe em M = 1.
+TEST(Monitor, SelecaoComIndicesDentroDeM) {
+    Monitor m(test_config("mon_indices_m"));
+    Db db = build(m);
+    const AccessPath bt = path(m, db.t["a_bt"], PathKind::PrimaryBTree);
+    std::vector<Point> pts;
+    for (std::int32_t k = 0; k < 300; k += 3) pts.push_back(Point{0, Key{k}});
+    m.flush_all();
+    m.invalidate_all();
+    SelectParams sp;
+    sp.m = 2;
+    sp.expected_rows = static_cast<double>(pts.size());
+    const OpResult r = ok(m.select_points(bt, pts, ResultShape{}, sp));
+    EXPECT_EQ(r.rows, pts.size());
+    EXPECT_EQ(r.delta.global.index_area_requests, 0u);
+    const TableStats ts = m.stats(db.t["a_bt"]);
+    const StructureStats& st = ts.structures.front();
+    ASSERT_TRUE(st.height.has_value());
+    if (*st.height > 1)   // cada descida pede a raiz pela reserva (pode ser acerto, se ela ainda estiver lá)
+        EXPECT_GE(r.delta.per_kind[static_cast<std::size_t>(FileKind::Index)].requests, pts.size());
+    const AccessPath sec = path(m, db.t["b_heap"], PathKind::SecondaryBTreeNonClustering);
+    SelectParams um;
+    um.m = 1;
+    const auto plano = m.plan_select(sec, false, 1, um);
+    ASSERT_TRUE(std::holds_alternative<NotApplicable>(plano));
+    EXPECT_TRUE(std::get<NotApplicable>(plano).kind == NotApplicable::Kind::Inviavel);
 }
 
 TEST(Monitor, MruLeMenosQueLruNoBnlComVariasPassadas) {
@@ -224,6 +440,43 @@ TEST(Monitor, GrupoDeDuplicatasQueNaoCabeViraInaplicavel) {   // (151)
     const Outcome o = join(m, db, JoinAlgorithm::SortMerge, "c_heap", PathKind::Scan, "c_heap", PathKind::Scan, 8, true, jp);
     ASSERT_TRUE(std::holds_alternative<NotApplicable>(o));
     EXPECT_TRUE(std::get<NotApplicable>(o).reason.find("não cabe") != std::string::npos);
+}
+
+// CBD-007 (issue #1): com a interna UNIQUE, o sort-merge usa group_pages = 0 e não guarda o grupo.
+// O UNIQUE só é garantido quando uma estrutura indexa o campo (157); num heap ele é só declarado.
+// Na base, 10 × 10 registros de mesma chave devolviam 10 pares em vez de 100, sem aviso.
+TEST(Monitor, SortMergeRejeitaUniqueViolado) {
+    Monitor m(test_config("mon_sm_unique"));
+    const Schema su = make_schema({{"k", FieldType::Int32, 0, true}, {"v", FieldType::Int32}});
+    const Schema sn = make_schema({{"k", FieldType::Int32}, {"v", FieldType::Int32}});
+    std::vector<std::vector<Value>> dez, distintos;
+    for (std::int64_t i = 0; i < 10; ++i) {
+        dez.push_back({std::int64_t{7}, i});
+        distintos.push_back({i, i});
+    }
+    auto add = [&](const std::string& name, const Schema& s, const std::vector<std::vector<Value>>& rows) {
+        const TableId t = m.create_table(name, s, PrimarySpec{});
+        RowsStream rs(m, t, rows);
+        m.bulk_load(t, rs);
+        return t;
+    };
+    const TableId ext = add("externa", sn, dez);
+    const TableId uni = add("interna_unique", su, dez);   // o heap aceita a repetição (157)
+    const TableId nun = add("interna_not_unique", sn, dez);
+    const TableId uok = add("interna_unique_ok", su, distintos);
+    auto input = [&](TableId t, std::uint8_t operand) { return JoinInput{path(m, t, PathKind::Scan), 0, operand}; };
+    auto sort_merge = [&](TableId inner) {
+        m.flush_all();
+        m.invalidate_all();
+        return m.join(JoinAlgorithm::SortMerge, input(ext, 0), input(inner, 1), 8, ResultShape{});
+    };
+    ASSERT_EQ(std::get<JoinPlan>(m.plan_join(JoinAlgorithm::SortMerge, input(ext, 0), input(uni, 1), 8, JoinParams{}))
+                  .group_pages, 0u);
+    EXPECT_THROW(sort_merge(uni), std::logic_error);   // nunca "sucesso" com 10 pares
+    EXPECT_EQ(ok(sort_merge(nun)).rows, 100u);          // NOT UNIQUE: o grupo de duplicatas dá os 100
+    const OpResult u = ok(sort_merge(uok));             // UNIQUE válido continua com group_pages = 0
+    EXPECT_EQ(u.rows, 10u);
+    EXPECT_EQ(u.checksum, ok(m.join(JoinAlgorithm::Bnl, input(ext, 0), input(uok, 1), 8, ResultShape{})).checksum);
 }
 
 TEST(Monitor, HashPreParticionadoIncompativelUsaSoOMaior) {   // (164)

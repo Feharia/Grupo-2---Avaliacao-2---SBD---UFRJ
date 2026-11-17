@@ -1,19 +1,20 @@
 # Bancada de teste de CBD: protótipo gerado por IA
 
-Este é um protótipo funcional da arquitetura descrita em `../HANDOFF_ARQUITETURA_2026-11-08.md` (decisões 1 a 171, com as emendas de 08/11) e no diagrama `../diagrama_camadas_v5.png`. É **código bruto gerado por IA**, ainda sem revisão do grupo. O `PROMPTS.md` traz o log de prompts e as correções que a própria IA fez durante a geração.
+Este é um protótipo funcional da arquitetura descrita em `../HANDOFF_ARQUITETURA_2026-11-08.md` (decisões 1 a 45 e 100 a 175, com as emendas de 08/11 e da auditoria de 10/11) e no diagrama `../diagrama_camadas_v5.png`. É **código bruto gerado por IA**, ainda sem revisão do grupo. O `PROMPTS.md` traz o log de prompts e as correções que a própria IA fez durante a geração.
 
-Estado em 08/11/2026:
-- **compila sem avisos** com Apple clang 21 (`-Wall -Wextra -Wpedantic -Wshadow`);
-- **40 testes passam**, também com ASan e UBSan;
-- a bancada roda na escala do handoff (Aluno com 20.000 linhas, Inscrição com 100.000) em cerca de 25 s;
-- todas as **358 linhas medidas batem com o SQLite**, em número de linhas e checksum. Cada combinação repete até as contagens e o tempo variarem menos de 5% (de 3 a 10 vezes; decisão 132 emendada);
+Estado em 17/11/2026 (commit `49be2d4`, rodada definitiva em `resultados_exemplo/`):
+- **compila sem avisos** com `make` no Apple clang 21 (`-Wall -Wextra -Wpedantic -Wshadow`); o CI compila com GCC 13;
+- **87 testes passam** na suíte principal e **11** no `testes_memoria`, que conta as alocações reais das estruturas auxiliares, também com ASan e UBSan; mais 48 testes Python das ferramentas;
+- a bancada roda na escala do handoff (Aluno com 20.000 linhas, Inscrição com 100.000) em cerca de 40 s;
+- todas as **563 linhas medidas batem com o SQLite**, em número de linhas e checksum. Cada combinação repete até as contagens e o tempo variarem menos de 5% (de 3 a 10 vezes; decisão 132 emendada), e o `convergencia.csv` marca os grupos que pararam no teto;
+- a matriz obrigatória do enunciado de 04/11 está completa: 60 células, 54 executadas e 6 não aplicáveis (caso 3), e o `tools/verificar_matriz.py` aprova a rodada; veja a tabela "Cobertura da matriz";
 - as células que não rodam aparecem no resultado com o motivo (decisão 170 do handoff): 132 com status `nao_aplicavel` (casos 1 a 4). Nenhuma célula fica `inviavel` desde o particionamento recursivo do hash join (decisão 171).
 
 ## Como rodar
 
 ```bash
 make                 # build/bancada e build/testes
-make test            # 40 testes (shim com a sintaxe do GoogleTest)
+make test            # 67 testes (shim com a sintaxe do GoogleTest)
 make asan            # testes com AddressSanitizer + UBSan
 make rapido          # bancada em escala 0,1 + reference.py + compare.py + tabelas.py
 ```
@@ -24,8 +25,11 @@ Rodada completa, com conferência e tabelas:
 ./build/bancada --saida saida
 python3 -I tools/reference.py saida
 python3 -I tools/compare.py saida
+python3 -I tools/verificar_matriz.py saida   # matriz obrigatória do enunciado; código 1 se faltar algo
 python3 -I tools/tabelas.py saida     # saida/tabelas.md e saida/tabelas/*.csv
 ```
+
+O `verificar_matriz.py` reprova a rodada se faltar uma célula obrigatória em LRU ou MRU, se uma célula obrigatória vier não aplicável sem fundamento (só a igualdade em UNIQUE com 1% ou 50% pode, pelo caso 3), se o porte de uma junção não conferir com os blocos reais e o m, ou se a rodada for reduzida (escala menor que 1 ou menos de 3 repetições). Células inviáveis aparecem como aviso. O inventário vem de `tools/matriz.py`, o mesmo da tabela de cobertura (BENCH-005).
 
 O `tabelas.py` aceita `--politica MRU` (as tabelas principais saem com a outra política), `--md ARQUIVO`, `--csv PASTA` e `--sem-csv`.
 
@@ -69,43 +73,27 @@ cmake -S . -B build-cmake && cmake --build build-cmake && ctest --test-dir build
 | 1 | `src/layer1/bench.cpp` | gerador da base, especificação padrão, constantes por quantis, lotes, repetições, CSVs, manifesto |
 | — | `tools/reference.py`, `tools/compare.py` | conferência com o SQLite (147, 166) |
 | — | `tools/tabelas.py` | tabelas de análise a partir de uma saída (Markdown e CSV) |
-| — | `tests/` | 40 testes das camadas 2, 3 e 4 |
+| — | `tools/matriz.py`, `tools/verificar_matriz.py` | inventário da matriz obrigatória e verificador que reprova lacunas (BENCH-005) |
+| — | `tests/` | 67 testes das camadas 2, 3 e 4 |
 
 ## Saídas da bancada
 
 | Arquivo | Conteúdo |
 |---|---|
-| `resultados.csv` | uma linha por política, operação, variante, algoritmo e repetição. Traz a posição na matriz do enunciado (`tipo`, `tamanho`, `config` a–e, `seletividade` pontual/0,1%/50%), o `status` (`ok`, `nao_aplicavel` ou `inviavel`, decisão 170) e o `motivo` de cada célula que não roda. Nas células executadas: linhas, checksum, requisições, acertos, faltas, taxa de acerto, leituras e gravações sequenciais/aleatórias, expulsões sujas, gravações forçadas, alocações, leituras de índice, E/S de temporários, custo estimado (transferências e seeks), `flush_writes` (deve ser 0) e tempo |
+| `resultados.csv` | uma linha por política, operação, variante, algoritmo e repetição. Traz a posição na matriz do enunciado (`tipo`, `tamanho`, `config` a–e, `seletividade` pontual/1%/50%), o `status` (`ok`, `nao_aplicavel` ou `inviavel`, decisão 170) e o `motivo` de cada célula que não roda. Nas células executadas: linhas, checksum, requisições, acertos, faltas, taxa de acerto, leituras e gravações sequenciais/aleatórias, expulsões sujas, gravações forçadas, alocações, leituras de índice, E/S de temporários, custo estimado (transferências e seeks), `flush_writes` (deve ser 0) e tempo |
 | `ocupacao.csv` | blocos por estrutura, antes e depois da carga de manutenção (§6.1.1) |
 | `estatisticas.csv` | n, R, bfr, b, altura, nós internos, folhas, distintos, buckets, overflow, fator de carga e cadeias, todos medidos pelo código |
 | `fases.csv` | E/S por fase de cada operação (runs, passes, particionamento, build/probe…) |
-| `operacoes.csv`, `constantes.csv`, `lotes/` | SQL equivalente, constantes de faixa pelos quantis e lotes de chaves |
+| `convergencia.csv` | uma linha por grupo de repetições: nº de repetições, dispersão de E/S e de tempo, se cada critério convergiu e se a parada foi por convergência ou pelo teto (P07) |
+| `caminhos.csv` | acesso realmente executado em cada entrada, por algoritmo, tirado do plano (P09) |
+| `operacoes.csv`, `constantes.csv`, `lotes/` | SQL equivalente, constantes de cada faixa (com a seletividade pedida e a efetiva) e lotes de chaves |
 | `dados/`, `esquema.csv`, `manifesto.txt` | a base gerada, o esquema e o manifesto da execução |
 
-Uma rodada completa está em `resultados_exemplo/` (sem os dados e os arquivos do motor), com as tabelas do `tabelas.py` em `resultados_exemplo/tabelas.md` e `resultados_exemplo/tabelas/`.
+A rodada definitiva, feita com o código do commit `49be2d4` e reproduzida num clone limpo, está em `resultados_exemplo/` (sem os dados e os arquivos do motor), com as tabelas do `tabelas.py` em `resultados_exemplo/tabelas.md` e `resultados_exemplo/tabelas/`.
 
-## Primeiros resultados (escala 1, LRU, médias das repetições)
+## Resultados
 
-Valores medidos em `resultados_exemplo/`. São só ilustrativos; a análise é tarefa do grupo.
-
-| Operação | Caminho | Leituras | Estimado | Observação |
-|---|---|---:|---:|---|
-| 1.000 pontos por DRE | heap, varredura | 323.962 | 323.000 | b/2 por chave |
-| 1.000 pontos por DRE | B+ primária | 1.046 | 3.000 | nós internos ficam na área de índices: taxa de acerto de 0,66 |
-| 1.000 pontos por DRE | hash primário | 1.007 | 1.108 | cadeia média de 1,1 |
-| CR ≤ mediana (50%) | heap, varredura | 646 | 646 | |
-| CR ≤ mediana (50%) | B+ secundária não clustering | 9.715 | 10.046 | o índice perde da varredura (resultado central, §11) |
-| curso ≤ 100 (50%) | clustering sobre B+ | 482 (479 seq.) | 326 | blocos sequenciais |
-| curso ≤ 100 (50%) | clustering sobre hash | 672 (todas aleatórias) | 326 | o mesmo resultado, com acesso aleatório (§11) |
-| Aluno ⋈ Inscrição | BNL | 70.141 (MRU: 69.525) | 70.141 | |
-| Aluno ⋈ Inscrição | sort-merge | 6.404 + 4.063 gravações | 10.413 | |
-| Aluno ⋈ Inscrição | partition-hash | 4.703 + 2.362 gravações | 7.127 | |
-
-Números derivados do layout, sem nenhum valor escrito à mão:
-- Aluno: R = 127 e bfr = 31; o heap tem b = 646.
-- Hash de Aluno por DRE: 809 buckets, α = 0,80.
-- Hash de Aluno por curso (decisão 163): 211 buckets, b = 791.
-- B+ de Aluno por DRE com fill 0,7: 953 folhas, altura 3.
+A análise dos resultados da rodada de exemplo está na §4 do [README principal](../../README.md#4-resultados), e as 16 tabelas completas estão em [`resultados_exemplo/tabelas.md`](resultados_exemplo/tabelas.md).
 
 ## Desvios do handoff
 

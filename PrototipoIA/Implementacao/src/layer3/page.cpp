@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
+#include <string>
 
 namespace cbd {
 
@@ -24,6 +26,29 @@ void set_slot(std::span<std::byte> p, std::uint16_t i, Slot s) {
     store<std::uint16_t>(d + 2, s.len);
 }
 std::uint32_t page_size(std::span<const std::byte> p) { return static_cast<std::uint32_t>(p.size()); }
+
+// CBD-008: os metadados de uma página lida do disco são conferidos antes de qualquer acesso ao
+// diretório de slots. Página malformada vira erro controlado, nunca leitura fora do bloco (§7.1).
+[[noreturn]] void malformed(const char* what) { throw std::out_of_range(std::string("página malformada: ") + what); }
+
+PageHeader sp_header(std::span<const std::byte> p) {
+    if (p.size() < kPageHeader) malformed("bloco menor que o cabeçalho");
+    const PageHeader h = read_header(p);
+    const std::uint32_t dir_end = kPageHeader + kSlotEntry * std::uint32_t{h.nslots};
+    if (dir_end > page_size(p)) malformed("diretório de slots passa do bloco");
+    if (h.free_lo < dir_end || h.free_lo > h.free_hi || h.free_hi > page_size(p))
+        malformed("limites da área livre inconsistentes");
+    if (h.live > h.nslots) malformed("mais registros vivos que slots");
+    return h;
+}
+
+// slot i (i < nslots, já conferido por sp_header); um slot vivo precisa estar na área de registros
+Slot checked_slot(std::span<const std::byte> p, const PageHeader& h, std::uint16_t i) {
+    const Slot s = slot_at(p, i);
+    if (s.len != 0 && (s.off < h.free_lo || static_cast<std::uint32_t>(s.off) + s.len > page_size(p)))
+        malformed("slot com offset fora do bloco");
+    return s;
+}
 }  // namespace
 
 std::uint32_t sp_capacity(std::uint32_t bs, std::uint32_t r) { return (bs - kPageHeader) / (r + kSlotEntry); }
@@ -37,43 +62,45 @@ void sp_init(std::span<std::byte> p, PageType t) {
     write_header(p, h);
 }
 
-std::uint16_t sp_nslots(std::span<const std::byte> p) { return read_header(p).nslots; }
+std::uint16_t sp_nslots(std::span<const std::byte> p) { return sp_header(p).nslots; }
 
 std::span<const std::byte> sp_record(std::span<const std::byte> p, std::uint16_t i) {
-    const PageHeader h = read_header(p);
+    const PageHeader h = sp_header(p);
     if (i >= h.nslots) return {};
-    const Slot s = slot_at(p, i);
+    const Slot s = checked_slot(p, h, i);
     if (s.len == 0) return {};
-    if (static_cast<std::uint32_t>(s.off) + s.len > p.size() || s.off < h.free_lo)
-        throw std::out_of_range("slot com offset fora do bloco");   // (§7.1)
     return p.subspan(s.off, s.len);
 }
 
 std::uint32_t sp_used_bytes(std::span<const std::byte> p) {
-    const PageHeader h = read_header(p);
-    std::uint32_t used = 0;
+    const PageHeader h = sp_header(p);
+    std::uint32_t used = 0, dead = 0;
     for (std::uint16_t i = 0; i < h.nslots; ++i) {
-        const Slot s = slot_at(p, i);
+        const Slot s = checked_slot(p, h, i);
         if (s.len) used += s.len + kSlotEntry;
+        else dead += kSlotEntry;
     }
+    if (kPageHeader + used + dead > page_size(p)) malformed("registros somam mais que o bloco");
     return used;
 }
 
 std::uint32_t sp_free_bytes(std::span<const std::byte> p) {
-    const PageHeader h = read_header(p);
-    std::uint32_t live = 0;
-    for (std::uint16_t i = 0; i < h.nslots; ++i) live += slot_at(p, i).len;
-    return page_size(p) - kPageHeader - kSlotEntry * h.nslots - live;
+    const PageHeader h = sp_header(p);
+    std::uint32_t taken = kPageHeader + kSlotEntry * std::uint32_t{h.nslots};
+    for (std::uint16_t i = 0; i < h.nslots; ++i) taken += checked_slot(p, h, i).len;
+    if (taken > page_size(p)) malformed("registros somam mais que o bloco");   // evita o underflow
+    return page_size(p) - taken;
 }
 
 bool sp_fits(std::span<const std::byte> p, std::size_t len) {
-    const PageHeader h = read_header(p);
+    const PageHeader h = sp_header(p);
     bool dead = false;
-    for (std::uint16_t i = 0; i < h.nslots && !dead; ++i) dead = slot_at(p, i).len == 0;
+    for (std::uint16_t i = 0; i < h.nslots && !dead; ++i) dead = checked_slot(p, h, i).len == 0;
     return sp_free_bytes(p) >= len + (dead ? 0 : kSlotEntry);
 }
 
 void sp_compact(std::span<std::byte> p) {
+    sp_free_bytes(p);   // confere cabeçalho, slots e a soma dos registros antes de mover bytes
     PageHeader h = read_header(p);
     std::vector<std::byte> copy(p.begin(), p.end());
     std::uint32_t hi = page_size(p);
@@ -91,10 +118,10 @@ void sp_compact(std::span<std::byte> p) {
 
 std::optional<std::uint16_t> sp_insert(std::span<std::byte> p, std::span<const std::byte> rec) {
     if (rec.empty()) throw std::invalid_argument("registro vazio");
-    PageHeader h = read_header(p);
+    PageHeader h = sp_header(p);
     std::optional<std::uint16_t> dead;
     for (std::uint16_t i = 0; i < h.nslots; ++i)
-        if (slot_at(p, i).len == 0) { dead = i; break; }
+        if (checked_slot(p, h, i).len == 0) { dead = i; break; }
     const std::uint32_t need = static_cast<std::uint32_t>(rec.size()) + (dead ? 0 : kSlotEntry);
     if (sp_free_bytes(p) < need) return std::nullopt;
     if (static_cast<std::uint32_t>(h.free_hi - h.free_lo) < need) {
@@ -115,17 +142,17 @@ std::optional<std::uint16_t> sp_insert(std::span<std::byte> p, std::span<const s
 }
 
 void sp_erase(std::span<std::byte> p, std::uint16_t i) {
-    PageHeader h = read_header(p);
-    if (i >= h.nslots || slot_at(p, i).len == 0) throw std::logic_error("sp_erase: slot inexistente ou já removido");
+    PageHeader h = sp_header(p);
+    if (i >= h.nslots || checked_slot(p, h, i).len == 0) throw std::logic_error("sp_erase: slot inexistente ou já removido");
     set_slot(p, i, Slot{0, 0});
     --h.live;
     write_header(p, h);
 }
 
 bool sp_replace(std::span<std::byte> p, std::uint16_t i, std::span<const std::byte> rec) {
-    PageHeader h = read_header(p);
+    PageHeader h = sp_header(p);
     if (i >= h.nslots) throw std::logic_error("sp_replace: slot inexistente");
-    Slot s = slot_at(p, i);
+    Slot s = checked_slot(p, h, i);
     if (s.len == 0) throw std::logic_error("sp_replace: slot removido");
     if (rec.size() <= s.len) {   // cabe no lugar
         std::memcpy(p.data() + s.off, rec.data(), rec.size());

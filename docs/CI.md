@@ -16,11 +16,17 @@ vez de trocar silenciosamente para o shim local. Essa opção requer CMake
 3.22+, disponível no runner escolhido. O projeto continua aceitando seu
 fluxo local anterior; o gate não muda o CMake nem o motor.
 
-O CTest registra um executável (`testes`), que atualmente contém **59 casos
-GoogleTest**. O XML `gtest.xml` permite consultar cada caso. O outro XML,
-`ctest.xml`, representa o executável registrado no CTest. Há também 30 testes
-Python do guard de cobertura e das ferramentas de comparação de I/O,
-mais regressões dirigidas do workflow, sem dependências externas.
+O CTest registra dois executáveis: `testes`, com a suíte principal, e
+`testes_memoria`, que troca o `operator new` global para contar as
+alocações reais das estruturas auxiliares (decisão 173, issues CBD-003 a
+CBD-005) e por isso fica separado. O GoogleTest grava um XML por
+executável em `gtest/` (`gtest/testes.xml` e `gtest/testes_memoria.xml`),
+que permite consultar cada caso. O outro XML, `ctest.xml`, representa os
+executáveis registrados no CTest. Há também 48 testes Python, sem
+dependências externas: o guard de cobertura do smoke, as ferramentas de
+comparação de I/O, a conferência com o SQLite (`compare.py`), o verificador
+da matriz obrigatória, a tabela de convergência e regressões dirigidas do
+workflow.
 
 Os cinco diretórios de build/testes/evidências são inicializados em um step,
 usando `RUNNER_TEMP` e `GITHUB_ENV`. O contexto `runner` não é permitido no
@@ -37,6 +43,9 @@ verifica ASan/UBSan e não valida vazamentos com LeakSanitizer.
 O comando é `bancada --rapido --tuplas --saida DIRETORIO_NOVO`. Depois, a
 referência SQLite é gerada, o inventário de execuções é verificado e
 `compare.py --tuplas` compara contagens, checksums e multiconjuntos de tuplas.
+Ele também conta as combinações conferidas e as ausentes (operação declarada
+sem linha, linha medida sem referência, linha sem dump, dump sem referência) e
+reprova se houver alguma ausente (BENCH-006).
 
 O contrato mínimo de CI, em **ambas as políticas LRU e MRU**, exige:
 
@@ -62,7 +71,7 @@ a correção dos valores é verificada pelo comparador SQLite existente.
 
 Essa rodada reduzida não certifica a matriz experimental integral. A
 [suíte de I/O](IO.md) acrescenta comparação entre revisões com inventário
-versionado de 108 execuções e alerta para aumentos, sem budget bloqueante.
+versionado de 168 execuções e alerta para aumentos, sem budget bloqueante.
 O [consumo do Actions](CUSTO_ACTIONS.md) foi avaliado separadamente.
 
 ## Evidências e reprodução

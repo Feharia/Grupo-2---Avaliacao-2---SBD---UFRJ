@@ -1,0 +1,2 @@
+politica,operacao,variante,algoritmo,n_repeticoes,dispersao_io,dispersao_tempo,convergiu_io,convergiu_tempo
+MRU,sel_rg_dre_baixa,aluno_bt_dre:primary_btree,,10,0.0000,0.1051,sim,nao

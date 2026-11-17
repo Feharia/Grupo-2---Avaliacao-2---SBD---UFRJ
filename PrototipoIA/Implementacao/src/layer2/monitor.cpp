@@ -111,9 +111,10 @@ std::vector<Phase> PhaseRecorder::finish() {
 // ======================================================================= planos
 std::size_t JoinPlan::frames_used() const {
     switch (alg) {
-        case JoinAlgorithm::Bnl: return m;   // chunk + 1 da interna + as guardadas pela política, limitado a m
-        case JoinAlgorithm::SortMerge:
-            return std::max({run_pages + 2, fan_in + 1, final_fan_in + group_pages});
+        case JoinAlgorithm::Bnl:   // chunk + 1 da interna + as molduras retidas do diretório (173, CBD-004)
+            return chunk + 1 + dir_frames;
+        case JoinAlgorithm::SortMerge:   // + as molduras da lista de runs (CBD-005)
+            return std::max({run_pages + 2, fan_in + 1, final_fan_in + group_pages}) + desc_frames;
         case JoinAlgorithm::Hash:
             return std::max(partitions > 1 ? partitions + 1 : std::size_t{2}, build_pages + 1);
     }
@@ -121,8 +122,12 @@ std::size_t JoinPlan::frames_used() const {
 }
 
 std::size_t SelectPlan::frames_used() const {
-    if (sort_rids) return scratch_pages + 1;
-    return 1;   // uma página do cursor ou do fetch por vez; páginas de índice ficam fora de M (145)
+    // M inclui as páginas de índice (172): no probe e no clustering, a página do índice fica fixada
+    // enquanto o fetch fixa a de dados; a descida da B+ fixa um nó por vez.
+    const bool index_and_data = path == PathKind::SecondaryHash || path == PathKind::SecondaryBTreeNonClustering ||
+                                path == PathKind::SecondaryBTreeClustering;
+    const std::size_t base = index_and_data ? 2 : 1;
+    return sort_rids ? scratch_pages + base : base;
 }
 
 std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, const JoinInput& outer,
@@ -157,7 +162,19 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
             if (params.chunk) p.chunk = params.chunk;
             else if (p.b_outer + 2 <= m) p.chunk = std::max<std::size_t>(1, p.b_outer);
             else p.chunk = std::max<std::size_t>(1, m / 2);
-            if (p.chunk > m - 1) return NotApplicable{"chunk > m − 1", NotApplicable::Kind::Inviavel};
+            if (p.chunk > m - 2) return NotApplicable{"chunk > m − 2", NotApplicable::Kind::Inviavel};
+            {   // o diretório do chunk (um RecordView por registro) ocupa ⌈registros × 24 B / bloco⌉
+                // molduras, retidas na execução (decisão 173, CBD-004); o que sobra das m − 1 − chunk
+                // fica de cache para a interna. Se o diretório não couber, o chunk diminui.
+                const std::size_t bs = storage_.block_size();
+                const std::size_t per_page = to.b ? ceil_div(static_cast<std::size_t>(to.n), to.b) : 1;
+                auto entries = [&](std::size_t c) { return (m - 1 - c) * bs / sizeof(RecordView); };
+                while (p.chunk > 1 && p.chunk * per_page > entries(p.chunk)) --p.chunk;
+                if (p.chunk * per_page > entries(p.chunk))
+                    return NotApplicable{"diretório do BNL não cabe em m", NotApplicable::Kind::Inviavel};
+                p.dir_frames = std::max<std::size_t>(1, ceil_div(p.chunk * per_page * sizeof(RecordView), bs));
+                p.dir_entries = p.dir_frames * bs / sizeof(RecordView);
+            }
             break;
         case JoinAlgorithm::SortMerge: {
             auto ordered = [](const JoinInput& in) {   // (164)
@@ -166,13 +183,32 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
             };
             p.sort_outer = !ordered(outer);
             p.sort_inner = !ordered(inner);
-            p.run_pages = m - 2;
-            p.fan_in = m - 1;
             p.group_pages = p.inner_unique ? 0 : params.group_pages;
             if (p.group_pages + 2 > m) return NotApplicable{"group_pages não deixa espaço para a intercalação", NotApplicable::Kind::Inviavel};
-            p.final_fan_in = m - p.group_pages;
-            std::size_t ro = p.sort_outer ? std::max<std::size_t>(1, ceil_div(p.d_outer, p.run_pages)) : 1;   // runs densas
-            std::size_t ri = p.sort_inner ? std::max<std::size_t>(1, ceil_div(p.d_inner, p.run_pages)) : 1;
+            // A lista de runs cresce com b/m e é cobrada em M (CBD-005): desc_frames molduras guardam os
+            // descritores das runs das duas entradas e da saída de um passe de intercalação, e saem do
+            // rascunho, do fan-in e da intercalação final. Mais molduras para a lista deixam as runs
+            // menores e mais numerosas; repete até o número de molduras parar de subir.
+            const std::size_t bs = storage_.block_size();
+            std::size_t ro = 1, ri = 1, d = 0;
+            for (int it = 0;; ++it) {
+                if (d + 3 > m || p.group_pages + 2 + d > m || it > 16)
+                    return NotApplicable{"lista de runs não cabe em m", NotApplicable::Kind::Inviavel};
+                p.run_pages = m - 2 - d;
+                p.fan_in = m - 1 - d;
+                p.final_fan_in = m - p.group_pages - d;
+                // runs: quantos registros cabem no rascunho com o diretório cobrado (173)
+                const std::size_t cap_o = ScratchSpace::capacity_for(so, p.run_pages, storage_.block_size());
+                const std::size_t cap_i = ScratchSpace::capacity_for(si, p.run_pages, storage_.block_size());
+                ro = p.sort_outer ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(to.n), cap_o)) : 1;
+                ri = p.sort_inner ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(ti.n), cap_i)) : 1;
+                const std::size_t lista = (p.sort_outer ? ro + ceil_div(ro, p.fan_in) : 0) +
+                                          (p.sort_inner ? ri + ceil_div(ri, p.fan_in) : 0);
+                const std::size_t nd = ceil_div(lista * kRunDescriptorBytes, bs);
+                if (nd <= d) break;
+                d = nd;
+            }
+            p.desc_frames = d;
             p.runs_outer = ro;
             p.runs_inner = ri;
             while (ro + ri > p.final_fan_in) {
@@ -185,16 +221,17 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
         case JoinAlgorithm::Hash: {
             const double f = 1.2;   // fator de folga declarado
             p.build_pages = m - 1;
-            // os registros cabem densos no ScratchSpace e o diretório do hash fica fora das molduras (140),
-            // então a folga f só entra na contagem de partições (emenda da 108)
-            if (params.partitions == 0 && p.d_outer <= p.build_pages) {
+            // o build cabe se os registros e o diretório da tabela hash couberem em m − 1 páginas (173);
+            // a folga f só entra na contagem de partições (emenda da 108)
+            const std::size_t cap_build = ScratchSpace::capacity_for(so, p.build_pages, storage_.block_size());
+            if (params.partitions == 0 && to.n <= cap_build) {
                 p.partitions = 1;   // o build cabe: sem particionamento
                 break;
             }
             // 1º passe com até m − 1 partições; o que não couber é particionado de novo (171)
             p.partitions = params.partitions
                                ? params.partitions
-                               : std::min<std::size_t>(m - 1, ceil_div(static_cast<std::size_t>(std::ceil(p.d_outer * f)), p.build_pages));
+                               : std::min<std::size_t>(m - 1, ceil_div(static_cast<std::size_t>(std::ceil(to.n * f)), cap_build));
             if (p.partitions > m - 1)
                 return NotApplicable{"partições pedidas excedem m − 1", NotApplicable::Kind::Inviavel};
             auto prepart = [](const JoinInput& in) {   // (164)
@@ -247,6 +284,8 @@ std::variant<SelectPlan, NotApplicable> Monitor::plan_select(const AccessPath& p
         p.scratch_pages = p.m - 2;
     }
     if (p.m < 1) return NotApplicable{"m < 1", NotApplicable::Kind::Inviavel};
+    if (p.frames_used() > p.m)   // índice e dados juntos não cabem em m (172)
+        return NotApplicable{"página de índice e página de dados não cabem em m", NotApplicable::Kind::Inviavel};
     try {
         (void)storage_.stats(path.table);
     } catch (const std::logic_error& e) {
@@ -260,6 +299,9 @@ template <class Exec, class Est>
 Outcome Monitor::measured(std::size_t m, std::size_t frames, bool swapped, const ResultShape& shape, Exec&& exec,
                           Est&& est) {
     if (frames > m) throw std::logic_error("orçamento do plano excede m (148)");
+    // CBD-010: o que o preparo deixou sujo é gravado antes do 1º snapshot e contado à parte, para
+    // não cair no delta da operação se uma expulsão o gravar, nem no flush de fim
+    const std::uint64_t prep = storage_.flush_all();              // 2b: preparo
     Reservation res = storage_.reserve(m);                        // 3
     ResultSink sink(shape, swapped);
     const auto t0 = std::chrono::steady_clock::now();
@@ -275,9 +317,12 @@ Outcome Monitor::measured(std::size_t m, std::size_t frames, bool swapped, const
     auto ph = phases.finish();
     const auto t1 = std::chrono::steady_clock::now();
     OpResult r;
+    r.prep_writes = prep;
     r.delta = s1 - s0;
     if (r.delta.global.data_area_requests != 0)
         throw std::logic_error("página de dados pedida sem reserva durante a operação medida (159)");
+    if (r.delta.global.index_area_requests != 0)
+        throw std::logic_error("página de índice pedida sem reserva durante a operação medida (172)");
     r.flush_writes = storage_.flush_all();                        // 7: verificação, deve ser 0
     r.estimate = est();                                           // 8
     r.rows = sink.rows();

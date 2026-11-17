@@ -1,9 +1,55 @@
 # Suíte pequena para regressão de I/O
 
-O perfil `io-rapido-v1` compara **108 execuções de consultas**, incluindo
+O perfil `io-rapido-v1` compara **168 execuções de consultas**, incluindo
 seleções em heap/B+/hash e índices secundários, BNL, hash join, sort-merge,
 LRU e MRU. Reutiliza a escala reduzida da bancada existente. Não substitui
 a matriz experimental integral exigida no trabalho.
+
+**Revisão do inventário (13/11/2026, auditoria P04/P05).** O inventário
+passou de 108 para 168 identidades, só com acréscimos: as 8 células do
+NATURAL JOIN que faltavam (P×P b–e, P×G c–e, G×G e) × 3 algoritmos × 2
+políticas, com as duas variantes da configuração c. A seletividade baixa
+passou de 0,1% para 1% (enunciado v2). Nenhuma identidade antiga mudou, e
+os dois lados continuam rodando o mesmo driver, então a comparação segue
+válida sem nova versão do perfil.
+
+**Alertas esperados nessa revisão.** Na comparação local contra `4091762`, os
+168 cenários foram pareados, e 22 tiveram aumento: 20 de sort-merge e 2 de
+hash join, de +0,2% a +1,1%. Nenhum cenário diminuiu. A causa é a decisão
+173: o diretório do ScratchSpace passou a ser cobrado das páginas da reserva,
+então as runs ficam um pouco menores e as partições do hash, um pouco mais
+numerosas.
+
+Com a decisão 172 (P02, commit isolado), são 29 alertas: os 22 acima e 7
+nas seleções por índice. Agora as páginas de índice vêm da reserva de M = 2,
+sem o cache da área de índices:
+- hash secundário pontual: +64% a +68%;
+- B+ primária pontual: +4,9% em LRU e +98% em MRU (na escala 0,1 a árvore
+  tem altura 2, e a MRU expulsa a raiz a cada chave);
+- B+ secundária por faixa: +0,4% a +4,8%, pela releitura da folha depois da
+  cadeia de overflow.
+Reverter o commit do P02 volta aos 22 alertas.
+
+**Alertas esperados nas correções das issues abertas (16/11/2026).** Cada
+commit foi comparado com o anterior, como o CI faz num push:
+- CBD-007, CBD-008 e CBD-003 (#1, #3, #5): 0 alertas.
+- CBD-004 (#6): 8 alertas, todos de BNL com MRU, de +0,9% a +8,3% (o maior
+  é Aluno ⋈ Inscrição com os papéis trocados, 725 → 785 leituras). As
+  molduras do diretório do chunk passaram a ficar retidas durante a junção;
+  antes, o subpool as usava como cache da interna, e a MRU aproveitava esse
+  cache a mais. Com LRU, nada muda.
+- CBD-005 (#7): 0 alertas. A lista de runs passou a ocupar molduras de M,
+  mas, na escala reduzida, as runs a mais não mudam a contagem (alguns
+  sort-merge caem 2 blocos, −0,3%).
+
+**PR para a main.** Num `pull_request`, a referência é a base do PR (a main,
+`4091762`), e o driver do candidato é compilado também contra a biblioteca
+dela. Por isso o driver só usa os campos novos (`dir_frames`, `desc_frames`,
+`bfr_medio`) quando eles existem. Contra a main, são 168 cenários pareados e
+29 alertas, que somam os efeitos acima: 12 de sort-merge (+0,7% a +1,1%) e 2
+de hash join (+0,6%), pelo diretório e pela lista de runs cobrados em M; 7
+nas seleções por índice (+0,4% a +98%), pelas páginas de índice dentro de M;
+e 8 de BNL com MRU (+0,9% a +8,3%), pelas molduras do diretório retidas.
 
 ## Protocolo
 
@@ -23,7 +69,7 @@ a matriz experimental integral exigida no trabalho.
   fontes e saída. As flags e a versão do compilador precisam coincidir.
 - SHA256 de dados, esquema, consultas, constantes e lotes, além dos hashes
   de driver/ferramentas, precisam coincidir. O inventário
-  `tools/io_cenarios_v1.json` fixa as 108 identidades, incluindo variantes;
+  `tools/io_cenarios_v1.json` fixa as 168 identidades, incluindo variantes;
   remover uma delas dos dois lados também falha.
 - Ambos os lados passam pela referência SQLite do candidato, comparação de
   contagens/checksums e multiconjuntos de tuplas e verificação de cobertura.

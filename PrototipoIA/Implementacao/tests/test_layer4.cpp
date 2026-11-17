@@ -157,6 +157,31 @@ TEST(BufferPool, FreeBlockDePaginaFixadaLanca) {
     EXPECT_TRUE(g2.read()[10] == std::byte{0});                         // sem dados antigos
 }
 
+// P06 da auditoria de 10/11: fetch de um bloco marcado como livre no bitmap precisa falhar,
+// inclusive depois de o bloco ter sido gravado; a realocação do mesmo bloco volta a valer.
+TEST(BufferPool, FetchDeBlocoLivreLanca) {
+    BufferPool pool(test_config("bp_fetch_livre"));
+    for (FileKind kind : {FileKind::Data, FileKind::Temp}) {
+        const FileId f = pool.create(kind == FileKind::Data ? "a.dat" : "t.tmp", kind);
+        BlockId b{};
+        {
+            auto [nb, g] = pool.allocate(f, kNoReservation);
+            g.write()[10] = std::byte{9};
+            b = nb;
+        }
+        { auto [outro, g] = pool.allocate(f, kNoReservation); }   // o arquivo continua com b < blocos
+        pool.flush_all();
+        pool.free_block(b);
+        EXPECT_THROW(pool.fetch(b, kRandomReuse, kNoReservation), std::logic_error);
+        pool.invalidate_all();
+        EXPECT_THROW(pool.fetch(b, kRandomReuse, kNoReservation), std::logic_error);   // também fora do pool
+        auto [b2, g2] = pool.allocate(f, kNoReservation);
+        EXPECT_EQ(b2.block, b.block);
+        g2.reset();
+        EXPECT_NO_THROW(pool.fetch(b2, kRandomReuse, kNoReservation));
+    }
+}
+
 TEST(BufferPool, FlushAllContaEDepoisZera) {
     BufferPool pool(test_config("bp_flush"));
     const FileId f = pool.create("a.dat", FileKind::Data);

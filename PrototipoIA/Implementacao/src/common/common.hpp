@@ -159,6 +159,7 @@ struct IoCounts {
     std::uint64_t writes_seq = 0, writes_rand = 0;
     std::uint64_t dirty_evictions = 0, forced_writes = 0;
     std::uint64_t data_area_requests = 0;   // pedidos sem reserva a arquivos Data; 0 nas operações medidas (159)
+    std::uint64_t index_area_requests = 0;  // pedidos sem reserva a arquivos Index; 0 nas operações medidas (172)
     IoCounts& operator+=(const IoCounts&);
     IoCounts& operator-=(const IoCounts&);
     std::uint64_t reads()  const { return reads_seq + reads_rand; }
@@ -168,7 +169,7 @@ struct IoCounts {
 struct Counters {
     IoCounts global;
     std::array<IoCounts, 4> per_kind{};                  // indexado por FileKind
-    std::unordered_map<FileId, IoCounts> per_file;
+    std::unordered_map<FileId, IoCounts> per_file;       // sem os temporários (CBD-005)
     friend Counters operator-(Counters a, const Counters& b);
 };
 
@@ -199,6 +200,7 @@ struct StructureStats {
 struct TableStats {
     std::uint64_t n = 0;
     std::uint32_t r = 0, bfr = 0;
+    std::uint32_t bfr_medio = 0;   // registros por bloco pelo tamanho médio real dos registros (P08)
     std::uint32_t b = 0;   // heap: todos; B+: folhas; hash: buckets + overflow (119)
     std::vector<StructureStats> structures;
 };
@@ -231,6 +233,7 @@ struct OpResult {
     std::uint64_t      rows = 0;
     std::uint64_t      checksum = 0;
     Counters           delta;          // snapshot final − inicial, antes do flush de fim
+    std::uint64_t      prep_writes = 0;    // preparo: páginas sujas gravadas antes do 1º snapshot (CBD-010)
     std::uint64_t      flush_writes = 0;
     Cost               estimate;
     std::vector<Phase> phases;

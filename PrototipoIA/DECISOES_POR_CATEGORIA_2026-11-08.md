@@ -1,6 +1,6 @@
 # Decisões da bancada por categoria e importância
 
-Estado em 08/11/2026. Classifica as 117 decisões do `HANDOFF_ARQUITETURA_2026-11-08.md` (1 a 45 e 100 a 171), já com as emendas de 08/11. O número da decisão vem no início do título. O texto completo e o motivo de cada uma estão no handoff.
+Estado em 13/11/2026. Classifica as 121 decisões do `HANDOFF_ARQUITETURA_2026-11-08.md` (1 a 45 e 100 a 175), já com as emendas de 08/11 e da auditoria de 10/11. O número da decisão vem no início do título. O texto completo e o motivo de cada uma estão no handoff.
 
 **Critério das categorias**
 - **Arquitetura:** define as camadas e os contratos entre elas, o modelo de memória e de medição, ou uma escolha que muda os números medidos ou as conclusões do relatório.
@@ -12,11 +12,11 @@ Estado em 08/11/2026. Classifica as 117 decisões do `HANDOFF_ARQUITETURA_2026-1
 - **Média:** afeta robustez, detalhe de medida ou desempenho de uma estrutura, sem mudar as conclusões principais.
 - **Baixa:** detalhe, documentação, ou decisão registrada que a bancada não exercita.
 
-Total: 71 decisões de arquitetura (11 críticas, 31 altas, 22 médias e 7 baixas) e 46 de implementação (8 altas, 24 médias e 14 baixas). Nenhuma decisão de implementação é crítica. Na tabela de implementação, as decisões 21 e 25 e as decisões 26 e 28 dividem uma linha, porque tratam do mesmo assunto.
+Total: 75 decisões de arquitetura (12 críticas, 34 altas, 22 médias e 7 baixas) e 46 de implementação (8 altas, 24 médias e 14 baixas). Nenhuma decisão de implementação é crítica. Na tabela de implementação, as decisões 21 e 25 e as decisões 26 e 28 dividem uma linha, porque tratam do mesmo assunto.
 
 ---
 
-## Decisões de arquitetura (71)
+## Decisões de arquitetura (75)
 
 | Importância | Título | Explicação da decisão | O que foi decidido |
 |---|---|---|---|
@@ -31,6 +31,7 @@ Total: 71 decisões de arquitetura (11 críticas, 31 altas, 22 médias e 7 baixa
 | Crítica | 11. Políticas comparadas | O fator de buffer que o enunciado manda variar (§2.2, §6.2) | LRU × MRU, com uma instância da política por região (área ou subpool) |
 | Crítica | 124. Algoritmo × caminho de acesso | Diz o que as configurações a a e significam para cada algoritmo de junção | O BNL não usa índices; o sort-merge aproveita a entrada ordenada (ordered_by); o hash join aproveita um arquivo hash como partições prontas |
 | Crítica | 140. Memória de trabalho em molduras | Evita estruturas da linguagem maiores que a área reservada (§7.1) | ScratchSpace em molduras anônimas da reserva, nunca gravadas nem contadas; os diretórios internos são limitados pela capacidade |
+| Crítica | 175. Matriz completa do NATURAL JOIN | O NATURAL JOIN é obrigatório nas 15 células (3 tamanhos × 5 configurações); a bancada montava 7 (P05) | Curso e Disciplina organizados por B+ e por hash; índices secundários hash (codigo, dre) e B+ (curso) nos heaps; as 15 células com os três algoritmos |
 | Alta | 102. Modelo de seek | Define o que conta como acesso aleatório | Cabeça de disco global: há seek quando muda o arquivo ou quando o bloco não é o anterior + 1, como nas fórmulas dos livros |
 | Alta | 149. Ordem de medição | Evita que gravações de fim de operação entrem ou saiam da medida por engano | O snapshot final e o fechamento das fases vêm antes do flush de fim |
 | Alta | 160. Estatísticas sem E/S | O plano é resolvido antes do snapshot inicial; se ele lesse estruturas, aqueceria o cache | Estatísticas medidas ao fim da carga e do reorganize e guardadas no catálogo; stats() não faz E/S |
@@ -38,7 +39,7 @@ Total: 71 decisões de arquitetura (11 críticas, 31 altas, 22 médias e 7 baixa
 | Alta | 14. Gravação forçada e flushes | Separa o custo da carga do custo da operação | Páginas sujas são gravadas na expulsão; o flush depois da carga não é medido; os flushes de verificação devem gravar zero |
 | Alta | 148. Orçamento de molduras | Garante que nenhum algoritmo use mais que M | Todas as parcelas de memória estão no plano, e frames_used() ≤ m é verificado antes de executar |
 | Alta | 136. Subpool com política própria | Faz a política de substituição atuar dentro da memória do operador | Cada reserva tem a sua instância de LRU ou MRU |
-| Alta | 145. B+ primária em dois arquivos | Separa nós internos (área de índices, fora de M) e folhas com dados (pela reserva) | Nós internos num arquivo do tipo Index; folhas com os registros no arquivo de dados |
+| Alta | 145. B+ primária em dois arquivos | Separa nós internos e folhas com dados | Nós internos num arquivo do tipo Index; folhas com os registros no arquivo de dados. Emendada pela 172: numa operação medida, os nós internos também vêm da reserva |
 | Alta | 1. Tamanho do bloco | Muda b, bfr, fan-out e M ao mesmo tempo | 4.096 B, fixo; não é fator do experimento |
 | Alta | 6. Nº total de páginas | Tamanho do buffer pool | 84 molduras (336 KiB), a soma das áreas |
 | Alta | 17. Métricas do buffer | O que o enunciado pede para registrar (§2.2) | Requisições, acertos, faltas, taxa de acerto, alocações, leituras e gravações sequenciais e aleatórias, gravações sujas na expulsão e gravações forçadas |
@@ -48,6 +49,9 @@ Total: 71 decisões de arquitetura (11 críticas, 31 altas, 22 médias e 7 baixa
 | Alta | 143. Plano resolvido | A execução e a estimativa precisam usar os mesmos parâmetros | O plano é calculado uma vez. Runs e partições usam blocos densos ⌈n/bfr⌉; as estimativas usam b para ler e esse valor para gravar e reler (emendada) |
 | Alta | 122. Externa e interna | A escolha dos papéis muda o custo (§5.1.3) | BNL: a menor por fora. Hash: a menor como build. Sort-merge: o lado UNIQUE por dentro. Há uma variante com os papéis trocados (emendada) |
 | Alta | 171. Hash join recursivo | Sem recursão, o hash join só valia para builds de até cerca de 800 blocos com m = 32 | Particionamento recursivo, com semente nova por passe, parada e bailout em blocos; estimativa pela fórmula do livro |
+| Alta | 172. M inclui as páginas de índice | Define o que M mede: sem isso, um cache de índices fora do orçamento favorecia a B+ e o hash secundário (P02 da auditoria de 10/11) | Durante a operação, dados, índice, temporários e rascunho vêm da reserva; a área de índices só serve à carga e à manutenção; o Monitor exige index_area_requests = 0 |
+| Alta | 173. Estruturas auxiliares dentro de M | O §7.1 do enunciado pede atenção a estruturas auxiliares não contabilizadas; sem isso, "respeitar M" seria falso (P01, P03 da auditoria de 10/11) | Os diretórios do ScratchSpace (12 B por registro) e do BNL (um RecordView por registro) são cobrados das molduras da reserva; ordenação no lugar; o chunk do BNL diminui quando o diretório não cabe |
+| Alta | 174. Seletividade baixa de 1% | O enunciado de 04/11 trocou 0,1% por 1%; num campo discreto, uma faixa não pode cortar um valor no meio (P04) | 1% e 50%, com faixas feitas de grupos inteiros de valores iguais e a seletividade pedida e a efetiva gravadas em constantes.csv |
 | Alta | 164. Condições para aproveitar ordem e partições | A organização sozinha não garante ordem nem partições compatíveis | O sort-merge só pula a ordenação se ordered_by for o campo da junção. Hash pré-particionado só no campo da junção; com duas entradas hash incompatíveis, aproveita-se a maior |
 | Alta | 117. Saída do índice secundário | Preserva o resultado central de que o índice não clustering perde para a varredura a 50% | RIDs na ordem das posting lists (fórmula h + s); a variante que ordena os RIDs fica à parte |
 | Alta | 125. Seleções em lote | A seleção pontual isolada (cerca de 3 blocos) não é mensurável com 5% de variação | Lote de cerca de 1.000 chaves, gravado antes da execução; seleção por faixa à parte |

@@ -42,7 +42,8 @@ public:
     RID  insert(std::span<const std::byte> rec);          // DuplicateKey se a chave for única e existir
     void erase(RID rid);
     RID  replace(RID rid, std::span<const std::byte> rec); // mesma chave; pode mudar de lugar
-    std::uint32_t      leaf_for(const std::optional<Key>& lo) const;   // descida pela esquerda
+    // descida pela esquerda; numa operação medida, os nós vêm da reserva (172)
+    std::uint32_t      leaf_for(const std::optional<Key>& lo, ReservationId res = kNoReservation) const;
     std::optional<RID> find_first(const Key& k) const;               // manutenção
     Shape              measure() const;
     std::string        verify(bool check_occupancy) const;           // vazio = invariantes ok
@@ -57,9 +58,9 @@ public:
 
 private:
     using Path = std::vector<std::pair<std::uint32_t, std::size_t>>;   // (nó, índice do filho)
-    PageGuard    leaf(std::uint32_t b) const;
-    PageGuard    node(std::uint32_t b) const;
-    InternalNode load_node(std::uint32_t b) const;
+    PageGuard    leaf(std::uint32_t b, ReservationId res = kNoReservation) const;
+    PageGuard    node(std::uint32_t b, ReservationId res = kNoReservation) const;
+    InternalNode load_node(std::uint32_t b, ReservationId res = kNoReservation) const;
     void         save_node(std::uint32_t b, const InternalNode&);
     std::uint32_t descend(const Key&, Path&, bool rightmost) const;
     bool          find_path(std::uint32_t b, const Key&, std::uint32_t target, Path&) const;

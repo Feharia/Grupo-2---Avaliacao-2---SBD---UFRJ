@@ -67,6 +67,89 @@ TEST(SlottedPage, SlotsNaoSaoRenumerados) {
     EXPECT_EQ(read_header(page).live, 3);
 }
 
+// CBD-008 (issue #3): a auditoria reproduziu, com ASan, leitura fora do bloco numa página de 4.096 B
+// com nslots = 65535. Os metadados lidos do disco são conferidos antes de qualquer acesso ao
+// diretório; página malformada vira std::out_of_range em todas as funções da SlottedPage.
+TEST(SlottedPage, PaginaMalformadaFalhaSemAcessoInvalido) {
+    std::vector<std::byte> page(4096);
+    sp_init(page, PageType::Heap);
+    const std::vector<std::byte> rec(70, std::byte{1});
+    ASSERT_TRUE(sp_insert(page, rec).has_value());
+    ASSERT_TRUE(sp_insert(page, rec).has_value());
+    auto with_header = [&](auto change) {
+        std::vector<std::byte> p = page;
+        PageHeader h = read_header(p);
+        change(h);
+        write_header(p, h);
+        return p;
+    };
+    auto with_slot = [&](std::uint16_t i, std::uint16_t off, std::uint16_t len) {
+        std::vector<std::byte> p = page;
+        std::memcpy(p.data() + kPageHeader + kSlotEntry * i, &off, 2);
+        std::memcpy(p.data() + kPageHeader + kSlotEntry * i + 2, &len, 2);
+        return p;
+    };
+    const auto key_of = [](std::span<const std::byte> r) { return Key{static_cast<std::int32_t>(r.size())}; };
+    const std::vector<std::vector<std::byte>> bad{
+        with_header([](PageHeader& h) { h.nslots = 65535; }),           // o caso da auditoria
+        with_header([](PageHeader& h) { h.free_lo = 4000; h.free_hi = 100; }),
+        with_header([](PageHeader& h) { h.free_hi = 5000; }),
+        with_header([](PageHeader& h) { h.live = 9; }),
+        with_slot(0, 4090, 100),                                         // registro passa do fim do bloco
+        with_slot(0, 10, 70),                                            // registro dentro do diretório
+        with_slot(1, 100, 3996)};                                        // soma dos registros > bloco
+    for (std::size_t c = 0; c < bad.size(); ++c) {
+        std::vector<std::byte> p = bad[c];
+        const bool slot_case = c >= 4;   // cabeçalho válido: sp_nslots não precisa recusar
+        if (!slot_case) EXPECT_THROW(sp_nslots(p), std::out_of_range);
+        EXPECT_THROW(sp_used_bytes(p), std::out_of_range);
+        EXPECT_THROW(sp_free_bytes(p), std::out_of_range);
+        EXPECT_THROW(sp_fits(p, 10), std::out_of_range);
+        EXPECT_THROW(sp_insert(p, rec), std::out_of_range);
+        EXPECT_THROW(sp_compact(p), std::out_of_range);
+        if (c != 6) {   // no último caso, cada slot isolado está dentro do bloco: ler não sai dele
+            EXPECT_THROW(sorted_slots(p, key_of), std::out_of_range);
+            EXPECT_THROW(sp_record(p, 0), std::out_of_range);
+            EXPECT_THROW(sp_erase(p, 0), std::out_of_range);
+            EXPECT_THROW(sp_replace(p, 0, rec), std::out_of_range);
+        }
+    }
+}
+
+// Casos-limite que continuam corretos com a verificação do CBD-008: diretório cheio, slot apagado e
+// reaproveitado, registros de tamanhos diferentes e compactação por sp_replace que cresce.
+TEST(SlottedPage, CasosLimiteContinuamValidos) {
+    std::vector<std::byte> page(4096);
+    sp_init(page, PageType::Heap);
+    auto balance = [&] {   // cabeçalho + usados + slots mortos + livre = bloco
+        std::uint32_t dead = 0;
+        for (std::uint16_t i = 0; i < sp_nslots(page); ++i) dead += sp_record(page, i).empty() ? 1 : 0;
+        return kPageHeader + sp_used_bytes(page) + kSlotEntry * dead + sp_free_bytes(page);
+    };
+    std::uint16_t n = 0;
+    for (std::size_t len = 1;; len = len % 37 + 1) {   // registros de 1 a 37 bytes até encher
+        const std::vector<std::byte> r(len, std::byte{static_cast<unsigned char>(len)});
+        if (!sp_insert(page, r)) break;
+        ++n;
+    }
+    while (sp_insert(page, std::vector<std::byte>(1, std::byte{1}))) ++n;   // completa com 1 byte
+    EXPECT_EQ(sp_nslots(page), n);
+    EXPECT_FALSE(sp_fits(page, 1));
+    EXPECT_EQ(balance(), 4096u);
+    for (std::uint16_t i = 0; i < n; i += 3) sp_erase(page, i);
+    EXPECT_EQ(balance(), 4096u);
+    const std::vector<std::byte> big(60, std::byte{0x5A});
+    ASSERT_TRUE(sp_replace(page, 1, big));   // cresce: libera o antigo e compacta
+    EXPECT_EQ(sp_record(page, 1).size(), 60u);
+    EXPECT_TRUE(sp_record(page, 1)[59] == std::byte{0x5A});
+    const auto again = sp_insert(page, std::vector<std::byte>(5, std::byte{7}));
+    ASSERT_TRUE(again.has_value());
+    EXPECT_EQ(*again % 3, 0);                 // reaproveita um slot apagado
+    sp_compact(page);
+    EXPECT_EQ(balance(), 4096u);
+    EXPECT_EQ(sp_record(page, 2).size(), 3u);  // o 3º registro inserido (3 bytes) não mudou de slot
+}
+
 TEST(Record, NuloVarCharEVerificacaoSempreLigada) {
     const Schema s = make_schema({{"id", FieldType::Int32, 0, true}, {"nome", FieldType::Char, 10, false, true},
                                   {"nota", FieldType::Int64}, {"bio", FieldType::VarChar, 20, false, true},
@@ -196,7 +279,7 @@ TEST(StorageManager, RidsEstaveisComDivisoesEReorganize) {   // (141, 169)
             AccessPath p;
             for (const auto& ap : sm.access_paths(t))
                 if (ap.kind == PathKind::SecondaryBTreeNonClustering) p = ap;
-            RidCursor rc = sm.probe(p, Point{1, Key{std::int32_t(g)}}, kRandomReuse);
+            RidCursor rc = sm.probe(p, Point{1, Key{std::int32_t(g)}}, kRandomReuse, r);
             int seen = 0;
             while (auto rid = rc.next()) {
                 PinnedRecord pr = sm.fetch(t, *rid, kRandomOnce, r);
@@ -209,7 +292,7 @@ TEST(StorageManager, RidsEstaveisComDivisoesEReorganize) {   // (141, 169)
         for (const auto& ap : sm.access_paths(t))
             if (ap.kind == PathKind::SecondaryHash) hp = ap;
         for (int u : {0, 777, 1999, 10005, 11499}) {
-            RidCursor rc = sm.probe(hp, Point{2, Key{std::int32_t(u)}}, kRandomReuse);
+            RidCursor rc = sm.probe(hp, Point{2, Key{std::int32_t(u)}}, kRandomReuse, r);
             if (auto rid = rc.next()) {
                 PinnedRecord pr = sm.fetch(t, *rid, kRandomOnce, r);
                 EXPECT_EQ(pr.view.get<std::int32_t>(2), u);
@@ -328,6 +411,151 @@ TEST(ScratchSpace, OrdenaEMontaHash) {
         EXPECT_EQ(seen, n);
     }
     EXPECT_THROW(sm.create_scratch(s, r, 3), std::runtime_error);   // 2 + 3 > 4 molduras da reserva
+}
+
+// P01 da auditoria de 10/11 (E03): com 2 páginas e registros de um Int32, o espaço aceitava 1364
+// registros e a ordenação alocava 54.560 B fora das molduras. O diretório (slot, chain e head,
+// 12 B por registro) passa a ser cobrado das mesmas 2 páginas (decisão 173).
+TEST(ScratchSpace, DiretorioCabeNasPaginasDaReserva) {
+    StorageManager sm(test_config("sm_scratch_e03"));
+    const Schema s = make_schema({{"k", FieldType::Int32}});
+    auto r = sm.reserve(2);
+    ScratchSpace sc = sm.create_scratch(s, r, 2);
+    const std::size_t orcamento = 2 * sm.block_size();
+    std::uint64_t seed = 11;
+    while (sc.add(detail::make_view(encode_record(s, {std::int64_t(lcg(seed) % 1000)}), &s))) {}
+    const std::size_t por_registro = s.record_size + 2 + 12;   // prefixo de tamanho + diretório
+    EXPECT_LE(sc.size() * por_registro, orcamento);            // antes: 1364 × 18 B = 24.552 B > 8.192 B
+    EXPECT_GT(sc.size(), 0u);
+    EXPECT_EQ(sc.size(), ScratchSpace::capacity_for(s, 2, sm.block_size()));
+    EXPECT_LE(sc.record_bytes() + sc.aux_bytes(), orcamento);
+    const std::size_t aux = sc.aux_bytes();
+    sc.sort_by(0);
+    EXPECT_EQ(sc.aux_bytes(), aux);                            // ordena no lugar, sem vetores novos
+    for (std::size_t i = 1; i < sc.size(); ++i) EXPECT_LE(sc.at(i - 1).get<std::int32_t>(0), sc.at(i).get<std::int32_t>(0));
+    sc.build_hash(0, 3);
+    EXPECT_LE(sc.record_bytes() + sc.aux_bytes(), orcamento);
+    int achados = 0;
+    for (auto m = sc.probe(Key{sc.at(0).get<std::int32_t>(0)}); m.next();) ++achados;
+    EXPECT_GE(achados, 1);
+}
+
+TEST(ScratchSpace, OrdenarRidsNaoAlocaFora) {
+    StorageManager sm(test_config("sm_scratch_rids"));
+    auto r = sm.reserve(1);
+    ScratchSpace sc = sm.create_rid_scratch(r, 1);
+    std::uint64_t seed = 3;
+    while (sc.add(RID{static_cast<std::uint32_t>(1 + lcg(seed) % 500), static_cast<std::uint16_t>(lcg(seed) % 30)})) {}
+    EXPECT_LE(sc.record_bytes() + sc.aux_bytes(), sm.block_size());
+    const std::size_t aux = sc.aux_bytes();
+    sc.sort_rids();
+    EXPECT_EQ(sc.aux_bytes(), aux);
+    for (std::size_t i = 1; i < sc.size(); ++i) {
+        const RID a = sc.rid_at(i - 1), b = sc.rid_at(i);
+        EXPECT_TRUE(a.block < b.block || (a.block == b.block && a.slot <= b.slot));
+    }
+}
+
+// P02 da auditoria de 10/11 (decisão 172): numa busca com reserva, as páginas de índice também vêm
+// da reserva. Com M = 2, a B+ primária (descida + folha), a B+ secundária com posting lists em
+// overflow e o hash secundário cabem nas 2 molduras, e nenhuma página de índice é pedida fora dela.
+TEST(StorageManager, IndicesDentroDaReserva) {
+    StorageManager sm(test_config("sm_indices_m"));
+    const TableId tb = sm.create_table("tb", kv_schema(true, 60), PrimarySpec{StructureKind::BTree, 0, 0.7});
+    const TableId th = sm.create_table("th", kv_schema(false, 60), PrimarySpec{});
+    sm.create_index(th, IndexSpec{StructureKind::SecBTree, 1, false});   // g: 4 valores, posting lists longas
+    sm.create_index(th, IndexSpec{StructureKind::SecHash, 2, false});    // u: UNIQUE
+    std::vector<std::vector<std::byte>> rb, rh;
+    for (int i = 0; i < 6000; ++i) rb.push_back(kv(sm, tb, i, 0, i));
+    for (int i = 0; i < 6000; ++i) rh.push_back(kv(sm, th, i, i % 4, i));
+    VecStream vb(std::move(rb)), vh(std::move(rh));
+    sm.bulk_load(tb, vb);
+    sm.bulk_load(th, vh);
+    sm.flush_all();
+    sm.invalidate_all();
+    const auto index_kind = static_cast<std::size_t>(FileKind::Index);
+    auto r = sm.reserve(2);
+    const Counters s0 = sm.snapshot();
+    for (int k : {5, 777, 4321, 5999}) {   // B+ primária: a descida passa por nós de índice
+        SearchCursor c = sm.find(path_of(sm, tb, PathKind::PrimaryBTree), Point{0, Key{std::int32_t(k)}}, kRandomOnce, r);
+        auto rec = c.next();
+        ASSERT_TRUE(rec.has_value());
+        EXPECT_EQ(rec->get<std::int32_t>(0), k);
+    }
+    int seen = 0;   // B+ secundária: folha do índice, overflow da posting list e fetch
+    {
+        RidCursor rc = sm.probe(path_of(sm, th, PathKind::SecondaryBTreeNonClustering), Point{1, Key{std::int32_t(2)}},
+                                kRandomOnce, r);
+        while (auto rid = rc.next()) {
+            PinnedRecord pr = sm.fetch(th, *rid, kRandomOnce, r);
+            EXPECT_EQ(pr.view.get<std::int32_t>(1), 2);
+            ++seen;
+        }
+    }
+    EXPECT_EQ(seen, 1500);
+    for (int u : {0, 2999, 5999}) {   // hash secundário
+        RidCursor rc = sm.probe(path_of(sm, th, PathKind::SecondaryHash), Point{2, Key{std::int32_t(u)}}, kRandomOnce, r);
+        auto rid = rc.next();
+        ASSERT_TRUE(rid.has_value());
+        PinnedRecord pr = sm.fetch(th, *rid, kRandomOnce, r);
+        EXPECT_EQ(pr.view.get<std::int32_t>(2), u);
+    }
+    const Counters d = sm.snapshot() - s0;
+    EXPECT_LE(r.peak_pinned(), 2u);
+    EXPECT_EQ(d.global.index_area_requests, 0u);
+    EXPECT_EQ(d.global.data_area_requests, 0u);
+    EXPECT_GT(d.per_kind[index_kind].requests, 0u);   // as páginas de índice passaram pela reserva
+}
+
+// P10 da auditoria de 10/11: clustering B+ sobre hash com chaves colidindo no mesmo bucket e
+// registros intercalados. Compara os registros exatos (k, u) com um oráculo de varredura completa,
+// antes e depois de remoções que abrem espaço no começo das cadeias, de inserções que podem cair
+// nesse espaço (antes da 1ª ocorrência antiga) e do reorganize.
+TEST(StorageManager, ClusteringSobreHashComColisoesContraOraculo) {
+    StorageManager sm(test_config("sm_clust_oraculo"));
+    const TableId t = sm.create_table("th", kv_schema(false, 40), PrimarySpec{StructureKind::Hash, 0, 0.7, 3});
+    sm.create_index(t, IndexSpec{StructureKind::SecBTree, 0, true});
+    std::vector<std::vector<std::byte>> rows;
+    for (int i = 0; i < 900; ++i) rows.push_back(kv(sm, t, (i * 7) % 30, 0, i));   // 30 chaves em 3 buckets, intercaladas
+    VecStream vs(std::move(rows));
+    sm.bulk_load(t, vs);
+    using Par = std::pair<std::int32_t, std::int32_t>;
+    auto pelo_indice = [&](const KeyRange& r) {
+        auto res = sm.reserve(2);
+        SearchCursor c = sm.find(path_of(sm, t, PathKind::SecondaryBTreeClustering), r, kSeqOnce, res);
+        std::vector<Par> out;
+        while (auto rec = c.next()) out.push_back({rec->get<std::int32_t>(0), rec->get<std::int32_t>(2)});
+        std::sort(out.begin(), out.end());
+        return out;
+    };
+    auto oraculo = [&](const KeyRange& r) {
+        auto res = sm.reserve(1);
+        std::vector<Par> out;
+        BlockScan scan = sm.scan_blocks(t, kSeqOnce, res);
+        while (auto c = scan.next())
+            while (auto rec = c->next()) {
+                const Key k = rec->key(0);
+                if (r.contains(k)) out.push_back({rec->get<std::int32_t>(0), rec->get<std::int32_t>(2)});
+            }
+        std::sort(out.begin(), out.end());
+        return out;
+    };
+    auto confere = [&](const char* fase) {
+        for (std::int32_t a = 0; a < 30; a += 3)
+            for (std::int32_t w : {0, 1, 4}) {
+                const KeyRange r{0, Key{a}, Key{std::int32_t(a + w)}};
+                const auto got = pelo_indice(r), want = oraculo(r);
+                EXPECT_EQ(got.size(), want.size());
+                EXPECT_TRUE(got == want);
+                if (got != want) std::fprintf(stderr, "  divergência em %s, faixa [%d, %d]\n", fase, a, a + w);
+            }
+    };
+    confere("carga");
+    for (std::int32_t k : {0, 3, 9, 21}) sm.erase_key(t, 0, Key{k});   // libera espaço no começo das cadeias
+    for (int i = 0; i < 60; ++i) sm.insert(t, kv(sm, t, (i * 11) % 30, 0, 5000 + i));
+    confere("manutenção");
+    sm.reorganize(t);
+    confere("reorganize");
 }
 
 TEST(StorageManager, ClusteringSobreHashEBPlus) {

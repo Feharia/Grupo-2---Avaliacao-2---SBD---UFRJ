@@ -2,6 +2,7 @@
 // repetições e grava resultados, ocupação, fases, lotes, constantes e manifesto (129–133).
 // Desvio do handoff: a especificação fica neste arquivo (spec_padrao), porque toml++ não está
 // disponível no ambiente do protótipo; o formato TOML continua sendo a meta (129).
+#include "convergencia.hpp"   // mesmo diretório: o driver também compila contra a biblioteca da referência (CI de E/S)
 #include "layer2/monitor.hpp"
 
 #include <algorithm>
@@ -257,11 +258,11 @@ struct OpDef {
     OpKind kind;
     std::string tipo;                      // tipo do §5.1/§5.2 (natural_join, igualdade_unique...)
     std::string tamanho;                   // junção: menor_menor, menor_maior, maior_maior
-    std::string seletividade;              // seleção: pontual, 0,1%, 50%
+    std::string seletividade;              // seleção: pontual, 1%, 50% (enunciado v2, decisão 174)
     std::vector<PathRef> paths;            // seleção: um caminho por variante
     std::string field;                     // seleção: campo do predicado
     double selectivity = 0;                // faixa
-    std::string range_mode;                // "meio", "topo", "base", "valor"
+    std::string range_mode;                // "meio", "topo" ou "base" (decisão 174)
     // junção
     std::vector<JoinCase> join_inputs;
     std::string field0, field1;
@@ -285,10 +286,16 @@ Spec spec_padrao() {
     Spec s;
     using SK = StructureKind;
     s.variants = {
-        {"curso_heap", "curso", SK::Heap, "", {}},
-        {"disciplina_heap", "disciplina", SK::Heap, "", {}},
+        // P05 (decisão 175): no heap, secundário de campo UNIQUE é hash e de NOT UNIQUE é B+ (§4.2)
+        {"curso_heap", "curso", SK::Heap, "", {{SK::SecHash, "codigo"}}},
+        {"curso_bt_codigo", "curso", SK::BTree, "codigo", {}},
+        {"curso_h_codigo", "curso", SK::Hash, "codigo", {}},
+        {"disciplina_heap", "disciplina", SK::Heap, "", {{SK::SecBTree, "curso"}}},
+        {"disciplina_bt_curso", "disciplina", SK::BTree, "curso", {}},
+        {"disciplina_h_curso", "disciplina", SK::Hash, "curso", {}},
         {"turma_heap", "turma", SK::Heap, "", {{SK::SecBTree, "professor"}}},
-        {"aluno_heap", "aluno", SK::Heap, "", {{SK::SecHash, "cpf"}, {SK::SecBTree, "professor_orientador"}, {SK::SecBTree, "cr"}}},
+        {"aluno_heap", "aluno", SK::Heap, "", {{SK::SecHash, "cpf"}, {SK::SecBTree, "professor_orientador"}, {SK::SecBTree, "cr"},
+                                               {SK::SecHash, "dre"}, {SK::SecBTree, "curso"}}},
         {"aluno_bt_dre", "aluno", SK::BTree, "dre", {}},
         {"aluno_bt_curso", "aluno", SK::BTree, "curso", {{SK::SecBTree, "curso", true}}},
         {"aluno_h_dre", "aluno", SK::Hash, "dre", {}},
@@ -308,26 +315,28 @@ Spec spec_padrao() {
         return o;
     };
     const std::string pts = "SELECT a.* FROM lote l JOIN aluno a ON a.{f} = l.k";
-    // igualdade em UNIQUE: nível próprio ("pontual"); 0,1% e 50% são o caso 3 (170)
+    // igualdade em UNIQUE: nível próprio ("pontual"); 1% e 50% são o caso 3 (170)
     s.ops.push_back(sel("sel_pt_dre", "igualdade_unique", "pontual", OpKind::Points, "dre", pts,
                         {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
                          {"aluno_h_dre", PK::PrimaryHash, "dre", "b"}}));
     s.ops.push_back(sel("sel_pt_cpf", "igualdade_unique", "pontual", OpKind::Points, "cpf", pts,
                         {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryHash, "cpf", "c"}}));
     const std::string rg = "SELECT a.* FROM aluno a WHERE a.{f} >= {lo} AND a.{f} <= {hi}";
-    for (auto [suf, sv, lbl] : {std::tuple{"baixa", 0.001, "0,1%"}, std::tuple{"alta", 0.5, "50%"}}) {
+    // seletividade baixa de 1% (enunciado v2, §5.2 e §6.2; decisão 174); os ids *_baixa ficam, pelo CI
+    for (auto [suf, sv, lbl] : {std::tuple{"baixa", 0.01, "1%"}, std::tuple{"alta", 0.5, "50%"}}) {
+        const bool baixa = sv < 0.1;
         // faixa em UNIQUE: o hash primário sai como caso 4; o índice secundário (c) é o caso 2 (170)
         s.ops.push_back(sel(std::string("sel_rg_dre_") + suf, "faixa_unique", lbl, OpKind::Range, "dre", rg,
                             {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
                              {"aluno_h_dre", PK::PrimaryHash, "dre", "b"}}, sv, "meio"));
         s.ops.push_back(sel(std::string("sel_rg_cr_") + suf, "faixa_not_unique", lbl, OpKind::Range, "cr", rg,
                             {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "cr", "c"}},
-                            sv, sv < 0.01 ? "topo" : "base"));
+                            sv, baixa ? "topo" : "base"));
         s.ops.push_back(sel(std::string("sel_rg_curso_") + suf, "faixa_not_unique", lbl, OpKind::Range, "curso", rg,
                             {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso", "b"},
                              {"aluno_bt_curso", PK::SecondaryBTreeClustering, "curso", "c"},
                              {"aluno_h_curso", PK::SecondaryBTreeClustering, "curso", "c"},
-                             {"aluno_h_curso", PK::PrimaryHash, "curso", "b"}}, sv, sv < 0.01 ? "valor" : "base"));
+                             {"aluno_h_curso", PK::PrimaryHash, "curso", "b"}}, sv, baixa ? "meio" : "base"));
     }
     auto join = [](std::string id, std::string tipo, std::string tamanho, std::string sql, std::string f0, std::string f1,
                    std::vector<JoinCase> inputs, bool swapped = false) {
@@ -344,15 +353,25 @@ Spec spec_padrao() {
                           {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::Scan, ""}, "b"},
                           {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_bt_dre", PK::PrimaryBTree, "dre"}, "c"},
                           {{"aluno_h_dre", PK::PrimaryHash, "dre"}, {"inscricao_h_dre", PK::PrimaryHash, "dre"}, "c"},
-                          {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::SecondaryBTreeNonClustering, "dre"}, "d"}},
+                          {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::SecondaryBTreeNonClustering, "dre"}, "d"},
+                          {{"aluno_heap", PK::SecondaryHash, "dre"}, {"inscricao_heap", PK::SecondaryBTreeNonClustering, "dre"}, "e"}},
                          true));
     s.ops.push_back(join("j_pequenas", "natural_join", "menor_menor",
                          "SELECT x.*, y.* FROM curso x JOIN disciplina y ON x.codigo = y.curso", "codigo", "curso",
-                         {{{"curso_heap", PK::Scan, ""}, {"disciplina_heap", PK::Scan, ""}, "a"}}));
+                         {{{"curso_heap", PK::Scan, ""}, {"disciplina_heap", PK::Scan, ""}, "a"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap", PK::Scan, ""}, "b"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_bt_curso", PK::PrimaryBTree, "curso"}, "c"},
+                          {{"curso_h_codigo", PK::PrimaryHash, "codigo"}, {"disciplina_h_curso", PK::PrimaryHash, "curso"}, "c"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap", PK::SecondaryBTreeNonClustering, "curso"}, "d"},
+                          {{"curso_heap", PK::SecondaryHash, "codigo"}, {"disciplina_heap", PK::SecondaryBTreeNonClustering, "curso"}, "e"}}));
     s.ops.push_back(join("j_grande_pequena", "natural_join", "menor_maior",
                          "SELECT x.*, y.* FROM curso x JOIN aluno y ON x.codigo = y.curso", "codigo", "curso",
                          {{{"curso_heap", PK::Scan, ""}, {"aluno_heap", PK::Scan, ""}, "a"},
-                          {{"curso_heap", PK::Scan, ""}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "b"}}));
+                          {{"curso_heap", PK::Scan, ""}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "b"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "c"},
+                          {{"curso_h_codigo", PK::PrimaryHash, "codigo"}, {"aluno_h_curso", PK::PrimaryHash, "curso"}, "c"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "curso"}, "d"},
+                          {{"curso_heap", PK::SecondaryHash, "codigo"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "curso"}, "e"}}));
     // tipos 2 e 3: só as configurações a e e existem; b, c e d são o caso 1 (170)
     s.ops.push_back(join("j_unique", "equijoin_unique", "maior_maior",
                          "SELECT x.*, y.* FROM aluno x JOIN detalhes y ON x.cpf = y.cpf", "cpf", "cpf",
@@ -417,23 +436,50 @@ AccessPath resolve(Monitor& mon, const Built& b, const PathRef& ref) {
 }
 
 // ======================================================================= constantes e lotes (125, 130)
-struct RangeConst { Value lo, hi; std::uint64_t expected = 0; };
+struct RangeConst { Value lo, hi; std::uint64_t expected = 0; double target = 0, effective = 0; };
 
+// Faixa com seletividade "cerca de" sel (§6.2, decisão 174). A faixa é feita de grupos inteiros de
+// valores iguais (num campo discreto não dá para cortar no meio de um valor), e o nº de grupos é o que
+// deixa a contagem mais perto do alvo. "base" cresce a partir do menor valor, "topo" a partir do maior,
+// e "meio" a partir do valor do meio, para a direita.
 RangeConst resolve_range(const BaseTable& t, const std::string& field, double sel, const std::string& mode) {
     const std::size_t col = t.col(field);
     std::vector<Value> v;
     for (const auto& r : t.rows)
         if (!std::holds_alternative<std::monostate>(r[col])) v.push_back(r[col]);
     std::sort(v.begin(), v.end(), [](const Value& a, const Value& c) { return value_cmp(a, c) < 0; });
-    const std::size_t n = v.size();
-    const std::size_t k = std::max<std::size_t>(1, static_cast<std::size_t>(std::llround(sel * static_cast<double>(n))));
+    std::vector<std::pair<Value, std::uint64_t>> groups;   // valor e nº de linhas, em ordem
+    for (const auto& x : v) {
+        if (groups.empty() || value_cmp(groups.back().first, x) != 0) groups.push_back({x, 0});
+        ++groups.back().second;
+    }
+    const double target = sel * static_cast<double>(t.rows.size());
+    const std::size_t g = groups.size();
+    std::size_t first = 0;
+    int dir = 1;
+    if (mode == "topo") { first = g - 1; dir = -1; }
+    else if (mode == "meio") {   // grupo do valor que fica no meio da faixa desejada
+        const std::size_t pos = v.size() / 2 - std::min(v.size() / 2, static_cast<std::size_t>(target / 2));
+        first = static_cast<std::size_t>(std::lower_bound(groups.begin(), groups.end(), v[pos],
+                    [](const auto& e, const Value& x) { return value_cmp(e.first, x) < 0; }) - groups.begin());
+    }
+    std::size_t best_len = 1, len = 0;
+    std::uint64_t sum = 0, best_sum = 0;
+    double best_err = -1;
+    for (std::size_t i = first; i < g; i = dir > 0 ? i + 1 : i - 1) {
+        sum += groups[i].second;
+        ++len;
+        const double err = std::abs(static_cast<double>(sum) - target);
+        if (best_err < 0 || err < best_err) { best_err = err; best_len = len; best_sum = sum; }
+        if (static_cast<double>(sum) >= target || (dir < 0 && i == 0)) break;
+    }
+    const std::size_t last = dir > 0 ? first + best_len - 1 : first - (best_len - 1);
     RangeConst rc;
-    if (mode == "meio") { rc.lo = v[n / 2 - k / 2]; rc.hi = v[std::min(n - 1, n / 2 - k / 2 + k - 1)]; }
-    else if (mode == "topo") { rc.lo = v[n - k]; rc.hi = v[n - 1]; }
-    else if (mode == "base") { rc.lo = v[0]; rc.hi = v[k - 1]; }
-    else { rc.lo = v[n / 2]; rc.hi = v[n / 2]; }   // "valor": um único valor (≈ 1/d)
-    for (const auto& x : v)
-        if (value_cmp(x, rc.lo) >= 0 && value_cmp(x, rc.hi) <= 0) ++rc.expected;
+    rc.lo = groups[std::min(first, last)].first;
+    rc.hi = groups[std::max(first, last)].first;
+    rc.expected = best_sum;
+    rc.target = sel;
+    rc.effective = static_cast<double>(best_sum) / static_cast<double>(t.rows.size());
     return rc;
 }
 
@@ -503,24 +549,107 @@ std::vector<std::string> result_row(const std::string& pol, const std::string& o
     return c;
 }
 
-// repete até a variação ficar abaixo da tolerância (mín. min_reps, máx. max_reps) (132, emendada):
-// as contagens de blocos são determinísticas fora dos lotes, então a regra vale também para o tempo
-void repeat(const Spec& spec, const std::function<Measured(int rep)>& once,
-            const std::function<void(int, const Measured&)>& record) {
-    std::vector<double> io, ms;
-    auto spread = [&](const std::vector<double>& v) {
-        const auto [mn, mx] = std::minmax_element(v.end() - spec.min_reps, v.end());
-        const double mean = std::accumulate(v.end() - spec.min_reps, v.end(), 0.0) / spec.min_reps;
-        return mean == 0 ? 0.0 : (*mx - *mn) / mean;
-    };
-    for (int rep = 1; rep <= spec.max_reps; ++rep) {
+// Resumo da convergência de uma combinação (P07): Convergence e o critério de parada estão em
+// layer1/convergencia.hpp, testados com séries determinísticas (BENCH-007). Parar no teto não é
+// convergir. As contagens de blocos são determinísticas fora dos lotes, então a regra vale também
+// para o tempo (132, emendada).
+Convergence repeat(const Spec& spec, const std::function<Measured(int rep)>& once,
+                   const std::function<void(int, const Measured&)>& record) {
+    return repeat_until_stable(spec.min_reps, spec.max_reps, spec.tolerance, [&](int rep) {
         const Measured m = once(rep);
         record(rep, m);
-        if (!m.ok) return;
-        io.push_back(static_cast<double>(m.r.delta.global.reads() + m.r.delta.global.writes()));
-        ms.push_back(static_cast<double>(m.r.wall_time.count()));
-        if (rep >= spec.min_reps && spread(io) < spec.tolerance && spread(ms) < spec.tolerance) return;
+        return Sample{m.ok, static_cast<double>(m.r.delta.global.reads() + m.r.delta.global.writes()),
+                      static_cast<double>(m.r.wall_time.count())};
+    });
+}
+
+std::vector<std::string> convergence_row(const std::string& pol, const std::string& op, const std::string& variant,
+                                         const std::string& alg, const Convergence& c) {
+    auto flag = [&](bool ok) { return c.executed ? (ok ? "sim" : "nao") : ""; };
+    return {pol, op, variant, alg, std::to_string(c.reps), c.executed ? fmt(c.io_spread, 4) : "",
+            c.executed ? fmt(c.time_spread, 4) : "", flag(c.io_ok), flag(c.time_ok), c.stop()};
+}
+
+// Acesso que cada algoritmo realmente executa sobre cada entrada (P09). BNL, sort-merge e
+// partition-hash leem a organização primária; um índice secundário não clustering nunca é lido.
+std::string executed_access(const AccessPath& p, JoinAlgorithm alg, bool sorts, bool prepartitioned, bool partitions) {
+    std::string base;
+    switch (p.kind) {
+        case PathKind::PrimaryBTree: base = "folhas da B+"; break;
+        case PathKind::PrimaryHash: base = "buckets do hash"; break;
+        case PathKind::Scan: base = "varredura do heap"; break;
+        case PathKind::SecondaryBTreeClustering:
+            base = "varredura da organização primária (índice clustering não usado)"; break;
+        default: base = "varredura do heap (índice secundário não usado)"; break;   // §4.2: só sobre heap
     }
+    switch (alg) {
+        case JoinAlgorithm::Bnl: return base;
+        case JoinAlgorithm::SortMerge: return base + (sorts ? " + ordenação em runs" : " lidas em ordem (sem ordenar)");
+        case JoinAlgorithm::Hash:
+            if (prepartitioned) return base + " usados como partições (sem particionar)";
+            return base + (partitions ? " + particionamento" : ", sem particionar (cabe em memória)");
+    }
+    return base;
+}
+
+// Parâmetros que entram na estimativa de cada combinação (BENCH-008): os mesmos que estimate_join e
+// estimate_select recebem, para a tabela de custo estimado × medido mostrar de onde vem cada número.
+// A comparação de E/S do CI compila este driver também contra a biblioteca da referência (num PR, a
+// base, que pode ser bem mais antiga): os campos que ela pode não ter entram só se existirem. Por isso
+// as duas funções são templates, e o `requires` dentro delas depende do tipo.
+template <class Plan>
+std::string join_params(const Plan& p) {
+    std::ostringstream os;
+    os << "m=" << p.m << "; b_ext=" << p.b_outer << "; b_int=" << p.b_inner << "; d_ext=" << p.d_outer
+       << "; d_int=" << p.d_inner;
+    switch (p.alg) {
+        case JoinAlgorithm::Bnl:
+            os << "; chunk=" << p.chunk;
+            if constexpr (requires { p.dir_frames; }) os << "; dir_frames=" << p.dir_frames;   // P03
+            break;
+        case JoinAlgorithm::SortMerge:
+            os << "; ordena_ext=" << (p.sort_outer ? "sim" : "nao") << "; ordena_int=" << (p.sort_inner ? "sim" : "nao")
+               << "; run_pages=" << p.run_pages << "; runs_ext=" << p.runs_outer << "; runs_int=" << p.runs_inner
+               << "; fan_in=" << p.fan_in << "; passes_ext=" << p.merge_passes_outer << "; passes_int="
+               << p.merge_passes_inner << "; group_pages=" << p.group_pages;
+            if constexpr (requires { p.desc_frames; }) os << "; desc_frames=" << p.desc_frames;   // CBD-005
+            break;
+        case JoinAlgorithm::Hash:
+            os << "; particoes=" << p.partitions << "; niveis=" << p.levels << "; build_pages=" << p.build_pages
+               << "; pre_ext=" << (p.prepartitioned_outer ? "sim" : "nao") << "; pre_int="
+               << (p.prepartitioned_inner ? "sim" : "nao");
+            break;
+    }
+    return os.str();
+}
+
+template <class Stats>
+std::string select_params(const Stats& t, const AccessPath& path, double batch, double expected_rows) {
+    std::ostringstream os;
+    os << "n=" << t.n << "; b=" << t.b << "; bfr=" << t.bfr;
+    if constexpr (requires { t.bfr_medio; }) os << "; bfr_medio=" << t.bfr_medio;   // P08
+    os << "; lote=" << batch << "; linhas_esperadas=" << expected_rows;
+    for (const auto& s : t.structures) {
+        if (s.id != path.id) continue;
+        if (s.height) os << "; h=" << *s.height;
+        if (s.distinct) os << "; distintos=" << *s.distinct;
+        if (s.chain_avg) os << "; cadeia_media=" << fmt(*s.chain_avg, 2);
+    }
+    if (path.kind == PathKind::SecondaryBTreeClustering && !t.structures.empty() && t.structures.front().chain_avg)
+        os << "; cadeia_media_primaria=" << fmt(*t.structures.front().chain_avg, 2);
+    return os.str();
+}
+
+std::string executed_access(const AccessPath& p) {   // seleção: o caminho pedido é o executado
+    switch (p.kind) {
+        case PathKind::Scan: return "varredura do heap com filtro";
+        case PathKind::PrimaryBTree: return "descida na B+ primária e leitura das folhas";
+        case PathKind::PrimaryHash: return "bucket do hash primário e overflow";
+        case PathKind::SecondaryHash: return "probe no hash secundário + fetch por RID";
+        case PathKind::SecondaryBTreeNonClustering: return "probe na B+ secundária + fetch por RID";
+        case PathKind::SecondaryBTreeClustering: return "B+ clustering + leitura dos blocos da organização";
+    }
+    return "?";
 }
 
 void write_occupancy(Monitor& mon, const Built& b, Csv& out, const std::string& pol, const std::string& when) {
@@ -568,11 +697,11 @@ void declare_not_applicable(Csv& out, const std::string& pol, const Spec& spec) 
         for (const char* tam : {"menor_menor", "menor_maior", "maior_maior"})
             for (const char* cfg : {"b", "c", "d"})
                 for (const char* alg : algs) row(op, Cell{tipo, tam, cfg, ""}, alg, caso1);
-    for (auto [op, lbl] : {std::pair{"sel_rg_dre_baixa", "0,1%"}, std::pair{"sel_rg_dre_alta", "50%"}})
+    for (auto [op, lbl] : {std::pair{"sel_rg_dre_baixa", "1%"}, std::pair{"sel_rg_dre_alta", "50%"}})
         row(op, Cell{"faixa_unique", "", "c", lbl}, "",
             "caso 2: o §4.2 só admite hash como secundário de campo UNIQUE (heap) e só clustering NOT UNIQUE "
             "nas outras organizações; hash não responde a faixa (170)");
-    for (const char* lbl : {"0,1%", "50%"})
+    for (const char* lbl : {"1%", "50%"})
         for (const char* cfg : {"a", "b", "c"})
             row("sel_igualdade_unique", Cell{"igualdade_unique", "", cfg, lbl}, "",
                 "caso 3: igualdade em UNIQUE devolve 1 registro (s = 1/N); medida no nível pontual (170)");
@@ -634,7 +763,7 @@ int main(int argc, char** argv) {
     Csv opcsv(out_dir / "operacoes.csv");
     opcsv.row({"operacao", "tipo", "sql", "lote", "tipo_lote"});
     Csv consts(out_dir / "constantes.csv");
-    consts.row({"operacao", "lo", "hi", "linhas_esperadas"});
+    consts.row({"operacao", "lo", "hi", "linhas_esperadas", "seletividade_alvo", "seletividade_efetiva"});
     fs::create_directories(out_dir / "lotes");
     std::map<std::string, RangeConst> ranges;
     std::map<std::pair<std::string, int>, std::vector<Value>> batches;
@@ -648,7 +777,8 @@ int main(int argc, char** argv) {
             sql = replace_all(sql, "{lo}", sql_literal(rc.lo));
             sql = replace_all(sql, "{hi}", sql_literal(rc.hi));
             opcsv.row({op.id, "faixa", sql, "", ""});
-            consts.row({op.id, value_text(rc.lo), value_text(rc.hi), std::to_string(rc.expected)});
+            consts.row({op.id, value_text(rc.lo), value_text(rc.hi), std::to_string(rc.expected), fmt(rc.target, 4),
+                        fmt(rc.effective, 4)});
         } else {
             const BaseTable& a = db.at("aluno");
             const std::size_t col = a.col(op.field);
@@ -677,6 +807,13 @@ int main(int argc, char** argv) {
                "distintos", "buckets", "overflow", "fator_carga", "cadeia_media", "cadeia_max"});
     Csv phases(out_dir / "fases.csv");
     phases.row({"politica", "operacao", "variante", "algoritmo", "rep", "fase", "leituras", "gravacoes", "requisicoes"});
+    Csv conv(out_dir / "convergencia.csv");   // P07
+    conv.row({"politica", "operacao", "variante", "algoritmo", "n_repeticoes", "dispersao_io", "dispersao_tempo",
+              "convergiu_io", "convergiu_tempo", "parada"});
+    Csv access(out_dir / "caminhos.csv");     // P09
+    access.row({"politica", "operacao", "config", "variante", "algoritmo", "acesso_externa", "acesso_interna"});
+    Csv params(out_dir / "parametros.csv");   // BENCH-008
+    params.row({"politica", "operacao", "variante", "algoritmo", "parametros"});
 
     for (Policy pol : spec.policies) {
         const std::string pname = to_string(pol);
@@ -721,7 +858,13 @@ int main(int argc, char** argv) {
                     const Cell cell{op.tipo, op.tamanho, ref.config, op.seletividade};
                     SelectParams sp;
                     sp.m = spec.m_select;
-                    repeat(spec,
+                    access.row({pname, op.id, ref.config, variant, "", executed_access(path), ""});
+                    {   // parâmetros da estimativa (sem E/S: o catálogo já tem as estatísticas, 160)
+                        const double lote = op.kind == OpKind::Points ? static_cast<double>(batches.at({op.id, 1}).size()) : 1.0;
+                        const double esperadas = op.kind == OpKind::Points ? lote : static_cast<double>(ranges.at(op.id).expected);
+                        params.row({pname, op.id, variant, "", select_params(mon.stats(t), path, lote, esperadas)});
+                    }
+                    const Convergence cv = repeat(spec,
                            [&](int rep) {
                                prepare();
                                if (op.kind == OpKind::Points) {
@@ -744,6 +887,7 @@ int main(int argc, char** argv) {
                                                    std::to_string(ph.delta.global.writes()),
                                                    std::to_string(ph.delta.global.requests)});
                            });
+                    conv.row(convergence_row(pname, op.id, variant, "", cv));
                 }
                 continue;
             }
@@ -776,7 +920,17 @@ int main(int argc, char** argv) {
                         const JoinInput& outer = fo ? in0 : in1;
                         const JoinInput& inner = fo ? in1 : in0;
                         const std::string vname = variant + (fo == first_outer ? "" : " (papeis trocados)");
-                        repeat(spec,
+                        {   // acesso executado, lido do plano (sem E/S, decisão 160)
+                            const auto planned = mon.plan_join(alg, outer, inner, spec.m_join, JoinParams{});
+                            std::string ae = "não executada", ai = "não executada";
+                            if (const auto* p = std::get_if<JoinPlan>(&planned)) {
+                                ae = executed_access(outer.path, alg, p->sort_outer, p->prepartitioned_outer, p->partitions > 1);
+                                ai = executed_access(inner.path, alg, p->sort_inner, p->prepartitioned_inner, p->partitions > 1);
+                                params.row({pname, op.id, vname, to_string(alg), join_params(*p)});
+                            }
+                            access.row({pname, op.id, jc.config, vname, to_string(alg), ae, ai});
+                        }
+                        const Convergence cv = repeat(spec,
                                [&](int rep) {
                                    prepare();
                                    const ResultShape sh = shape_for(op.id, vname, to_string(alg), rep);
@@ -793,10 +947,13 @@ int main(int argc, char** argv) {
                                                        std::to_string(ph.delta.global.writes()),
                                                        std::to_string(ph.delta.global.requests)});
                                });
+                        conv.row(convergence_row(pname, op.id, vname, to_string(alg), cv));
                     }
                 }
             }
             results.flush();
+            conv.flush();
+            access.flush();
         }
 
         // carga de manutenção (131): 5% de inserções e 1% de remoções nas variantes de aluno
