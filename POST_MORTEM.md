@@ -920,3 +920,35 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
    8.192 B de orçamento, e todos os casos estouraram. Um erro do próprio
    teste: a primeira versão do autoteste do contador usava um vetor sem uso,
    cuja alocação o clang suprimiu; passou a chamar `::operator new` direto.
+4. #6 (CBD-004), memória auxiliar do BNL, com M mínimo e registros densos
+   e variáveis, no `testes_memoria`. O `bnl_join` roda direto no
+   `StorageManager`, com o contador armado só nele, e o plano vem do
+   `Monitor` com os mesmos dados. Resultados: o diretório do chunk cabe nas
+   suas molduras em todos os casos (por exemplo, m = 32 com registros de
+   8 B: 86.016 B em 21 molduras); o resto do heap é controle O(m), até
+   4,3 KB com m = 32 (vetor das páginas do chunk, índice da política de
+   substituição do subpool, uma entrada por moldura ocupada, e strings de
+   chaves VarChar), e não cresce com os dados (4.180 B e 4.268 B com 12.000
+   e 24.000 registros). Abaixo do M mínimo, o plano é inviável, como
+   esperado. O teste revelou um defeito fora do que o plano previa para este
+   commit: o plano estima os registros por página pela média (n / b), e com
+   chaves VarChar de 1 a 24 caracteres, em m = 32, uma página acima da média
+   enchia o diretório e o BNL parava com `DoesNotFit`, embora o plano
+   dissesse que cabia. Correção local no `bnl_join`: quando o diretório
+   enche, a rodada fecha ali, e o resto da página e as páginas seguintes,
+   ainda fixadas, abrem a próxima. Sem estouro, as rodadas são as mesmas de
+   antes (mesma E/S); com estouro, há uma passada a mais na interna, em vez
+   de erro. Um erro do próprio teste: a primeira versão comparava 6.000 e
+   12.000 registros, e o caso menor não enchia as 32 molduras, o que fazia o
+   índice da política parecer crescer com os dados.
+   Segundo defeito, achado ao montar a sequência manual da #9: desde o P03, o
+   plano cobrava as m − 1 − chunk molduras restantes pelo diretório, mas
+   nenhuma era tirada do subpool, que continuava usando-as como cache. Na
+   prática, o operador tinha as m molduras para páginas mais o diretório. Agora
+   o diretório ocupa ⌈registros do chunk × 24 B / bloco⌉ molduras, retidas
+   durante a junção (`StorageManager::hold_frames`), e as demais ficam de cache
+   para a interna, como pretendia o chunk de m/2. RED/GREEN em
+   `BnlRetemAsMoldurasDoDiretorio` (M = 8, chunk 2, interna de 6 páginas, MRU):
+   10 leituras sem retenção, 11 com ela, que é a conta à mão (4 + 6 + 1). Com
+   LRU o caso não distingue: as páginas do novo chunk expulsam a interna, que
+   inunda o cache nos dois casos.

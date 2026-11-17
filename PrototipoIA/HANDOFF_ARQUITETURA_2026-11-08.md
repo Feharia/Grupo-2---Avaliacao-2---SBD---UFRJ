@@ -272,7 +272,7 @@ Origem: `PROBLEMAS_IDENTIFICADOS_CBD_2026-11-10.md` (P01 a P15), conferido contr
   - **Motivo:** decisão do grupo sobre o P02 da auditoria. M passa a ser toda a memória de páginas do operador, e as comparações não dependem de um cache de índices fora do orçamento.
 - **173. Estruturas auxiliares dentro de M** [P01, P03] — Altera 140 e a §7. As estruturas auxiliares do operador passam a ser cobradas das molduras da reserva: frames_used = páginas fixadas + ⌈bytes auxiliares / bloco⌉ ≤ m.
   - **ScratchSpace:** o diretório (slot, chain e head, 12 B por registro, mais a folga do vetor de slots) é cobrado das próprias páginas. A ordenação é no lugar, e a tabela hash tem n cabeças. `capacity_for` aplica a mesma regra, e o plano a usa para contar runs e decidir se o build cabe.
-  - **BNL:** o diretório do chunk guarda só RecordView, nas m − 1 − chunk molduras restantes. O plano reduz o chunk quando ele não cabe; na execução, o excesso vira `inviavel` em vez de passar de M. Com M = 32, as tabelas da base mantêm chunk de 16 páginas.
+  - **BNL:** o diretório do chunk guarda só RecordView e ocupa dir_frames = ⌈registros do chunk × 24 B / bloco⌉ molduras, retidas durante a junção (`hold_frames`), para o subpool não usá-las como cache (CBD-004). As demais das m − 1 − chunk ficam de cache para a interna, onde a política de substituição faz diferença. O plano reduz o chunk quando o diretório não cabe nas m − 1 − chunk molduras, estimando os registros por página pela média. Na execução, se uma página acima da média encher o diretório, a rodada fecha ali, e o resto da página e as páginas seguintes, ainda fixadas, abrem a próxima rodada (CBD-004): uma passada a mais na interna, nunca além de M. Com M = 32, as tabelas da base mantêm chunk de 16 páginas.
   - **Overhead declarado, fora de M:** descritores de tamanho O(m), como a lista de runs, as fontes do merge e o vetor de partições, e o lote de chaves da seleção pontual, que é entrada da consulta.
   - **Motivo:** o §7.1 do enunciado chama atenção para estruturas auxiliares não contabilizadas. No E03 da auditoria, a ordenação de 2 páginas alocava 54.560 B fora das 8.192 B da reserva.
 - **174. Seletividade baixa de 1%, com faixas feitas de grupos de valores** [P04] — Altera 130 e os níveis da 170.
@@ -322,8 +322,8 @@ Toda operação medida usa uma reserva de m molduras. O plano calcula cada parce
 
 **BNL**
 - chunk = b da externa quando ela é menor (b ≤ m − 2), e o BNL faz uma passada só. Senão, chunk = ⌊m/2⌋: o que sobra fica para a interna, e é aí que a política de substituição faz diferença (§3.1.1 das conclusões).
-- Diretório do chunk (173): um RecordView por registro, nas dir_frames = m − 1 − chunk molduras restantes. Se chunk × registros por página não couber, o chunk diminui; na execução, o excesso vira inviável.
-- Uso simultâneo: chunk páginas da externa + 1 da interna + dir_frames = m.
+- Diretório do chunk (173): um RecordView por registro, em dir_frames = ⌈registros do chunk × 24 B / bloco⌉ molduras, retidas na execução (CBD-004). Se chunk × registros por página (média) não couber, o chunk diminui; na execução, uma página acima da média que encha o diretório fecha a rodada, e o resto dela passa à seguinte (CBD-004).
+- Uso simultâneo: chunk páginas da externa + 1 da interna + dir_frames ≤ m. As molduras que sobram são cache da interna.
 
 **Sort-merge**
 - Geração de runs: run_pages = m − 2 páginas de ScratchSpace, mais 1 página de entrada e 1 página de saída = m. Número de runs de cada entrada: ⌈n / capacity_for(run_pages)⌉, com o diretório cobrado das páginas (173).

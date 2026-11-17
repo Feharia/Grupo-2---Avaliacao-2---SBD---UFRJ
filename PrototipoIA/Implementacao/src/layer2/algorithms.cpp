@@ -138,14 +138,24 @@ void bnl_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inner
     ph.begin("bnl");
     BlockScan oscan = sm.scan_blocks(outer.path.table, kSeqOnce, res);
     // Diretório do chunk (decisão 173): um RecordView por registro, com capacidade fixa nas
-    // m − 1 − chunk molduras que o plano reservou para ele. A chave é lida da página a cada
-    // comparação, para não guardar cópias; ordenar no lugar não aloca.
+    // dir_frames molduras que o plano reservou para ele. Essas molduras ficam retidas durante a
+    // junção, para o subpool não usá-las como cache (CBD-004); as que sobram das m − 1 − chunk
+    // continuam de cache para a interna. A chave é lida da página a cada comparação, para não
+    // guardar cópias; ordenar no lugar não aloca.
+    const std::vector<PageGuard> retidas = sm.hold_frames(res, plan.dir_frames);
     const FieldId of = outer.field;
     auto key_less = [of](const RecordView& a, const RecordView& b) { return compare_keys(a.key(of), b.key(of)) < 0; };
     std::vector<RecordView> dir;
     dir.reserve(plan.dir_entries);
+    // CBD-004: o plano estima os registros por página pela média (n / b). Com registros variáveis,
+    // uma página acima da média pode encher o diretório; então a rodada fecha ali, e o resto da
+    // página e as páginas seguintes, ainda fixadas, abrem a próxima. Sem estouro, as rodadas são
+    // as mesmas de antes (mesma E/S); com estouro, há uma passada a mais na interna, e não erro.
+    if (plan.dir_entries == 0) throw DoesNotFit("diretório do BNL sem molduras");
+    std::vector<BlockCursor> carry;
     for (;;) {
-        std::vector<BlockCursor> chunk;   // plan.chunk páginas da externa fixadas
+        std::vector<BlockCursor> chunk = std::move(carry);   // até plan.chunk páginas da externa fixadas
+        carry.clear();
         while (chunk.size() < plan.chunk) {
             auto c = oscan.next();
             if (!c) break;
@@ -153,12 +163,18 @@ void bnl_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inner
         }
         if (chunk.empty()) break;
         dir.clear();
-        for (auto& c : chunk)
-            while (auto r = c.next()) {
-                if (r->is_null(of)) continue;
-                if (dir.size() == plan.dir_entries) throw DoesNotFit("diretório do BNL excede as molduras reservadas");
-                dir.push_back(*r);
+        std::size_t i = 0;
+        for (; i < chunk.size() && dir.size() < plan.dir_entries; ++i)
+            while (dir.size() < plan.dir_entries) {
+                auto r = chunk[i].next();
+                if (!r) break;
+                if (!r->is_null(of)) dir.push_back(*r);
             }
+        if (dir.size() == plan.dir_entries) {   // diretório cheio: a página corrente pode ter mais registros
+            const std::size_t from = i > 0 ? i - 1 : 0;
+            for (std::size_t j = from; j < chunk.size(); ++j) carry.push_back(std::move(chunk[j]));
+            chunk.erase(chunk.begin() + static_cast<std::ptrdiff_t>(from), chunk.end());
+        }
         std::sort(dir.begin(), dir.end(), key_less);
         BlockScan iscan = sm.scan_blocks(inner.path.table, kSeqReuse, res);
         while (auto ic = iscan.next()) {

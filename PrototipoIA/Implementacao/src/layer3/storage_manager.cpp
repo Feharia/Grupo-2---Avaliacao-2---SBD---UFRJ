@@ -312,6 +312,13 @@ ScratchSpace StorageManager::create_scratch(const Schema& s, const Reservation& 
     return ScratchSpace(std::move(pg), std::make_shared<const Schema>(s), pool_.block_size());
 }
 
+std::vector<PageGuard> StorageManager::hold_frames(const Reservation& r, std::size_t n) {
+    std::vector<PageGuard> held;
+    held.reserve(n);
+    for (std::size_t i = 0; i < n; ++i) held.push_back(pool_.scratch(r.id()));
+    return held;
+}
+
 ScratchSpace StorageManager::create_rid_scratch(const Reservation& r, std::size_t pages) {
     static const Schema rid_schema = make_schema({FieldSpec{"rid", FieldType::Int64}});
     return create_scratch(rid_schema, r, pages);

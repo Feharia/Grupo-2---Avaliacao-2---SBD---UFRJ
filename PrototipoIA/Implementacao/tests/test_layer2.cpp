@@ -1,6 +1,7 @@
 // Testes da camada 2: junções, seleções, inaplicáveis, políticas, orçamento e partições (§10, 151, 152, 164).
 #include "helpers.hpp"
 #include "layer2/monitor.hpp"
+#include "layer3/page.hpp"
 #include "mini_test.hpp"
 
 #include <map>
@@ -139,6 +140,38 @@ TEST(Monitor, DiretorioDoBnlCabeEmM) {
     m.invalidate_all();
     const OpResult r = ok(m.join(JoinAlgorithm::Bnl, in0, in1, 32, ResultShape{}));
     EXPECT_EQ(r.rows, 40000u * 80u);          // 500 grupos de 80 registros: 80 × 80 pares por grupo
+}
+
+// CBD-004: as molduras do diretório do BNL são retidas durante a junção, e o subpool não as usa
+// como cache. M = 8, chunk = 2 (externa de 4 páginas: 2 rodadas), diretório em 1 moldura: sobram 5
+// molduras para as 6 páginas da interna. Com MRU, a 1ª rodada lê as 6 (B6 expulsa B5); na 2ª, A3 e
+// A4 expulsam A2 e A1, e só B5 é relida: 4 + 6 + 1 = 11. Antes, com o diretório só cobrado no plano,
+// as 6 páginas cabiam nas 8 − 2 molduras, e a 2ª rodada não lia nada (10).
+TEST(Monitor, BnlRetemAsMoldurasDoDiretorio) {
+    Monitor m(test_config("mon_bnl_retem", Policy::Mru));
+    const Schema s = make_schema({{"k", FieldType::Int32}, {"pad", FieldType::Char, 100}});
+    const std::size_t por_pagina = sp_capacity(4096, s.record_size);
+    auto add = [&](const std::string& name, std::size_t pages) {
+        std::vector<std::vector<Value>> rows;
+        for (std::size_t i = 0; i < pages * por_pagina; ++i) rows.push_back({std::int64_t(i % 50), std::string("p")});
+        const TableId t = m.create_table(name, s, PrimarySpec{});
+        RowsStream rs(m, t, rows);
+        m.bulk_load(t, rs);
+        return t;
+    };
+    const TableId ext = add("externa", 4), inn = add("interna", 6);
+    ASSERT_EQ(m.stats(ext).b, 4u);
+    ASSERT_EQ(m.stats(inn).b, 6u);
+    const JoinInput o{path(m, ext, PathKind::Scan), 0, 0}, i{path(m, inn, PathKind::Scan), 0, 1};
+    JoinParams jp;
+    jp.chunk = 2;
+    const JoinPlan p = std::get<JoinPlan>(m.plan_join(JoinAlgorithm::Bnl, o, i, 8, jp));
+    ASSERT_EQ(p.chunk, 2u);
+    ASSERT_EQ(p.dir_frames, 1u);
+    m.flush_all();
+    m.invalidate_all();
+    const OpResult r = ok(m.join(JoinAlgorithm::Bnl, o, i, 8, ResultShape{}, jp));
+    EXPECT_EQ(r.delta.global.reads(), 4u + 6u + 1u);
 }
 
 // P12 da auditoria de 10/11: com M pequeno, o sort-merge grava runs e o hash grava partições, e

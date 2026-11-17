@@ -43,6 +43,9 @@ public:
     TempFile      create_temp(const Schema&, const Reservation&);
     ScratchSpace  create_scratch(const Schema&, const Reservation&, std::size_t pages);
     ScratchSpace  create_rid_scratch(const Reservation&, std::size_t pages);
+    // Retém n molduras anônimas da reserva enquanto o vetor viver: uma estrutura auxiliar cobrada em
+    // molduras (173) tira essas molduras do subpool, que não pode usá-las como cache (CBD-004).
+    std::vector<PageGuard> hold_frames(const Reservation&, std::size_t n);
 
     // estatística e ocupação
     TableStats    stats(TableId) const;                 // só lê o catálogo, sem E/S (160)
