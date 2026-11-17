@@ -850,3 +850,37 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   tem manifesto com "b3826e6 + P02" e precisa ser regenerado com o SHA final.
 - Os resultados desta entrada são locais; a validação hospedada de cada
   commit ainda não ocorreu.
+
+## 2026-11-16 — Correções das issues abertas, um commit por issue, com o Claude
+
+### Origem e escopo
+
+- Ponto de partida: o branch `fix/auditoria-p01-p15` em `b60c03d`, já
+  enviado. Nele, #2, #8, #10, #11, #12 e #13 têm os critérios de aceite
+  atendidos. A #4, que a entrada anterior dava como atendida, fica aberta:
+  a decisão 173 dizia que tudo o que ficava fora de M era O(m) e ocupava
+  menos de 1 moldura, o que não vale para a lista de runs.
+- Plano aprovado pelo usuário: um commit por issue, na ordem #1, #3, #5,
+  #6, #7, #4, #9, #16, #17, #14, #15 e #18. Cada mensagem termina com
+  `Closes #N`; a issue só fecha quando o PR entrar na `main`.
+- Decisões do usuário: a lista de runs do sort-merge passa a ser cobrada
+  dentro de M; o `sorted_slots` (cópia ordenada da folha corrente nas
+  leituras da B+) fica fora de M, declarado como overhead limitado a uma
+  folha.
+- Ferramenta: Claude (Claude Code, modelo Opus 5.5). Sem push: os envios
+  ficam com o usuário, um commit por vez.
+
+### Commits e evidências
+
+1. #1 (CBD-007), sort-merge com `group_pages = 0`. O plano usa grupo zero
+   quando o campo da interna é declarado UNIQUE, mas, sem estrutura que o
+   indexe, o UNIQUE não é verificado na inserção (157). No ramo sem grupo, o
+   executor emitia os pares com o primeiro registro da interna e descartava
+   as repetições. Agora ele confere a chave seguinte da interna e lança
+   `std::logic_error` (não `DoesNotFit`, para não virar célula inviável).
+   Custo: uma comparação em memória por registro da interna, sem E/S. O
+   planejador continua confiando no UNIQUE declarado; exigir unicidade
+   garantida por estrutura mudaria o plano das variantes heap. RED:
+   `SortMergeRejeitaUniqueViolado` contra `b60c03d` devolveu 10 pares onde
+   o certo seria 100 (ou erro); GREEN depois. NOT UNIQUE 10 × 10 dá 100 pares
+   e o UNIQUE válido continua com grupo zero.

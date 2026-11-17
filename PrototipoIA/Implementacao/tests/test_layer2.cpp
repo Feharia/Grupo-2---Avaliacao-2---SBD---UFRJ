@@ -313,6 +313,43 @@ TEST(Monitor, GrupoDeDuplicatasQueNaoCabeViraInaplicavel) {   // (151)
     EXPECT_TRUE(std::get<NotApplicable>(o).reason.find("não cabe") != std::string::npos);
 }
 
+// CBD-007 (issue #1): com a interna UNIQUE, o sort-merge usa group_pages = 0 e não guarda o grupo.
+// O UNIQUE só é garantido quando uma estrutura indexa o campo (157); num heap ele é só declarado.
+// Na base, 10 × 10 registros de mesma chave devolviam 10 pares em vez de 100, sem aviso.
+TEST(Monitor, SortMergeRejeitaUniqueViolado) {
+    Monitor m(test_config("mon_sm_unique"));
+    const Schema su = make_schema({{"k", FieldType::Int32, 0, true}, {"v", FieldType::Int32}});
+    const Schema sn = make_schema({{"k", FieldType::Int32}, {"v", FieldType::Int32}});
+    std::vector<std::vector<Value>> dez, distintos;
+    for (std::int64_t i = 0; i < 10; ++i) {
+        dez.push_back({std::int64_t{7}, i});
+        distintos.push_back({i, i});
+    }
+    auto add = [&](const std::string& name, const Schema& s, const std::vector<std::vector<Value>>& rows) {
+        const TableId t = m.create_table(name, s, PrimarySpec{});
+        RowsStream rs(m, t, rows);
+        m.bulk_load(t, rs);
+        return t;
+    };
+    const TableId ext = add("externa", sn, dez);
+    const TableId uni = add("interna_unique", su, dez);   // o heap aceita a repetição (157)
+    const TableId nun = add("interna_not_unique", sn, dez);
+    const TableId uok = add("interna_unique_ok", su, distintos);
+    auto input = [&](TableId t, std::uint8_t operand) { return JoinInput{path(m, t, PathKind::Scan), 0, operand}; };
+    auto sort_merge = [&](TableId inner) {
+        m.flush_all();
+        m.invalidate_all();
+        return m.join(JoinAlgorithm::SortMerge, input(ext, 0), input(inner, 1), 8, ResultShape{});
+    };
+    ASSERT_EQ(std::get<JoinPlan>(m.plan_join(JoinAlgorithm::SortMerge, input(ext, 0), input(uni, 1), 8, JoinParams{}))
+                  .group_pages, 0u);
+    EXPECT_THROW(sort_merge(uni), std::logic_error);   // nunca "sucesso" com 10 pares
+    EXPECT_EQ(ok(sort_merge(nun)).rows, 100u);          // NOT UNIQUE: o grupo de duplicatas dá os 100
+    const OpResult u = ok(sort_merge(uok));             // UNIQUE válido continua com group_pages = 0
+    EXPECT_EQ(u.rows, 10u);
+    EXPECT_EQ(u.checksum, ok(m.join(JoinAlgorithm::Bnl, input(ext, 0), input(uok, 1), 8, ResultShape{})).checksum);
+}
+
 TEST(Monitor, HashPreParticionadoIncompativelUsaSoOMaior) {   // (164)
     Monitor m(test_config("mon_prepart"));
     Db db = build(m);

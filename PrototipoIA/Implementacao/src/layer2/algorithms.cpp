@@ -212,6 +212,11 @@ void sort_merge_join(StorageManager& sm, const JoinInput& outer, const JoinInput
                 O->advance();
             }
             I->advance();
+            // CBD-007: o UNIQUE declarado só é garantido quando uma estrutura indexa o campo (157).
+            // Uma chave repetida aqui perderia pares sem aviso; o erro não vira "inviável".
+            if (I->cur() && compare_keys(I->cur()->key(inner.field), ki) == 0)
+                throw std::logic_error("sort-merge: interna declarada UNIQUE tem chaves repetidas; "
+                                       "group_pages = 0 é inválido (157)");
             continue;
         }
         group->clear();
