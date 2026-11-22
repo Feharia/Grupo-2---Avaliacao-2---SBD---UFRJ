@@ -114,7 +114,7 @@ std::size_t JoinPlan::frames_used() const {
         case JoinAlgorithm::Bnl:   // chunk + 1 da interna + as molduras retidas do diretório (173, CBD-004)
             return chunk + 1 + dir_frames;
         case JoinAlgorithm::SortMerge:   // + as molduras da lista de runs (CBD-005)
-            return std::max({run_pages + 2, fan_in + 1, final_fan_in + group_pages}) + desc_frames;
+            return std::max({run_pages + 2, fan_in + 1, final_fan_in + group_pages + ordered_extra_frames}) + desc_frames;
         case JoinAlgorithm::Hash:
             return std::max(partitions > 1 ? partitions + 1 : std::size_t{2}, build_pages + 1);
     }
@@ -170,9 +170,10 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
                 const std::size_t per_page = to.b ? ceil_div(static_cast<std::size_t>(to.n), to.b) : 1;
                 auto entries = [&](std::size_t c) { return (m - 1 - c) * bs / sizeof(RecordView); };
                 while (p.chunk > 1 && p.chunk * per_page > entries(p.chunk)) --p.chunk;
-                if (p.chunk * per_page > entries(p.chunk))
-                    return NotApplicable{"diretório do BNL não cabe em m", NotApplicable::Kind::Inviavel};
-                p.dir_frames = std::max<std::size_t>(1, ceil_div(p.chunk * per_page * sizeof(RecordView), bs));
+                // Com chunk=1, uma página densa pode ser consumida em várias rodadas.
+                // O executor retém o cursor e limita cada rodada à capacidade do diretório.
+                p.dir_frames = std::max<std::size_t>(1, std::min(m - 1 - p.chunk,
+                    ceil_div(p.chunk * per_page * sizeof(RecordView), bs)));
                 p.dir_entries = p.dir_frames * bs / sizeof(RecordView);
             }
             break;
@@ -183,8 +184,16 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
             };
             p.sort_outer = !ordered(outer);
             p.sort_inner = !ordered(inner);
+            auto extra_frames = [](const JoinInput& in, const TableStats& stats, bool needs_sort) -> std::size_t {
+                // Clustering sobre B+ usa só a folha de dados após localizar o primeiro RID.
+                // Sobre hash, o cursor mantém também a folha do índice durante a varredura do bucket.
+                return !needs_sort && in.path.kind == PathKind::SecondaryBTreeClustering &&
+                       !stats.structures.empty() && stats.structures.front().kind == StructureKind::Hash ? 1 : 0;
+            };
+            p.ordered_extra_frames = extra_frames(outer, to, p.sort_outer) + extra_frames(inner, ti, p.sort_inner);
             p.group_pages = p.inner_unique ? 0 : params.group_pages;
-            if (p.group_pages + 2 > m) return NotApplicable{"group_pages não deixa espaço para a intercalação", NotApplicable::Kind::Inviavel};
+            if (p.group_pages + 2 + p.ordered_extra_frames > m)
+                return NotApplicable{"grupo e cursores ordenados não cabem na intercalação", NotApplicable::Kind::Inviavel};
             // A lista de runs cresce com b/m e é cobrada em M (CBD-005): desc_frames molduras guardam os
             // descritores das runs das duas entradas e da saída de um passe de intercalação, e saem do
             // rascunho, do fan-in e da intercalação final. Mais molduras para a lista deixam as runs
@@ -192,14 +201,17 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
             const std::size_t bs = storage_.block_size();
             std::size_t ro = 1, ri = 1, d = 0;
             for (int it = 0;; ++it) {
-                if (d + 3 > m || p.group_pages + 2 + d > m || it > 16)
+                if (d + 3 > m || p.group_pages + 2 + p.ordered_extra_frames + d > m || it > 16)
                     return NotApplicable{"lista de runs não cabe em m", NotApplicable::Kind::Inviavel};
                 p.run_pages = m - 2 - d;
                 p.fan_in = m - 1 - d;
-                p.final_fan_in = m - p.group_pages - d;
-                // runs: quantos registros cabem no rascunho com o diretório cobrado (173)
-                const std::size_t cap_o = ScratchSpace::capacity_for(so, p.run_pages, storage_.block_size());
-                const std::size_t cap_i = ScratchSpace::capacity_for(si, p.run_pages, storage_.block_size());
+                p.final_fan_in = m - p.group_pages - d - p.ordered_extra_frames;
+                // Limite conservador pelo maior registro observado, com o diretório cobrado (173).
+                // O máximo declarado de VarChar pode ser muito maior que os dados presentes.
+                const std::size_t cap_o = ScratchSpace::capacity_for(to.max_record_bytes, p.run_pages, bs);
+                const std::size_t cap_i = ScratchSpace::capacity_for(ti.max_record_bytes, p.run_pages, bs);
+                if ((p.sort_outer && to.n && cap_o == 0) || (p.sort_inner && ti.n && cap_i == 0))
+                    return NotApplicable{"registro e diretório não cabem nas páginas das runs", NotApplicable::Kind::Inviavel};
                 ro = p.sort_outer ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(to.n), cap_o)) : 1;
                 ri = p.sort_inner ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(ti.n), cap_i)) : 1;
                 const std::size_t lista = (p.sort_outer ? ro + ceil_div(ro, p.fan_in) : 0) +

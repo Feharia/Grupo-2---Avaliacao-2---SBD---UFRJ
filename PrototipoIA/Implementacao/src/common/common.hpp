@@ -203,6 +203,7 @@ struct TableStats {
     std::uint32_t bfr_medio = 0;   // registros por bloco pelo tamanho médio real dos registros (P08)
     std::uint32_t b = 0;   // heap: todos; B+: folhas; hash: buckets + overflow (119)
     std::vector<StructureStats> structures;
+    std::uint32_t max_record_bytes = 0;   // maior tamanho observado; limite conservador até reorganize após remoções
 };
 
 struct HashPartitioning {

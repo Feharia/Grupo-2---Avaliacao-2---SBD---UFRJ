@@ -1,0 +1,2 @@
+/home/carlos/.pyenv/versions/3.11.14/bin/python3 -I /home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tools/compare.py /tmp/cbd-pr19-var-io-panFVP/before-matched/smoke --tuplas
+conferidas: 168 linhas medidas em 168 combinações; sem execução: nao_aplicavel: 132; ausentes: 0; divergências: 0

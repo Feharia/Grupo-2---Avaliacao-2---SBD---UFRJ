@@ -3,6 +3,7 @@
 #include "layer3/catalog.hpp"
 #include "layer3/structures.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 namespace cbd {
@@ -64,14 +65,17 @@ public:
         if (r) {
             ++n_;
             bytes_ += r->size();
+            max_record_bytes_ = std::max(max_record_bytes_, static_cast<std::uint32_t>(r->size()));
         }
         return r;
     }
     std::uint64_t count() const { return n_; }
     std::uint64_t bytes() const { return bytes_; }
+    std::uint32_t max_record_bytes() const { return max_record_bytes_; }
 private:
     RecordStream& in_;
     std::uint64_t n_ = 0, bytes_ = 0;
+    std::uint32_t max_record_bytes_ = 0;
 };
 
 }  // namespace
@@ -342,6 +346,7 @@ void StorageManager::refresh_stats(TableId t) {
     TableStats s;
     s.n = e.n;
     s.r = e.schema->record_size;
+    s.max_record_bytes = e.max_record_bytes;
     s.bfr = sp_capacity(pool_.block_size(), s.r);
     // blocagem pelo tamanho médio real: com VarChar, o máximo R superestima os blocos densos (P08)
     s.bfr_medio = e.n ? sp_capacity(pool_.block_size(), static_cast<std::uint32_t>((e.bytes + e.n - 1) / e.n)) : s.bfr;
@@ -388,6 +393,7 @@ void StorageManager::bulk_load(TableId t, RecordStream& sorted) {
     tables_.at(t).primary->bulk_load(cs);
     catalog_->table(t).n += cs.count();
     catalog_->table(t).bytes += cs.bytes();
+    catalog_->table(t).max_record_bytes = std::max(catalog_->table(t).max_record_bytes, cs.max_record_bytes());
     build_indexes(t);   // índices construídos depois da organização
     refresh_stats(t);
     catalog_->persist();
@@ -413,6 +419,8 @@ RID StorageManager::insert(TableId t, std::span<const std::byte> rec) {
     }
     ++catalog_->table(t).n;
     catalog_->table(t).bytes += rec.size();
+    catalog_->table(t).max_record_bytes =
+        std::max(catalog_->table(t).max_record_bytes, static_cast<std::uint32_t>(rec.size()));
     invalidate_stats(t);
     return rid;
 }
@@ -487,6 +495,7 @@ void StorageManager::reorganize(TableId t) {
     tables_.at(t).primary = make_primary(t);
     PrimaryFile& fresh = *tables_.at(t).primary;
     std::uint64_t n = 0, bytes = 0;
+    std::uint32_t max_record_bytes = 0;
     if (old->kind() == StructureKind::BTree) {
         const auto* bt = static_cast<const BPlusTreeFile*>(old.get());
         SortedLeafStream s(pool_, bt->data_file(), bt->engine().meta().first_leaf, bt->engine().key_of());
@@ -494,17 +503,20 @@ void StorageManager::reorganize(TableId t) {
         fresh.bulk_load(cs);
         n = cs.count();
         bytes = cs.bytes();
+        max_record_bytes = cs.max_record_bytes();
     } else {
         ScanStream s(BlockScan(&pool_, old->scan_plan(), e.schema, kSeqOnce, kNoReservation));
         CountingStream cs(s);
         fresh.bulk_load(cs);
         n = cs.count();
         bytes = cs.bytes();
+        max_record_bytes = cs.max_record_bytes();
     }
     for (FileId f : old->files()) pool_.remove_file(f);
     old.reset();
     e.n = n;
     e.bytes = bytes;
+    e.max_record_bytes = max_record_bytes;
     build_indexes(t);   // RIDs mudaram: índices reconstruídos (141)
     refresh_stats(t);
     catalog_->persist();

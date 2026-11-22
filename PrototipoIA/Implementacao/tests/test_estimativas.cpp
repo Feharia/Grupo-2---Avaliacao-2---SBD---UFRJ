@@ -37,6 +37,12 @@ TEST(Estimativas, Bnl) {
     const Cost c = estimate_join(p, tabela(2000, 100, 20), tabela(800, 40, 20));
     EXPECT_TRUE(perto(c.transfers, 380));
     EXPECT_TRUE(perto(c.seeks, 14));
+    // O diretório limita a rodada a 100 registros: 2000 / 100 = 20 rodadas,
+    // mesmo que o chunk nominal precisasse de apenas 7. Custo = 100 + 20 * 40 = 900.
+    p.dir_entries = 100;
+    const Cost limited = estimate_join(p, tabela(2000, 100, 20), tabela(800, 40, 20));
+    EXPECT_TRUE(perto(limited.transfers, 900));
+    EXPECT_TRUE(perto(limited.seeks, 40));
 }
 
 TEST(Estimativas, SortMergeComUmPasseEEntradaOrdenada) {

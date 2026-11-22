@@ -1,0 +1,21 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = MemoriaAuxiliar.BnlDiretorioDentroDasMolduras
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MemoriaAuxiliar
+[ RUN      ] MemoriaAuxiliar.BnlDiretorioDentroDasMolduras
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/memoria/test_bnl.cpp:71: Failure
+Value of: m == 3
+  Actual: false
+Expected: true
+[  FAILED  ] MemoriaAuxiliar.BnlDiretorioDentroDasMolduras (9 ms)
+[----------] 1 test from MemoriaAuxiliar (9 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (9 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] MemoriaAuxiliar.BnlDiretorioDentroDasMolduras
+
+ 1 FAILED TEST
+exit_code=1

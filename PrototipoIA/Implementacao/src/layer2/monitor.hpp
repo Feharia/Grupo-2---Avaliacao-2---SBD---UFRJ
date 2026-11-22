@@ -56,6 +56,7 @@ struct JoinPlan {
     std::size_t   runs_outer = 0, runs_inner = 0;           // runs geradas (limite do vetor de cada lado)
     std::size_t   merge_passes_outer = 0, merge_passes_inner = 0;
     std::size_t   desc_frames = 0;                      // lista de runs cobrada em M (CBD-005)
+    std::size_t   ordered_extra_frames = 0;             // índice retido além da página de dados nas fontes clustering/hash
     // hash join (externa = build)
     bool          prepartitioned_outer = false, prepartitioned_inner = false;
     std::size_t   partitions = 0;                       // ≤ m − 1

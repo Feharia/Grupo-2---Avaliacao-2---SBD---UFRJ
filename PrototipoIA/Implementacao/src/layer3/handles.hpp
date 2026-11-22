@@ -177,6 +177,8 @@ public:
     std::size_t    aux_bytes() const;                     // bytes reservados pelos vetores do diretório
     // Quantos registros de tamanho fixo (o máximo do esquema) cabem em `pages` páginas com o diretório.
     static std::size_t capacity_for(const Schema&, std::size_t pages, std::uint32_t block_size);
+    // A mesma conta usando um limite observado para o tamanho dos registros codificados.
+    static std::size_t capacity_for(std::uint32_t record_bytes, std::size_t pages, std::uint32_t block_size);
 private:
     friend class StorageManager;
     friend class ScratchMatches;

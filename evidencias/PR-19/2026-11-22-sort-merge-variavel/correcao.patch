@@ -1,0 +1,235 @@
+diff --git a/PrototipoIA/Implementacao/src/common/common.hpp b/PrototipoIA/Implementacao/src/common/common.hpp
+index ca9a3e3..914c188 100644
+--- a/PrototipoIA/Implementacao/src/common/common.hpp
++++ b/PrototipoIA/Implementacao/src/common/common.hpp
+@@ -203,6 +203,7 @@ struct TableStats {
+     std::uint32_t bfr_medio = 0;   // registros por bloco pelo tamanho médio real dos registros (P08)
+     std::uint32_t b = 0;   // heap: todos; B+: folhas; hash: buckets + overflow (119)
+     std::vector<StructureStats> structures;
++    std::uint32_t max_record_bytes = 0;   // maior tamanho observado; limite conservador até reorganize após remoções
+ };
+ 
+ struct HashPartitioning {
+diff --git a/PrototipoIA/Implementacao/src/layer2/monitor.cpp b/PrototipoIA/Implementacao/src/layer2/monitor.cpp
+index dd9b1e1..0c832c3 100644
+--- a/PrototipoIA/Implementacao/src/layer2/monitor.cpp
++++ b/PrototipoIA/Implementacao/src/layer2/monitor.cpp
+@@ -197,9 +197,12 @@ std::variant<JoinPlan, NotApplicable> Monitor::plan_join(JoinAlgorithm alg, cons
+                 p.run_pages = m - 2 - d;
+                 p.fan_in = m - 1 - d;
+                 p.final_fan_in = m - p.group_pages - d;
+-                // runs: quantos registros cabem no rascunho com o diretório cobrado (173)
+-                const std::size_t cap_o = ScratchSpace::capacity_for(so, p.run_pages, storage_.block_size());
+-                const std::size_t cap_i = ScratchSpace::capacity_for(si, p.run_pages, storage_.block_size());
++                // Limite conservador pelo maior registro observado, com o diretório cobrado (173).
++                // O máximo declarado de VarChar pode ser muito maior que os dados presentes.
++                const std::size_t cap_o = ScratchSpace::capacity_for(to.max_record_bytes, p.run_pages, bs);
++                const std::size_t cap_i = ScratchSpace::capacity_for(ti.max_record_bytes, p.run_pages, bs);
++                if ((p.sort_outer && to.n && cap_o == 0) || (p.sort_inner && ti.n && cap_i == 0))
++                    return NotApplicable{"registro e diretório não cabem nas páginas das runs", NotApplicable::Kind::Inviavel};
+                 ro = p.sort_outer ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(to.n), cap_o)) : 1;
+                 ri = p.sort_inner ? std::max<std::size_t>(1, ceil_div(static_cast<std::size_t>(ti.n), cap_i)) : 1;
+                 const std::size_t lista = (p.sort_outer ? ro + ceil_div(ro, p.fan_in) : 0) +
+diff --git a/PrototipoIA/Implementacao/src/layer3/catalog.hpp b/PrototipoIA/Implementacao/src/layer3/catalog.hpp
+index b20d8d2..316c55c 100644
+--- a/PrototipoIA/Implementacao/src/layer3/catalog.hpp
++++ b/PrototipoIA/Implementacao/src/layer3/catalog.hpp
+@@ -21,6 +21,7 @@ public:
+         std::vector<StructureId>      indexes;
+         std::uint64_t                 n = 0;
+         std::uint64_t                 bytes = 0;  // soma dos tamanhos reais dos registros (P08)
++        std::uint32_t                 max_record_bytes = 0;
+         TableStats                    stats;      // (160)
+         bool                          stats_valid = false;
+     };
+diff --git a/PrototipoIA/Implementacao/src/layer3/handles.cpp b/PrototipoIA/Implementacao/src/layer3/handles.cpp
+index 1b1cb3a..ccd7866 100644
+--- a/PrototipoIA/Implementacao/src/layer3/handles.cpp
++++ b/PrototipoIA/Implementacao/src/layer3/handles.cpp
+@@ -151,7 +151,11 @@ ScratchSpace& ScratchSpace::operator=(ScratchSpace&&) noexcept = default;
+ ScratchSpace::~ScratchSpace() = default;   // os guards devolvem as molduras ao subpool
+ 
+ std::size_t ScratchSpace::capacity_for(const Schema& s, std::size_t pages, std::uint32_t bs) {
+-    const std::size_t need = static_cast<std::size_t>(s.record_size) + 2;
++    return capacity_for(s.record_size, pages, bs);
++}
++
++std::size_t ScratchSpace::capacity_for(std::uint32_t record_bytes, std::size_t pages, std::uint32_t bs) {
++    const std::size_t need = static_cast<std::size_t>(record_bytes) + 2;
+     if (need > bs) return 0;
+     std::size_t page = 0, used = 0, n = 0, cap = 0;
+     while (scratch_step(pages, bs, need, page, used, n, cap)) {}
+diff --git a/PrototipoIA/Implementacao/src/layer3/handles.hpp b/PrototipoIA/Implementacao/src/layer3/handles.hpp
+index 320b9a9..d9b4e3f 100644
+--- a/PrototipoIA/Implementacao/src/layer3/handles.hpp
++++ b/PrototipoIA/Implementacao/src/layer3/handles.hpp
+@@ -177,6 +177,8 @@ public:
+     std::size_t    aux_bytes() const;                     // bytes reservados pelos vetores do diretório
+     // Quantos registros de tamanho fixo (o máximo do esquema) cabem em `pages` páginas com o diretório.
+     static std::size_t capacity_for(const Schema&, std::size_t pages, std::uint32_t block_size);
++    // A mesma conta usando um limite observado para o tamanho dos registros codificados.
++    static std::size_t capacity_for(std::uint32_t record_bytes, std::size_t pages, std::uint32_t block_size);
+ private:
+     friend class StorageManager;
+     friend class ScratchMatches;
+diff --git a/PrototipoIA/Implementacao/src/layer3/storage_manager.cpp b/PrototipoIA/Implementacao/src/layer3/storage_manager.cpp
+index 748bee4..31b3c72 100644
+--- a/PrototipoIA/Implementacao/src/layer3/storage_manager.cpp
++++ b/PrototipoIA/Implementacao/src/layer3/storage_manager.cpp
+@@ -3,6 +3,7 @@
+ #include "layer3/catalog.hpp"
+ #include "layer3/structures.hpp"
+ 
++#include <algorithm>
+ #include <cmath>
+ 
+ namespace cbd {
+@@ -64,14 +65,17 @@ public:
+         if (r) {
+             ++n_;
+             bytes_ += r->size();
++            max_record_bytes_ = std::max(max_record_bytes_, static_cast<std::uint32_t>(r->size()));
+         }
+         return r;
+     }
+     std::uint64_t count() const { return n_; }
+     std::uint64_t bytes() const { return bytes_; }
++    std::uint32_t max_record_bytes() const { return max_record_bytes_; }
+ private:
+     RecordStream& in_;
+     std::uint64_t n_ = 0, bytes_ = 0;
++    std::uint32_t max_record_bytes_ = 0;
+ };
+ 
+ }  // namespace
+@@ -342,6 +346,7 @@ void StorageManager::refresh_stats(TableId t) {
+     TableStats s;
+     s.n = e.n;
+     s.r = e.schema->record_size;
++    s.max_record_bytes = e.max_record_bytes;
+     s.bfr = sp_capacity(pool_.block_size(), s.r);
+     // blocagem pelo tamanho médio real: com VarChar, o máximo R superestima os blocos densos (P08)
+     s.bfr_medio = e.n ? sp_capacity(pool_.block_size(), static_cast<std::uint32_t>((e.bytes + e.n - 1) / e.n)) : s.bfr;
+@@ -388,6 +393,7 @@ void StorageManager::bulk_load(TableId t, RecordStream& sorted) {
+     tables_.at(t).primary->bulk_load(cs);
+     catalog_->table(t).n += cs.count();
+     catalog_->table(t).bytes += cs.bytes();
++    catalog_->table(t).max_record_bytes = std::max(catalog_->table(t).max_record_bytes, cs.max_record_bytes());
+     build_indexes(t);   // índices construídos depois da organização
+     refresh_stats(t);
+     catalog_->persist();
+@@ -413,6 +419,8 @@ RID StorageManager::insert(TableId t, std::span<const std::byte> rec) {
+     }
+     ++catalog_->table(t).n;
+     catalog_->table(t).bytes += rec.size();
++    catalog_->table(t).max_record_bytes =
++        std::max(catalog_->table(t).max_record_bytes, static_cast<std::uint32_t>(rec.size()));
+     invalidate_stats(t);
+     return rid;
+ }
+@@ -487,6 +495,7 @@ void StorageManager::reorganize(TableId t) {
+     tables_.at(t).primary = make_primary(t);
+     PrimaryFile& fresh = *tables_.at(t).primary;
+     std::uint64_t n = 0, bytes = 0;
++    std::uint32_t max_record_bytes = 0;
+     if (old->kind() == StructureKind::BTree) {
+         const auto* bt = static_cast<const BPlusTreeFile*>(old.get());
+         SortedLeafStream s(pool_, bt->data_file(), bt->engine().meta().first_leaf, bt->engine().key_of());
+@@ -494,17 +503,20 @@ void StorageManager::reorganize(TableId t) {
+         fresh.bulk_load(cs);
+         n = cs.count();
+         bytes = cs.bytes();
++        max_record_bytes = cs.max_record_bytes();
+     } else {
+         ScanStream s(BlockScan(&pool_, old->scan_plan(), e.schema, kSeqOnce, kNoReservation));
+         CountingStream cs(s);
+         fresh.bulk_load(cs);
+         n = cs.count();
+         bytes = cs.bytes();
++        max_record_bytes = cs.max_record_bytes();
+     }
+     for (FileId f : old->files()) pool_.remove_file(f);
+     old.reset();
+     e.n = n;
+     e.bytes = bytes;
++    e.max_record_bytes = max_record_bytes;
+     build_indexes(t);   // RIDs mudaram: índices reconstruídos (141)
+     refresh_stats(t);
+     catalog_->persist();
+diff --git a/PrototipoIA/Implementacao/tests/test_layer2.cpp b/PrototipoIA/Implementacao/tests/test_layer2.cpp
+index 5991888..78ba2ff 100644
+--- a/PrototipoIA/Implementacao/tests/test_layer2.cpp
++++ b/PrototipoIA/Implementacao/tests/test_layer2.cpp
+@@ -442,6 +442,72 @@ TEST(Monitor, GrupoDeDuplicatasQueNaoCabeViraInaplicavel) {   // (151)
+     EXPECT_TRUE(std::get<NotApplicable>(o).reason.find("não cabe") != std::string::npos);
+ }
+ 
++// O tamanho máximo declarado de VarChar não muda os pares de registros efetivamente armazenados.
++TEST(Monitor, SortMergeComVarCharCurtoIndependeDoMaximoDeclarado) {
++    std::optional<std::uint64_t> checksum;
++    for (const std::uint16_t width : {24, 1000, 4050}) {
++        Monitor m(test_config("mon_sm_var_" + std::to_string(width)));
++        const Schema schema = make_schema({{"k", FieldType::Int32, 0, true}, {"v", FieldType::VarChar, width}});
++        const TableId a = m.create_table("a", schema, {}), b = m.create_table("b", schema, {});
++        std::vector<std::vector<Value>> rows;
++        for (std::int64_t k = 999; k >= 0; --k) rows.push_back({k, std::string("x")});
++        RowsStream ra(m, a, rows), rb(m, b, rows);
++        m.bulk_load(a, ra);
++        m.bulk_load(b, rb);
++        const JoinInput outer{path(m, a, PathKind::Scan), 0, 0}, inner{path(m, b, PathKind::Scan), 0, 1};
++        for (const std::size_t memory : {5, 16}) {
++            m.flush_all();
++            m.invalidate_all();
++            const auto planned = m.plan_join(JoinAlgorithm::SortMerge, outer, inner, memory, {});
++            EXPECT_TRUE(std::holds_alternative<JoinPlan>(planned));
++            const auto outcome = m.join(JoinAlgorithm::SortMerge, outer, inner, memory, {});
++            if (const auto* result = std::get_if<OpResult>(&outcome)) {
++                EXPECT_EQ(result->rows, 1000u);
++                EXPECT_EQ(result->flush_writes, 0u);
++                if (!checksum) checksum = result->checksum;
++                EXPECT_EQ(result->checksum, *checksum);
++            } else {
++                EXPECT_TRUE(std::holds_alternative<OpResult>(outcome));
++            }
++        }
++    }
++}
++
++TEST(Monitor, SortMergeVarCharAposManutencao) {
++    Monitor m(test_config("mon_sm_var_manutencao"));
++    const Schema schema = make_schema({{"k", FieldType::Int32, 0, true}, {"v", FieldType::VarChar, 4050}});
++    const TableId a = m.create_table("a", schema, {}), b = m.create_table("b", schema, {});
++    std::vector<std::vector<Value>> rows;
++    for (std::int64_t k = 0; k < 1000; ++k) rows.push_back({k, std::string("x")});
++    for (const TableId t : {a, b}) {
++        RowsStream stream(m, t, rows);
++        m.bulk_load(t, stream);
++        m.insert(t, m.encode(t, {std::int64_t{1000}, std::string(200, 'y')}));
++        m.reorganize(t);
++    }
++    const JoinInput outer{path(m, a, PathKind::Scan), 0, 0}, inner{path(m, b, PathKind::Scan), 0, 1};
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, outer, inner, 16, {})).rows, 1001u);
++    for (const TableId t : {a, b}) {
++        EXPECT_EQ(m.erase_key(t, 0, Key{std::int32_t{1000}}), 1u);
++        m.reorganize(t);
++    }
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, outer, inner, 5, {})).rows, 1000u);
++}
++
++TEST(Monitor, SortMergeCapacidadeZeroViraInviavelNoPlano) {
++    Monitor m(test_config("mon_sm_var_zero"));
++    const Schema schema = make_schema({{"k", FieldType::Int32, 0, true}, {"v", FieldType::VarChar, 4050}});
++    const TableId a = m.create_table("a", schema, {}), b = m.create_table("b", schema, {});
++    for (const TableId t : {a, b}) {
++        RowsStream stream(m, t, {{std::int64_t{1}, std::string(4050, 'x')}});
++        m.bulk_load(t, stream);
++    }
++    const JoinInput outer{path(m, a, PathKind::Scan), 0, 0}, inner{path(m, b, PathKind::Scan), 0, 1};
++    const auto planned = m.plan_join(JoinAlgorithm::SortMerge, outer, inner, 4, {});
++    EXPECT_TRUE(std::holds_alternative<NotApplicable>(planned));
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, outer, inner, 5, {})).rows, 1u);
++}
++
+ // CBD-007 (issue #1): com a interna UNIQUE, o sort-merge usa group_pages = 0 e não guarda o grupo.
+ // O UNIQUE só é garantido quando uma estrutura indexa o campo (157); num heap ele é só declarado.
+ // Na base, 10 × 10 registros de mesma chave devolviam 10 pares em vez de 100, sem aviso.

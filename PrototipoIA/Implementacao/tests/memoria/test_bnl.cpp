@@ -66,9 +66,9 @@ TEST(MemoriaAuxiliar, BnlDiretorioDentroDasMolduras) {
     for (const auto& c : casos) {
         Ambiente amb("mem_bnl_" + std::to_string(n++), c);
         const JoinInput pe{amb.scan(amb.mon, amb.me), 0, 0}, pi{amb.scan(amb.mon, amb.mi), 0, 1};
-        std::size_t m = 3;   // M mínimo: o menor m em que o diretório do chunk cabe nas molduras
+        std::size_t m = 3;   // uma página externa, uma interna e uma para o diretório
         while (!std::holds_alternative<JoinPlan>(amb.mon.plan_join(JoinAlgorithm::Bnl, pe, pi, m, JoinParams{}))) ++m;
-        ASSERT_TRUE(m > 3);
+        ASSERT_TRUE(m == 3);   // uma página densa pode ser repartida entre rodadas
         const auto abaixo = amb.mon.plan_join(JoinAlgorithm::Bnl, pe, pi, m - 1, JoinParams{});
         EXPECT_TRUE(std::get<NotApplicable>(abaixo).kind == NotApplicable::Kind::Inviavel);   // abaixo: controlado
         for (std::size_t mm : {m, m + 4, std::size_t{32}}) {

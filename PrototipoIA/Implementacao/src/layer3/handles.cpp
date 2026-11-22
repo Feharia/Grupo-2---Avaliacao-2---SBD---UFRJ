@@ -151,7 +151,11 @@ ScratchSpace& ScratchSpace::operator=(ScratchSpace&&) noexcept = default;
 ScratchSpace::~ScratchSpace() = default;   // os guards devolvem as molduras ao subpool
 
 std::size_t ScratchSpace::capacity_for(const Schema& s, std::size_t pages, std::uint32_t bs) {
-    const std::size_t need = static_cast<std::size_t>(s.record_size) + 2;
+    return capacity_for(s.record_size, pages, bs);
+}
+
+std::size_t ScratchSpace::capacity_for(std::uint32_t record_bytes, std::size_t pages, std::uint32_t bs) {
+    const std::size_t need = static_cast<std::size_t>(record_bytes) + 2;
     if (need > bs) return 0;
     std::size_t page = 0, used = 0, n = 0, cap = 0;
     while (scratch_step(pages, bs, need, page, used, n, cap)) {}

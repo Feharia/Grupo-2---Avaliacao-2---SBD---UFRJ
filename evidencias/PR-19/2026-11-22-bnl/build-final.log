@@ -1,0 +1,9 @@
+[  3%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer2/algorithms.cpp.o
+[  6%] Linking CXX static library libcbd_motor.a
+[ 51%] Built target cbd_motor
+[ 55%] Linking CXX executable bancada
+[ 58%] Linking CXX executable testes_memoria
+[ 62%] Linking CXX executable testes
+[ 65%] Built target bancada
+[ 79%] Built target testes_memoria
+[100%] Built target testes

@@ -180,6 +180,9 @@ void bnl_join(StorageManager& sm, const JoinInput& outer, const JoinInput& inner
             for (std::size_t j = from; j < chunk.size(); ++j) carry.push_back(std::move(chunk[j]));
             chunk.erase(chunk.begin() + static_cast<std::ptrdiff_t>(from), chunk.end());
         }
+        // O cursor retomado pode estar no fim após encher o diretório exatamente.
+        // Também não há pares a produzir quando a rodada externa só contém chaves NULL.
+        if (dir.empty()) continue;
         std::sort(dir.begin(), dir.end(), key_less);
         BlockScan iscan = sm.scan_blocks(inner.path.table, kSeqReuse, res);
         while (auto ic = iscan.next()) {
@@ -470,7 +473,10 @@ Cost estimate_join(const JoinPlan& p, const TableStats& o, const TableStats& i) 
     Cost c;
     switch (p.alg) {
         case JoinAlgorithm::Bnl: {
-            const double chunks = std::ceil(br / static_cast<double>(std::max<std::size_t>(1, p.chunk)));
+            double chunks = std::ceil(br / static_cast<double>(std::max<std::size_t>(1, p.chunk)));
+            // O diretório também limita a rodada, inclusive quando uma página precisa ser repartida.
+            if (p.dir_entries)
+                chunks = std::max(chunks, std::ceil(static_cast<double>(o.n) / static_cast<double>(p.dir_entries)));
             c.transfers = br + chunks * bs;
             c.seeks = 2 * chunks;
             break;

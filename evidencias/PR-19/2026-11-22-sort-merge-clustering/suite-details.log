@@ -1,0 +1,320 @@
+Start testing: Nov 22 19:43 -03
+----------------------------------------------------------
+1/2 Testing: testes
+1/2 Test: testes
+Command: "/tmp/cbd-pr19-slot-prefetch-release/testes"
+Directory: /tmp/cbd-pr19-slot-prefetch-release
+"testes" start time: Nov 22 19:43 -03
+Output:
+----------------------------------------------------------
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+[==========] Running 94 tests from 12 test suites.
+[----------] Global test environment set-up.
+[----------] 16 tests from BPlusBulkLoadIntegration
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+[       OK ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros (10 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+[       OK ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes
+[       OK ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo
+[       OK ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros
+[       OK ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes
+[       OK ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes (1 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes (20 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada (9 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis
+[       OK ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis (21 ms)
+[ RUN      ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo
+[       OK ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo (2 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes
+[       OK ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes (1 ms)
+[ RUN      ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario
+[       OK ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas
+[       OK ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada
+[       OK ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados
+[       OK ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados (0 ms)
+[----------] 16 tests from BPlusBulkLoadIntegration (71 ms total)
+
+[----------] 3 tests from StorageBPlusContract
+[ RUN      ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas
+[       OK ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas (356 ms)
+[ RUN      ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites
+[       OK ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites (0 ms)
+[ RUN      ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas
+[       OK ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas (0 ms)
+[----------] 3 tests from StorageBPlusContract (357 ms total)
+
+[----------] 6 tests from Convergencia
+[ RUN      ] Convergencia.SerieEstavelConvergeNoMinimo
+[       OK ] Convergencia.SerieEstavelConvergeNoMinimo (0 ms)
+[ RUN      ] Convergencia.TempoOscilanteParaNoTeto
+[       OK ] Convergencia.TempoOscilanteParaNoTeto (0 ms)
+[ RUN      ] Convergencia.EsVariavelTambemParaNoTeto
+[       OK ] Convergencia.EsVariavelTambemParaNoTeto (0 ms)
+[ RUN      ] Convergencia.ConvergeDepoisDoAquecimento
+[       OK ] Convergencia.ConvergeDepoisDoAquecimento (0 ms)
+[ RUN      ] Convergencia.FalhaNaPrimeiraNaoExecuta
+[       OK ] Convergencia.FalhaNaPrimeiraNaoExecuta (0 ms)
+[ RUN      ] Convergencia.TetoIgualAoMinimoNaoConvergeSemCriterio
+[       OK ] Convergencia.TetoIgualAoMinimoNaoConvergeSemCriterio (0 ms)
+[----------] 6 tests from Convergencia (0 ms total)
+
+[----------] 8 tests from Estimativas
+[ RUN      ] Estimativas.BlocosDensosUsamABlocagemMedia
+[       OK ] Estimativas.BlocosDensosUsamABlocagemMedia (0 ms)
+[ RUN      ] Estimativas.Bnl
+[       OK ] Estimativas.Bnl (0 ms)
+[ RUN      ] Estimativas.SortMergeComUmPasseEEntradaOrdenada
+[       OK ] Estimativas.SortMergeComUmPasseEEntradaOrdenada (0 ms)
+[ RUN      ] Estimativas.HashSemPartesComUmEComDoisNiveis
+[       OK ] Estimativas.HashSemPartesComUmEComDoisNiveis (0 ms)
+[ RUN      ] Estimativas.SelecaoPelaBPrimaria
+[       OK ] Estimativas.SelecaoPelaBPrimaria (0 ms)
+[ RUN      ] Estimativas.ClusteringSobreHash
+[       OK ] Estimativas.ClusteringSobreHash (0 ms)
+[ RUN      ] Estimativas.HashesEBMaisSecundaria
+[       OK ] Estimativas.HashesEBMaisSecundaria (0 ms)
+[ RUN      ] Estimativas.Varredura
+[       OK ] Estimativas.Varredura (0 ms)
+[----------] 8 tests from Estimativas (0 ms total)
+
+[----------] 24 tests from Monitor
+[ RUN      ] Monitor.TresAlgoritmosConcordamEmTodasAsOrganizacoes
+[       OK ] Monitor.TresAlgoritmosConcordamEmTodasAsOrganizacoes (71 ms)
+[ RUN      ] Monitor.PapeisTrocadosNaoMudamOChecksum
+[       OK ] Monitor.PapeisTrocadosNaoMudamOChecksum (16 ms)
+[ RUN      ] Monitor.DiretorioDoBnlCabeEmM
+[       OK ] Monitor.DiretorioDoBnlCabeEmM (595 ms)
+[ RUN      ] Monitor.BnlRetemAsMoldurasDoDiretorio
+[       OK ] Monitor.BnlRetemAsMoldurasDoDiretorio (0 ms)
+[ RUN      ] Monitor.EsDosTemporariosFicaDentroDaMedicao
+[       OK ] Monitor.EsDosTemporariosFicaDentroDaMedicao (23 ms)
+[ RUN      ] Monitor.SequenciaManualDeEs
+[       OK ] Monitor.SequenciaManualDeEs (0 ms)
+[ RUN      ] Monitor.PreparoFlushEOperacaoSeparados
+[       OK ] Monitor.PreparoFlushEOperacaoSeparados (0 ms)
+[ RUN      ] Monitor.SelecaoComIndicesDentroDeM
+[       OK ] Monitor.SelecaoComIndicesDentroDeM (18 ms)
+[ RUN      ] Monitor.MruLeMenosQueLruNoBnlComVariasPassadas
+[       OK ] Monitor.MruLeMenosQueLruNoBnlComVariasPassadas (42 ms)
+[ RUN      ] Monitor.SemCacheOcultoEntreAreasDeTrabalho
+[       OK ] Monitor.SemCacheOcultoEntreAreasDeTrabalho (39 ms)
+[ RUN      ] Monitor.InaplicaveisDevolvemMotivo
+[       OK ] Monitor.InaplicaveisDevolvemMotivo (18 ms)
+[ RUN      ] Monitor.HashJoinRecursivoComMPequeno
+[       OK ] Monitor.HashJoinRecursivoComMPequeno (22 ms)
+[ RUN      ] Monitor.HashJoinBailoutEmGrupoIndivisivel
+[       OK ] Monitor.HashJoinBailoutEmGrupoIndivisivel (337 ms)
+[ RUN      ] Monitor.SelecoesConcordamEntreCaminhos
+[       OK ] Monitor.SelecoesConcordamEntreCaminhos (15 ms)
+[ RUN      ] Monitor.GrupoDeDuplicatasQueNaoCabeViraInaplicavel
+[       OK ] Monitor.GrupoDeDuplicatasQueNaoCabeViraInaplicavel (19 ms)
+[ RUN      ] Monitor.SortMergeComVarCharCurtoIndependeDoMaximoDeclarado
+[       OK ] Monitor.SortMergeComVarCharCurtoIndependeDoMaximoDeclarado (20 ms)
+[ RUN      ] Monitor.SortMergeVarCharAposManutencao
+[       OK ] Monitor.SortMergeVarCharAposManutencao (12 ms)
+[ RUN      ] Monitor.SortMergeCapacidadeZeroViraInviavelNoPlano
+[       OK ] Monitor.SortMergeCapacidadeZeroViraInviavelNoPlano (0 ms)
+[ RUN      ] Monitor.SortMergeRejeitaUniqueViolado
+[       OK ] Monitor.SortMergeRejeitaUniqueViolado (0 ms)
+[ RUN      ] Monitor.HashPreParticionadoIncompativelUsaSoOMaior
+[       OK ] Monitor.HashPreParticionadoIncompativelUsaSoOMaior (18 ms)
+[ RUN      ] Monitor.SortMergeAproveitaEntradaOrdenada
+[       OK ] Monitor.SortMergeAproveitaEntradaOrdenada (22 ms)
+[ RUN      ] Monitor.SortMergeClusteringHashContaIndiceEDados
+[       OK ] Monitor.SortMergeClusteringHashContaIndiceEDados (0 ms)
+[ RUN      ] Monitor.SortMergeDistingueClusteringHashDeClusteringBPlus
+[       OK ] Monitor.SortMergeDistingueClusteringHashDeClusteringBPlus (7 ms)
+[ RUN      ] Monitor.TabelaMenorCabeNumaPassada
+[       OK ] Monitor.TabelaMenorCabeNumaPassada (15 ms)
+[----------] 24 tests from Monitor (1321 ms total)
+
+[----------] 4 tests from SlottedPage
+[ RUN      ] SlottedPage.SlotsNaoSaoRenumerados
+[       OK ] SlottedPage.SlotsNaoSaoRenumerados (0 ms)
+[ RUN      ] SlottedPage.RejeitaSlotNaRegiaoLivre
+[       OK ] SlottedPage.RejeitaSlotNaRegiaoLivre (0 ms)
+[ RUN      ] SlottedPage.PaginaMalformadaFalhaSemAcessoInvalido
+[       OK ] SlottedPage.PaginaMalformadaFalhaSemAcessoInvalido (0 ms)
+[ RUN      ] SlottedPage.CasosLimiteContinuamValidos
+[       OK ] SlottedPage.CasosLimiteContinuamValidos (0 ms)
+[----------] 4 tests from SlottedPage (0 ms total)
+
+[----------] 1 test from Record
+[ RUN      ] Record.NuloVarCharEVerificacaoSempreLigada
+[       OK ] Record.NuloVarCharEVerificacaoSempreLigada (0 ms)
+[----------] 1 test from Record (0 ms total)
+
+[----------] 11 tests from StorageManager
+[ RUN      ] StorageManager.BPlusUnicaContraOraculo
+[       OK ] StorageManager.BPlusUnicaContraOraculo (47 ms)
+[ RUN      ] StorageManager.BPlusNaoUnicaComDuplicatas
+[       OK ] StorageManager.BPlusNaoUnicaComDuplicatas (33 ms)
+[ RUN      ] StorageManager.HashRejeitaDuplicataSoNoUnique
+[       OK ] StorageManager.HashRejeitaDuplicataSoNoUnique (0 ms)
+[ RUN      ] StorageManager.OverflowDoHashESeguidoELiberado
+[       OK ] StorageManager.OverflowDoHashESeguidoELiberado (1 ms)
+[ RUN      ] StorageManager.RidsEstaveisComDivisoesEReorganize
+[       OK ] StorageManager.RidsEstaveisComDivisoesEReorganize (98 ms)
+[ RUN      ] StorageManager.HeapNaoLiberaBlocosForaDoReorganize
+[       OK ] StorageManager.HeapNaoLiberaBlocosForaDoReorganize (0 ms)
+[ RUN      ] StorageManager.EstatisticasSemEntradaESaida
+[       OK ] StorageManager.EstatisticasSemEntradaESaida (0 ms)
+[ RUN      ] StorageManager.ValidaCriacaoDeIndices
+[       OK ] StorageManager.ValidaCriacaoDeIndices (0 ms)
+[ RUN      ] StorageManager.IndicesDentroDaReserva
+[       OK ] StorageManager.IndicesDentroDaReserva (28 ms)
+[ RUN      ] StorageManager.ClusteringSobreHashComColisoesContraOraculo
+[       OK ] StorageManager.ClusteringSobreHashComColisoesContraOraculo (18 ms)
+[ RUN      ] StorageManager.ClusteringSobreHashEBPlus
+[       OK ] StorageManager.ClusteringSobreHashEBPlus (11 ms)
+[----------] 11 tests from StorageManager (240 ms total)
+
+[----------] 1 test from TempFile
+[ RUN      ] TempFile.SealGravaKBlocosEReleituraLeK
+[       OK ] TempFile.SealGravaKBlocosEReleituraLeK (0 ms)
+[----------] 1 test from TempFile (0 ms total)
+
+[----------] 3 tests from ScratchSpace
+[ RUN      ] ScratchSpace.OrdenaEMontaHash
+[       OK ] ScratchSpace.OrdenaEMontaHash (0 ms)
+[ RUN      ] ScratchSpace.DiretorioCabeNasPaginasDaReserva
+[       OK ] ScratchSpace.DiretorioCabeNasPaginasDaReserva (0 ms)
+[ RUN      ] ScratchSpace.OrdenarRidsNaoAlocaFora
+[       OK ] ScratchSpace.OrdenarRidsNaoAlocaFora (0 ms)
+[----------] 3 tests from ScratchSpace (0 ms total)
+
+[----------] 4 tests from FileManager
+[ RUN      ] FileManager.CriaAbreEConfereCabecalho
+[       OK ] FileManager.CriaAbreEConfereCabecalho (0 ms)
+[ RUN      ] FileManager.BlockSizeDiferenteNaAberturaLanca
+[       OK ] FileManager.BlockSizeDiferenteNaAberturaLanca (0 ms)
+[ RUN      ] FileManager.CabecalhoTruncadoLancaEmVezDeTravar
+[       OK ] FileManager.CabecalhoTruncadoLancaEmVezDeTravar (0 ms)
+[ RUN      ] FileManager.ClassificaSequencialEAleatorio
+[       OK ] FileManager.ClassificaSequencialEAleatorio (0 ms)
+[----------] 4 tests from FileManager (0 ms total)
+
+[----------] 13 tests from BufferPool
+[ RUN      ] BufferPool.AcertosFaltasEAlocacoes
+[       OK ] BufferPool.AcertosFaltasEAlocacoes (0 ms)
+[ RUN      ] BufferPool.SubpoolNaoPassaDeM
+[       OK ] BufferPool.SubpoolNaoPassaDeM (0 ms)
+[ RUN      ] BufferPool.LruEMruEscolhemVitimasDiferentes
+[       OK ] BufferPool.LruEMruEscolhemVitimasDiferentes (0 ms)
+[ RUN      ] BufferPool.TossImmediateViraProximaVitima
+[       OK ] BufferPool.TossImmediateViraProximaVitima (0 ms)
+[ RUN      ] BufferPool.FreeBlockDePaginaFixadaLanca
+[       OK ] BufferPool.FreeBlockDePaginaFixadaLanca (0 ms)
+[ RUN      ] BufferPool.FetchDeBlocoLivreLanca
+[       OK ] BufferPool.FetchDeBlocoLivreLanca (0 ms)
+[ RUN      ] BufferPool.FlushAllContaEDepoisZera
+[       OK ] BufferPool.FlushAllContaEDepoisZera (0 ms)
+[ RUN      ] BufferPool.InvalidateAllComCatalogoFixado
+[       OK ] BufferPool.InvalidateAllComCatalogoFixado (0 ms)
+[ RUN      ] BufferPool.ReservaLiberadaLancaLogicError
+[       OK ] BufferPool.ReservaLiberadaLancaLogicError (0 ms)
+[ RUN      ] BufferPool.PedidoSemReservaEmDadosEContado
+[       OK ] BufferPool.PedidoSemReservaEmDadosEContado (0 ms)
+[ RUN      ] BufferPool.MigracaoParaOSubpoolContaComoAcerto
+[       OK ] BufferPool.MigracaoParaOSubpoolContaComoAcerto (0 ms)
+[ RUN      ] BufferPool.PrefetchIgnoraBlocosLivres
+[       OK ] BufferPool.PrefetchIgnoraBlocosLivres (0 ms)
+[ RUN      ] BufferPool.PrefetchLeAteOFimDoExtent
+[       OK ] BufferPool.PrefetchLeAteOFimDoExtent (0 ms)
+[----------] 13 tests from BufferPool (2 ms total)
+
+[----------] Global test environment tear-down
+[==========] 94 tests from 12 test suites ran. (1995 ms total)
+[  PASSED  ] 94 tests.
+<end of output>
+Test time =   2.00 sec
+----------------------------------------------------------
+Test Passed.
+"testes" end time: Nov 22 19:44 -03
+"testes" time elapsed: 00:00:01
+----------------------------------------------------------
+
+2/2 Testing: testes_memoria
+2/2 Test: testes_memoria
+Command: "/tmp/cbd-pr19-slot-prefetch-release/testes_memoria"
+Directory: /tmp/cbd-pr19-slot-prefetch-release
+"testes_memoria" start time: Nov 22 19:44 -03
+Output:
+----------------------------------------------------------
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+[==========] Running 11 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 11 tests from MemoriaAuxiliar
+[ RUN      ] MemoriaAuxiliar.BnlDiretorioDentroDasMolduras
+  [memoria] BNL densos (Int32, Int32), m = 4: chunk 1, diretório 8184 B em 2 molduras (8192 B); pico do heap 8980 B, dos quais 796 B de controle (limite 1536 B)
+  [memoria] BNL densos (Int32, Int32), m = 8: chunk 2, diretório 16368 B em 4 molduras (16384 B); pico do heap 17380 B, dos quais 1012 B de controle (limite 2048 B)
+  [memoria] BNL densos (Int32, Int32), m = 32: chunk 10, diretório 81912 B em 20 molduras (81920 B); pico do heap 84244 B, dos quais 2332 B de controle (limite 5120 B)
+  [memoria] BNL variáveis (VarChar 1..24, Int32), m = 4: chunk 1, diretório 8184 B em 2 molduras (8192 B); pico do heap 9082 B, dos quais 898 B de controle (limite 1536 B)
+  [memoria] BNL variáveis (VarChar 1..24, Int32), m = 8: chunk 3, diretório 16368 B em 4 molduras (16384 B); pico do heap 17560 B, dos quais 1192 B de controle (limite 2048 B)
+  [memoria] BNL variáveis (VarChar 1..24, Int32), m = 32: chunk 15, diretório 65520 B em 16 molduras (65536 B); pico do heap 68384 B, dos quais 2864 B de controle (limite 5120 B)
+[       OK ] MemoriaAuxiliar.BnlDiretorioDentroDasMolduras (65 ms)
+[ RUN      ] MemoriaAuxiliar.BnlControleNaoCresceComOsDados
+  [memoria] BNL controle com 12.000 e 24.000 registros, m = 32: 2404 B e 2404 B
+[       OK ] MemoriaAuxiliar.BnlControleNaoCresceComOsDados (94 ms)
+[ RUN      ] MemoriaAuxiliar.BnlPaginasDesiguaisNaoPassamDoDiretorio
+  [memoria] BNL páginas desiguais, m = 3: chunk 1, pico 4928 B (diretório 4080 B)
+  [memoria] BNL páginas desiguais, m = 4: chunk 1, pico 5000 B (diretório 4080 B)
+  [memoria] BNL páginas desiguais, m = 32: chunk 16, pico 56150 B (diretório 53232 B)
+[       OK ] MemoriaAuxiliar.BnlPaginasDesiguaisNaoPassamDoDiretorio (20 ms)
+[ RUN      ] MemoriaAuxiliar.SortMergeListaDeRunsDentroDeM
+  [memoria] sort-merge, m = 16: 102 + 17 runs, run_pages 11, lista em 3 moldura(s) (11440 B); pico do heap 35932 B (limite 94528 B)
+  [memoria] sort-merge, m = 32: 40 + 7 runs, run_pages 28, lista em 2 moldura(s) (4400 B); pico do heap 32220 B (limite 151360 B)
+[       OK ] MemoriaAuxiliar.SortMergeListaDeRunsDentroDeM (475 ms)
+[ RUN      ] MemoriaAuxiliar.HashDescritoresDePartesLimitadosPorM
+  [memoria] hash uniforme, m = 4: 3 partições no 1º passe, 5 nível(is) previsto(s); pico do heap 12520 B (limite 30432 B)
+  [memoria] hash uniforme, m = 8: 7 partições no 1º passe, 3 nível(is) previsto(s); pico do heap 15712 B (limite 59744 B)
+  [memoria] hash uniforme, m = 32: 22 partições no 1º passe, 1 nível(is) previsto(s); pico do heap 26518 B (limite 235616 B)
+  [memoria] hash com skew, m = 4: 3 partições no 1º passe, 4 nível(is) previsto(s); pico do heap 11264 B (limite 30432 B)
+  [memoria] hash com skew, m = 8: 7 partições no 1º passe, 2 nível(is) previsto(s); pico do heap 17702 B (limite 59744 B)
+  [memoria] hash com skew, m = 32: 6 partições no 1º passe, 1 nível(is) previsto(s); pico do heap 33128 B (limite 235616 B)
+[       OK ] MemoriaAuxiliar.HashDescritoresDePartesLimitadosPorM (293 ms)
+[ RUN      ] MemoriaAuxiliar.SortMergeGrupoGrandeFicaInviavel
+  [memoria] sort-merge com grupo de ~2.000 registros e group_pages = 1: DoesNotFit (inviável), pico 10087 B
+[       OK ] MemoriaAuxiliar.SortMergeGrupoGrandeFicaInviavel (8 ms)
+[ RUN      ] MemoriaAuxiliar.HashInscricaoComoBuildEmM32
+  [memoria] hash, Inscrição como build, m = 32: 31 partições, 2 níveis; pico do heap 48178 B; descritores de partição vivos até 30752 B (8 molduras, fora de M)
+[       OK ] MemoriaAuxiliar.HashInscricaoComoBuildEmM32 (337 ms)
+[ RUN      ] MemoriaAuxiliar.TabelaDeArquivosReaproveitaTemporariosApagados
+  [memoria] temporários criados e apagados: 50 deixam 0 B vivos (pico 654 B); 500 deixam 0 B vivos (pico 654 B)
+[       OK ] MemoriaAuxiliar.TabelaDeArquivosReaproveitaTemporariosApagados (17 ms)
+[ RUN      ] MemoriaAuxiliar.ScratchSpaceDentroDasPaginas
+  [memoria] E03: Int32, 2 páginas: 448 registros, 2688 B de registros + pico de 5376 B de heap; orçamento 8192 B
+  [memoria] Int32, 1 página: 224 registros, 1344 B de registros + pico de 2688 B de heap; orçamento 4096 B
+  [memoria] registro de 204 B, 2 páginas: 36 registros, 7598 B de registros + pico de 544 B de heap; orçamento 8192 B
+  [memoria] VarChar como chave, 3 páginas: 365 registros, 7808 B de registros + pico de 4506 B de heap; orçamento 12288 B
+[       OK ] MemoriaAuxiliar.ScratchSpaceDentroDasPaginas (19 ms)
+[ RUN      ] MemoriaAuxiliar.OrdenarRidsDentroDaPagina
+  [memoria] RIDs, 1 página: 184 registros, 1840 B de registros + pico de 1408 B de heap; orçamento 4096 B
+[       OK ] MemoriaAuxiliar.OrdenarRidsDentroDaPagina (0 ms)
+[ RUN      ] MemoriaAuxiliar.ContadorSoContaOEscopo
+[       OK ] MemoriaAuxiliar.ContadorSoContaOEscopo (0 ms)
+[----------] 11 tests from MemoriaAuxiliar (1332 ms total)
+
+[----------] Global test environment tear-down
+[==========] 11 tests from 1 test suite ran. (1332 ms total)
+[  PASSED  ] 11 tests.
+<end of output>
+Test time =   1.34 sec
+----------------------------------------------------------
+Test Passed.
+"testes_memoria" end time: Nov 22 19:44 -03
+"testes_memoria" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Nov 22 19:44 -03

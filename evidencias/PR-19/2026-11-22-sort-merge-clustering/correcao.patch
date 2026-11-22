@@ -1,0 +1,137 @@
+--- a/PrototipoIA/Implementacao/src/layer2/monitor.cpp
++++ b/PrototipoIA/Implementacao/src/layer2/monitor.cpp
+@@ -114,7 +114,7 @@
+         case JoinAlgorithm::Bnl:   // chunk + 1 da interna + as molduras retidas do diretório (173, CBD-004)
+             return chunk + 1 + dir_frames;
+         case JoinAlgorithm::SortMerge:   // + as molduras da lista de runs (CBD-005)
+-            return std::max({run_pages + 2, fan_in + 1, final_fan_in + group_pages}) + desc_frames;
++            return std::max({run_pages + 2, fan_in + 1, final_fan_in + group_pages + ordered_extra_frames}) + desc_frames;
+         case JoinAlgorithm::Hash:
+             return std::max(partitions > 1 ? partitions + 1 : std::size_t{2}, build_pages + 1);
+     }
+@@ -183,8 +183,16 @@
+             };
+             p.sort_outer = !ordered(outer);
+             p.sort_inner = !ordered(inner);
++            auto extra_frames = [](const JoinInput& in, const TableStats& stats, bool needs_sort) -> std::size_t {
++                // Clustering sobre B+ usa só a folha de dados após localizar o primeiro RID.
++                // Sobre hash, o cursor mantém também a folha do índice durante a varredura do bucket.
++                return !needs_sort && in.path.kind == PathKind::SecondaryBTreeClustering &&
++                       !stats.structures.empty() && stats.structures.front().kind == StructureKind::Hash ? 1 : 0;
++            };
++            p.ordered_extra_frames = extra_frames(outer, to, p.sort_outer) + extra_frames(inner, ti, p.sort_inner);
+             p.group_pages = p.inner_unique ? 0 : params.group_pages;
+-            if (p.group_pages + 2 > m) return NotApplicable{"group_pages não deixa espaço para a intercalação", NotApplicable::Kind::Inviavel};
++            if (p.group_pages + 2 + p.ordered_extra_frames > m)
++                return NotApplicable{"grupo e cursores ordenados não cabem na intercalação", NotApplicable::Kind::Inviavel};
+             // A lista de runs cresce com b/m e é cobrada em M (CBD-005): desc_frames molduras guardam os
+             // descritores das runs das duas entradas e da saída de um passe de intercalação, e saem do
+             // rascunho, do fan-in e da intercalação final. Mais molduras para a lista deixam as runs
+@@ -192,11 +200,11 @@
+             const std::size_t bs = storage_.block_size();
+             std::size_t ro = 1, ri = 1, d = 0;
+             for (int it = 0;; ++it) {
+-                if (d + 3 > m || p.group_pages + 2 + d > m || it > 16)
++                if (d + 3 > m || p.group_pages + 2 + p.ordered_extra_frames + d > m || it > 16)
+                     return NotApplicable{"lista de runs não cabe em m", NotApplicable::Kind::Inviavel};
+                 p.run_pages = m - 2 - d;
+                 p.fan_in = m - 1 - d;
+-                p.final_fan_in = m - p.group_pages - d;
++                p.final_fan_in = m - p.group_pages - d - p.ordered_extra_frames;
+                 // Limite conservador pelo maior registro observado, com o diretório cobrado (173).
+                 // O máximo declarado de VarChar pode ser muito maior que os dados presentes.
+                 const std::size_t cap_o = ScratchSpace::capacity_for(to.max_record_bytes, p.run_pages, bs);
+--- a/PrototipoIA/Implementacao/src/layer2/monitor.hpp
++++ b/PrototipoIA/Implementacao/src/layer2/monitor.hpp
+@@ -56,6 +56,7 @@
+     std::size_t   runs_outer = 0, runs_inner = 0;           // runs geradas (limite do vetor de cada lado)
+     std::size_t   merge_passes_outer = 0, merge_passes_inner = 0;
+     std::size_t   desc_frames = 0;                      // lista de runs cobrada em M (CBD-005)
++    std::size_t   ordered_extra_frames = 0;             // índice retido além da página de dados nas fontes clustering/hash
+     // hash join (externa = build)
+     bool          prepartitioned_outer = false, prepartitioned_inner = false;
+     std::size_t   partitions = 0;                       // ≤ m − 1
+--- a/PrototipoIA/Implementacao/src/layer1/bench.cpp
++++ b/PrototipoIA/Implementacao/src/layer1/bench.cpp
+@@ -613,6 +613,8 @@
+                << "; fan_in=" << p.fan_in << "; passes_ext=" << p.merge_passes_outer << "; passes_int="
+                << p.merge_passes_inner << "; group_pages=" << p.group_pages;
+             if constexpr (requires { p.desc_frames; }) os << "; desc_frames=" << p.desc_frames;   // CBD-005
++            os << "; final_fan_in=" << p.final_fan_in;
++            if constexpr (requires { p.ordered_extra_frames; }) os << "; ordered_extra_frames=" << p.ordered_extra_frames;
+             break;
+         case JoinAlgorithm::Hash:
+             os << "; particoes=" << p.partitions << "; niveis=" << p.levels << "; build_pages=" << p.build_pages
+--- a/PrototipoIA/Implementacao/tests/test_layer2.cpp
++++ b/PrototipoIA/Implementacao/tests/test_layer2.cpp
+@@ -573,6 +573,70 @@
+     EXPECT_LT(sorted.delta.global.reads() + sorted.delta.global.writes(), plain.delta.global.reads() + plain.delta.global.writes());
+ }
+ 
++// Cada cursor clustering sobre hash mantém uma folha de índice e uma página de dados.
++TEST(Monitor, SortMergeClusteringHashContaIndiceEDados) {
++    for (const bool unique : {true, false}) {
++        Monitor m(test_config(unique ? "mon_sm_clust_unique" : "mon_sm_clust_duplicatas"));
++        const Schema schema = make_schema({{"k", FieldType::Int32, 0, unique}});
++        const PrimarySpec primary{StructureKind::Hash, 0, 0.7, 3};
++        const TableId a = m.create_table("a", schema, primary), b = m.create_table("b", schema, primary);
++        std::vector<std::vector<Value>> rows;
++        for (std::int64_t i = 0; i < 3; ++i) rows.push_back({unique ? i : std::int64_t{7}});
++        for (const TableId t : {a, b}) {
++            RowsStream stream(m, t, rows);
++            m.bulk_load(t, stream);
++            m.create_index(t, {StructureKind::SecBTree, 0, true});
++        }
++        const JoinInput outer{path(m, a, PathKind::SecondaryBTreeClustering), 0, 0};
++        const JoinInput inner{path(m, b, PathKind::SecondaryBTreeClustering), 0, 1};
++        JoinParams params;
++        params.group_pages = 1;
++        const std::size_t minimum = unique ? 4 : 5;   // 2 cursores de 2 páginas, mais grupo se necessário
++        const auto rejected = m.plan_join(JoinAlgorithm::SortMerge, outer, inner, minimum - 1, params);
++        EXPECT_TRUE(std::holds_alternative<NotApplicable>(rejected));
++        EXPECT_NO_THROW({
++            const auto outcome = m.join(JoinAlgorithm::SortMerge, outer, inner, minimum - 1, {}, params);
++            EXPECT_TRUE(std::holds_alternative<NotApplicable>(outcome));
++        });
++        const auto planned = m.plan_join(JoinAlgorithm::SortMerge, outer, inner, minimum, params);
++        ASSERT_TRUE(std::holds_alternative<JoinPlan>(planned));
++        EXPECT_LE(std::get<JoinPlan>(planned).frames_used(), minimum);
++        m.flush_all();
++        m.invalidate_all();
++        const auto result = ok(m.join(JoinAlgorithm::SortMerge, outer, inner, minimum, {}, params));
++        EXPECT_EQ(result.rows, unique ? 3u : 9u);
++        EXPECT_EQ(result.delta.global.index_area_requests, 0u);
++    }
++}
++
++TEST(Monitor, SortMergeDistingueClusteringHashDeClusteringBPlus) {
++    Monitor m(test_config("mon_sm_clust_fontes"));
++    const Schema schema = make_schema({{"k", FieldType::Int32, 0, true}});
++    auto add = [&](const std::string& name, PrimarySpec primary) {
++        const auto table = m.create_table(name, schema, primary);
++        RowsStream stream(m, table, {{std::int64_t{1}}, {std::int64_t{2}}, {std::int64_t{3}}});
++        m.bulk_load(table, stream);
++        if (primary.kind != StructureKind::Heap) m.create_index(table, {StructureKind::SecBTree, 0, true});
++        return table;
++    };
++    const auto bt = add("bt", {StructureKind::BTree, 0, 0.7});
++    const auto hash = add("hash", {StructureKind::Hash, 0, 0.7, 3});
++    const auto heap = add("heap", {});
++    const JoinInput clustered_bt{path(m, bt, PathKind::SecondaryBTreeClustering), 0, 0};
++    const JoinInput primary_bt{path(m, bt, PathKind::PrimaryBTree), 0, 1};
++    const JoinInput clustered_hash{path(m, hash, PathKind::SecondaryBTreeClustering), 0, 0};
++    const JoinInput unsorted{path(m, heap, PathKind::Scan), 0, 1};
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, clustered_bt, primary_bt, 3, {})).rows, 3u);
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, clustered_hash, primary_bt, 3, {})).rows, 3u);
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, clustered_hash, unsorted, 4, {})).rows, 3u);
++    std::vector<std::vector<Value>> extra;
++    for (std::int64_t k = 4; k <= 1003; ++k) extra.push_back({k});
++    RowsStream stream(m, heap, std::move(extra));
++    m.bulk_load(heap, stream);
++    // As runs da entrada heap precisam de um passe para deixar espaço ao índice retido.
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, clustered_hash, unsorted, 5, {})).rows, 3u);
++}
++
+ TEST(Monitor, TabelaMenorCabeNumaPassada) {   // emenda da 108: menor é b ≤ m − 2
+     Monitor m(test_config("mon_menor"));
+     Db db = build(m);

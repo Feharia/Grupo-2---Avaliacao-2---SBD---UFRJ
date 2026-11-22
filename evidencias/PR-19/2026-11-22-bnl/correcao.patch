@@ -1,0 +1,138 @@
+--- a/PrototipoIA/Implementacao/src/layer2/monitor.cpp
++++ b/PrototipoIA/Implementacao/src/layer2/monitor.cpp
+@@ -170,9 +170,10 @@
+                 const std::size_t per_page = to.b ? ceil_div(static_cast<std::size_t>(to.n), to.b) : 1;
+                 auto entries = [&](std::size_t c) { return (m - 1 - c) * bs / sizeof(RecordView); };
+                 while (p.chunk > 1 && p.chunk * per_page > entries(p.chunk)) --p.chunk;
+-                if (p.chunk * per_page > entries(p.chunk))
+-                    return NotApplicable{"diretório do BNL não cabe em m", NotApplicable::Kind::Inviavel};
+-                p.dir_frames = std::max<std::size_t>(1, ceil_div(p.chunk * per_page * sizeof(RecordView), bs));
++                // Com chunk=1, uma página densa pode ser consumida em várias rodadas.
++                // O executor retém o cursor e limita cada rodada à capacidade do diretório.
++                p.dir_frames = std::max<std::size_t>(1, std::min(m - 1 - p.chunk,
++                    ceil_div(p.chunk * per_page * sizeof(RecordView), bs)));
+                 p.dir_entries = p.dir_frames * bs / sizeof(RecordView);
+             }
+             break;
+--- a/PrototipoIA/Implementacao/src/layer2/algorithms.cpp
++++ b/PrototipoIA/Implementacao/src/layer2/algorithms.cpp
+@@ -180,6 +180,9 @@
+             for (std::size_t j = from; j < chunk.size(); ++j) carry.push_back(std::move(chunk[j]));
+             chunk.erase(chunk.begin() + static_cast<std::ptrdiff_t>(from), chunk.end());
+         }
++        // O cursor retomado pode estar no fim após encher o diretório exatamente.
++        // Também não há pares a produzir quando a rodada externa só contém chaves NULL.
++        if (dir.empty()) continue;
+         std::sort(dir.begin(), dir.end(), key_less);
+         BlockScan iscan = sm.scan_blocks(inner.path.table, kSeqReuse, res);
+         while (auto ic = iscan.next()) {
+@@ -470,7 +473,10 @@
+     Cost c;
+     switch (p.alg) {
+         case JoinAlgorithm::Bnl: {
+-            const double chunks = std::ceil(br / static_cast<double>(std::max<std::size_t>(1, p.chunk)));
++            double chunks = std::ceil(br / static_cast<double>(std::max<std::size_t>(1, p.chunk)));
++            // O diretório também limita a rodada, inclusive quando uma página precisa ser repartida.
++            if (p.dir_entries)
++                chunks = std::max(chunks, std::ceil(static_cast<double>(o.n) / static_cast<double>(p.dir_entries)));
+             c.transfers = br + chunks * bs;
+             c.seeks = 2 * chunks;
+             break;
+--- a/PrototipoIA/Implementacao/tests/test_layer2.cpp
++++ b/PrototipoIA/Implementacao/tests/test_layer2.cpp
+@@ -5,6 +5,7 @@
+ #include "mini_test.hpp"
+ 
+ #include <functional>
++#include <iostream>
+ #include <map>
+ 
+ using namespace cbd;
+@@ -173,6 +174,58 @@
+     m.invalidate_all();
+     const OpResult r = ok(m.join(JoinAlgorithm::Bnl, o, i, 8, ResultShape{}, jp));
+     EXPECT_EQ(r.delta.global.reads(), 4u + 6u + 1u);
++}
++
++TEST(Monitor, BnlDividePaginaDensaComTresMolduras) {
++    for (const Policy policy : {Policy::Lru, Policy::Mru}) {
++        Monitor m(test_config(policy == Policy::Lru ? "mon_bnl_denso_lru" : "mon_bnl_denso_mru", policy));
++        const Schema schema = make_schema({{"k", FieldType::Int32, 0, true}});
++        const auto a = m.create_table("a", schema, {}), b = m.create_table("b", schema, {});
++        std::vector<std::vector<Value>> rows;
++        for (std::int64_t k = 0; k < 400; ++k) rows.push_back({k});
++        RowsStream ra(m, a, rows), rb(m, b, rows);
++        m.bulk_load(a, ra);
++        m.bulk_load(b, rb);
++        const JoinInput outer{path(m, a, PathKind::Scan), 0, 0}, inner{path(m, b, PathKind::Scan), 0, 1};
++        const auto planned = m.plan_join(JoinAlgorithm::Bnl, outer, inner, 3, {});
++        ASSERT_TRUE(std::holds_alternative<JoinPlan>(planned));
++        EXPECT_LE(std::get<JoinPlan>(planned).frames_used(), 3u);
++        m.flush_all();
++        m.invalidate_all();
++        const auto result = ok(m.join(JoinAlgorithm::Bnl, outer, inner, 3, {}));
++        EXPECT_EQ(result.rows, 400u);
++        // 400 registros cabem numa página, mas o diretório de 1 moldura exige três rodadas.
++        EXPECT_EQ(result.delta.global.requests, 4u);   // uma externa + três varreduras de uma página
++        EXPECT_EQ(result.delta.global.reads(), 2u);    // a página interna fica em cache entre rodadas
++        EXPECT_EQ(result.flush_writes, 0u);
++    }
++}
++
++TEST(Monitor, BnlDiretorioExatamenteCheioNaoRevarreInternaVazia) {
++    Monitor m(test_config("mon_bnl_limite"));
++    const Schema schema = make_schema({{"k", FieldType::Int32, 0, true}});
++    for (const std::size_t count : {169, 170, 171}) {
++        const auto a = m.create_table("a" + std::to_string(count), schema, {});
++        const auto b = m.create_table("b" + std::to_string(count), schema, {});
++        std::vector<std::vector<Value>> outer_rows, inner_rows;
++        for (std::size_t k = 0; k < count; ++k) outer_rows.push_back({static_cast<std::int64_t>(k)});
++        for (std::int64_t k = 0; k < 600; ++k) inner_rows.push_back({k});
++        RowsStream ra(m, a, outer_rows), rb(m, b, inner_rows);
++        m.bulk_load(a, ra);
++        m.bulk_load(b, rb);
++        const JoinInput outer{path(m, a, PathKind::Scan), 0, 0}, inner{path(m, b, PathKind::Scan), 0, 1};
++        m.flush_all();
++        m.invalidate_all();
++        const auto result = ok(m.join(JoinAlgorithm::Bnl, outer, inner, 3, {}));
++        EXPECT_EQ(result.rows, count);
++        // ABI desta bancada: diretório de 4096 B comporta 170 RecordViews de 24 B.
++        // A externa tem uma página e a interna duas; 171 linhas externas exigem duas rodadas.
++        EXPECT_EQ(result.delta.global.requests, count <= 170 ? 3u : 5u);
++        EXPECT_EQ(result.estimate.transfers, count <= 170 ? 3.0 : 5.0);
++        std::cout << "  [bnl] externa=" << count << " pares=" << result.rows
++                  << " requisicoes=" << result.delta.global.requests << " leituras=" << result.delta.global.reads()
++                  << " gravacoes=" << result.delta.global.writes() << '\n';
++    }
+ }
+ 
+ // P12 da auditoria de 10/11: com M pequeno, o sort-merge grava runs e o hash grava partições, e
+--- a/PrototipoIA/Implementacao/tests/memoria/test_bnl.cpp
++++ b/PrototipoIA/Implementacao/tests/memoria/test_bnl.cpp
+@@ -66,9 +66,9 @@
+     for (const auto& c : casos) {
+         Ambiente amb("mem_bnl_" + std::to_string(n++), c);
+         const JoinInput pe{amb.scan(amb.mon, amb.me), 0, 0}, pi{amb.scan(amb.mon, amb.mi), 0, 1};
+-        std::size_t m = 3;   // M mínimo: o menor m em que o diretório do chunk cabe nas molduras
++        std::size_t m = 3;   // uma página externa, uma interna e uma para o diretório
+         while (!std::holds_alternative<JoinPlan>(amb.mon.plan_join(JoinAlgorithm::Bnl, pe, pi, m, JoinParams{}))) ++m;
+-        ASSERT_TRUE(m > 3);
++        ASSERT_TRUE(m == 3);   // uma página densa pode ser repartida entre rodadas
+         const auto abaixo = amb.mon.plan_join(JoinAlgorithm::Bnl, pe, pi, m - 1, JoinParams{});
+         EXPECT_TRUE(std::get<NotApplicable>(abaixo).kind == NotApplicable::Kind::Inviavel);   // abaixo: controlado
+         for (std::size_t mm : {m, m + 4, std::size_t{32}}) {
+--- a/PrototipoIA/Implementacao/tests/test_estimativas.cpp
++++ b/PrototipoIA/Implementacao/tests/test_estimativas.cpp
+@@ -37,6 +37,12 @@
+     const Cost c = estimate_join(p, tabela(2000, 100, 20), tabela(800, 40, 20));
+     EXPECT_TRUE(perto(c.transfers, 380));
+     EXPECT_TRUE(perto(c.seeks, 14));
++    // O diretório limita a rodada a 100 registros: 2000 / 100 = 20 rodadas,
++    // mesmo que o chunk nominal precisasse de apenas 7. Custo = 100 + 20 * 40 = 900.
++    p.dir_entries = 100;
++    const Cost limited = estimate_join(p, tabela(2000, 100, 20), tabela(800, 40, 20));
++    EXPECT_TRUE(perto(limited.transfers, 900));
++    EXPECT_TRUE(perto(limited.seeks, 40));
+ }
+ 
+ TEST(Estimativas, SortMergeComUmPasseEEntradaOrdenada) {

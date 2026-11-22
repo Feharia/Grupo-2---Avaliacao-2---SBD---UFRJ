@@ -21,6 +21,7 @@ public:
         std::vector<StructureId>      indexes;
         std::uint64_t                 n = 0;
         std::uint64_t                 bytes = 0;  // soma dos tamanhos reais dos registros (P08)
+        std::uint32_t                 max_record_bytes = 0;
         TableStats                    stats;      // (160)
         bool                          stats_valid = false;
     };

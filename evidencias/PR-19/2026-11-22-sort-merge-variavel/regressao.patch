@@ -1,0 +1,76 @@
+diff --git a/PrototipoIA/Implementacao/tests/test_layer2.cpp b/PrototipoIA/Implementacao/tests/test_layer2.cpp
+index 5991888..f4ee5d2 100644
+--- a/PrototipoIA/Implementacao/tests/test_layer2.cpp
++++ b/PrototipoIA/Implementacao/tests/test_layer2.cpp
+@@ -445,6 +445,71 @@ TEST(Monitor, GrupoDeDuplicatasQueNaoCabeViraInaplicavel) {   // (151)
+ // CBD-007 (issue #1): com a interna UNIQUE, o sort-merge usa group_pages = 0 e não guarda o grupo.
+ // O UNIQUE só é garantido quando uma estrutura indexa o campo (157); num heap ele é só declarado.
+ // Na base, 10 × 10 registros de mesma chave devolviam 10 pares em vez de 100, sem aviso.
++TEST(Monitor, SortMergeComVarCharCurtoIndependeDoMaximoDeclarado) {
++    std::optional<std::uint64_t> checksum;
++    for (const std::uint16_t width : {24, 1000, 4050}) {
++        Monitor m(test_config("mon_sm_var_" + std::to_string(width)));
++        const Schema schema = make_schema({{"k", FieldType::Int32, 0, true}, {"v", FieldType::VarChar, width}});
++        const TableId a = m.create_table("a", schema, {}), b = m.create_table("b", schema, {});
++        std::vector<std::vector<Value>> rows;
++        for (std::int64_t k = 999; k >= 0; --k) rows.push_back({k, std::string("x")});
++        RowsStream ra(m, a, rows), rb(m, b, rows);
++        m.bulk_load(a, ra);
++        m.bulk_load(b, rb);
++        const JoinInput outer{path(m, a, PathKind::Scan), 0, 0}, inner{path(m, b, PathKind::Scan), 0, 1};
++        for (const std::size_t memory : {5, 16}) {
++            m.flush_all();
++            m.invalidate_all();
++            const auto planned = m.plan_join(JoinAlgorithm::SortMerge, outer, inner, memory, {});
++            EXPECT_TRUE(std::holds_alternative<JoinPlan>(planned));
++            const auto outcome = m.join(JoinAlgorithm::SortMerge, outer, inner, memory, {});
++            if (const auto* result = std::get_if<OpResult>(&outcome)) {
++                EXPECT_EQ(result->rows, 1000u);
++                EXPECT_EQ(result->flush_writes, 0u);
++                if (!checksum) checksum = result->checksum;
++                EXPECT_EQ(result->checksum, *checksum);
++            } else {
++                EXPECT_TRUE(std::holds_alternative<OpResult>(outcome));
++            }
++        }
++    }
++}
++
++TEST(Monitor, SortMergeVarCharAposManutencao) {
++    Monitor m(test_config("mon_sm_var_manutencao"));
++    const Schema schema = make_schema({{"k", FieldType::Int32, 0, true}, {"v", FieldType::VarChar, 4050}});
++    const TableId a = m.create_table("a", schema, {}), b = m.create_table("b", schema, {});
++    std::vector<std::vector<Value>> rows;
++    for (std::int64_t k = 0; k < 1000; ++k) rows.push_back({k, std::string("x")});
++    for (const TableId t : {a, b}) {
++        RowsStream stream(m, t, rows);
++        m.bulk_load(t, stream);
++        m.insert(t, m.encode(t, {std::int64_t{1000}, std::string(200, 'y')}));
++        m.reorganize(t);
++    }
++    const JoinInput outer{path(m, a, PathKind::Scan), 0, 0}, inner{path(m, b, PathKind::Scan), 0, 1};
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, outer, inner, 16, {})).rows, 1001u);
++    for (const TableId t : {a, b}) {
++        EXPECT_EQ(m.erase_key(t, 0, Key{std::int32_t{1000}}), 1u);
++        m.reorganize(t);
++    }
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, outer, inner, 5, {})).rows, 1000u);
++}
++
++TEST(Monitor, SortMergeCapacidadeZeroViraInviavelNoPlano) {
++    Monitor m(test_config("mon_sm_var_zero"));
++    const Schema schema = make_schema({{"k", FieldType::Int32, 0, true}, {"v", FieldType::VarChar, 4050}});
++    const TableId a = m.create_table("a", schema, {}), b = m.create_table("b", schema, {});
++    for (const TableId t : {a, b}) {
++        RowsStream stream(m, t, {{std::int64_t{1}, std::string(4050, 'x')}});
++        m.bulk_load(t, stream);
++    }
++    const JoinInput outer{path(m, a, PathKind::Scan), 0, 0}, inner{path(m, b, PathKind::Scan), 0, 1};
++    const auto planned = m.plan_join(JoinAlgorithm::SortMerge, outer, inner, 4, {});
++    EXPECT_TRUE(std::holds_alternative<NotApplicable>(planned));
++    EXPECT_EQ(ok(m.join(JoinAlgorithm::SortMerge, outer, inner, 5, {})).rows, 1u);
++}
++
+ TEST(Monitor, SortMergeRejeitaUniqueViolado) {
+     Monitor m(test_config("mon_sm_unique"));
+     const Schema su = make_schema({{"k", FieldType::Int32, 0, true}, {"v", FieldType::Int32}});

@@ -1163,3 +1163,110 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   local das duas correções com testes e evidências.
 - Logs, patch dos testes e comandos de reprodução estão em
   `evidencias/PR-19/2026-11-22-slot-prefetch/`.
+
+## 2026-11-22 — Continuação da revisão do PR #19, sort-merge variável
+
+- Após o commit local `2f0148c`, o usuário autorizou seguir ao próximo
+  item da revisão. Reproduzida a regressão de viabilidade do sort-merge
+  contra a base `4091762`, com programa limitado a esse cenário.
+- Duas entradas de 1.000 chaves únicas e VarChar com conteúdo `x` têm
+  registros efetivos de 7 bytes. A base produz 1.000 pares com M=5 ou 16.
+  No candidato, máximo declarado de 1.000 bytes causa recusa com M=5;
+  máximo de 4.050 causa recusa com M=5 e excesso de runs previstas com M=16.
+- Um plano testemunha executado com a biblioteca atual, reserva M=5 e
+  descritores cobrados nessa reserva produz os 1.000 pares em todos os
+  três máximos testados (24, 1.000 e 4.050), com checksum igual ao da base.
+  Isso demonstra a viabilidade dentro da reserva de páginas. Pico total de
+  heap não foi medido nesta reprodução.
+- Causa localizada no planejamento de `monitor.cpp`: capacidade baseada
+  no máximo do esquema, realimentando a reserva de descritores. Quando a
+  capacidade fica zero, `ceil_div` devolve zero e o plano assume uma run,
+  cujo limite é imposto por `make_runs` na execução.
+- Evidências em `evidencias/PR-19/2026-11-22-sort-merge-variavel/`, com
+  fonte do teste de integração, logs e comandos. A correção desse item
+  permanece pendente; o código de produção não foi modificado nesta etapa.
+
+### Correção local após autorização para continuar
+
+- Adicionadas três regressões permanentes de integração, com resultado
+  derivado das chaves de entrada. Todas falharam antes da alteração.
+  Cobrem VarChar curto, manutenção com tamanhos mistos e capacidade zero.
+- A camada 3 passa a manter o maior tamanho codificado observado por tabela,
+  coletado nos fluxos já existentes. Insert atualiza esse limite e ambas
+  as reorganizações o recalculam; remoções mantêm um limite superior seguro.
+  O campo novo de TableStats e os consumidores foram revisados. A API
+  anterior de capacity_for permanece disponível.
+- O sort-merge usa o limite observado para a capacidade das runs e rejeita
+  capacidade zero explicitamente. Continua cobrando a lista de descritores
+  em M. O planejamento permanece conservador diante de tamanhos mistos.
+- Os três testes passaram depois. Suíte de 103 testes C++ aprovada em
+  Release e ASan/UBSan (-O1, 57,73 s, LeakSanitizer desativado). O reproducer
+  original retornou os 1.000 pares corretos nos seis casos.
+- Perfil de I/O existente: 168 cenários, ambos os lados conferidos com
+  SQLite e tuplas, zero alterações de leituras, gravações ou flush frente
+  a `2f0148c`. A primeira comparação foi recusada por caminhos diferentes
+  de compilador nos metadados; repetida com `/usr/bin/c++` nos dois lados.
+- A correção ainda é local e sem commit. As duas medições identificam o
+  mesmo SHA base, com hashes distintos das árvores em seus metadados e o
+  diff preservado em correcao.patch. Logs e comandos estão no diretório
+  de evidências deste item. Revisão adicional do diff sem defeitos apontados.
+
+## 2026-11-22 — Sort-merge com cursores clustering/hash dentro de M
+
+- O usuário autorizou continuar. O próximo caso revisado mantém duas
+  páginas por fonte clustering sobre hash (índice e dados), enquanto o
+  plano contava uma. Reproduzida exceção de molduras fixadas com duas fontes
+  UNIQUE e M=3, e com duplicatas, grupo de uma página e M=4.
+- Acrescentados dois testes de integração. A versão completa dos testes
+  falha na biblioteca anterior e passa após a alteração. Cobre mínimos de
+  quatro/cinco molduras, clustering sobre B+, fontes mistas e passe extra
+  para materialização de heap. Os resultados esperados vêm das chaves.
+- JoinPlan passa a expor ordered_extra_frames, debitado apenas na fase
+  final, inclusive em frames_used, verificação de viabilidade e fan-in.
+  O driver registra esse parâmetro e final_fan_in, usando requires para
+  compilar também contra os headers anteriores. Consumidores e duração
+  dos cursores foram revistos no escopo desta mudança.
+- Release: 105 testes C++ aprovados. Perfil de I/O: 168 cenários, zero
+  alterações em leituras, gravações ou flush; SQLite com tuplas sem
+  divergências nos dois lados. A referência inclui a correção anterior de
+  VarChar, permitindo atribuir a comparação somente a este ajuste.
+- Evidências em `evidencias/PR-19/2026-11-22-sort-merge-clustering/`.
+  Os 105 testes passaram também com ASan/UBSan (-O1, 52,79 s,
+  LeakSanitizer desativado). Revisão adicional do ajuste sem defeitos apontados.
+  Os patches continuam locais e sem novo commit. As medições guardam o SHA
+  base e hashes das fontes para identificar as duas árvores modificadas.
+
+## 2026-11-22 — BNL com página densa e limite exato do diretório
+
+- Continuação autorizada pelo usuário. Reproduzidos o plano inviável com
+  400 Int32 e M=3 e a varredura interna vazia após 170 registros externos
+  preencherem exatamente o diretório. Os novos testes falharam antes.
+- O plano passa a limitar o diretório às molduras disponíveis ao chegar a
+  chunk=1. O executor já retém a página parcial entre rodadas. Agora pula
+  rodadas de diretório vazio. Conservados os limites de molduras e vetores.
+- Testes de integração em LRU/MRU e limites 169/170/171, com oráculo de
+  chaves e requisições calculadas à mão. Na fronteira de 170, leituras
+  caíram de cinco para três; 171 antes era inviável e agora produz 171 pares
+  com cinco leituras. O teste de alocações de memória, atualizado para M=3,
+  passou para registros densos e variáveis dentro do diretório e controle
+  declarado. As molduras continuam retidas.
+- A revisão identificou que a fórmula ainda ignorava o limite do diretório.
+  Novo RED comprovou a previsão de três contra cinco no caso de 171.
+  Corrigida a premissa usando também ceil(n/dir_entries), com teste unitário
+  calculado à mão. O modelo permanece aproximado para arredondamentos por
+  página/chunk e cache, com exemplo e limites documentados na evidência.
+- Release: 107 testes C++ aprovados. Perfil de I/O existente: 168 cenários
+  sem alterações em leituras, gravações e flush; SQLite com tuplas sem
+  divergências dos dois lados. Comparação contra a árvore com as duas
+  correções anteriores, isolando o efeito deste ajuste.
+- Fontes anteriores, diff, logs e comandos estão em
+  `evidencias/PR-19/2026-11-22-bnl/`. Alterações locais, sem novo commit.
+- ASan/UBSan: os mesmos 107 testes aprovados após o ajuste da fórmula,
+  em 54,14 s (-O1, LeakSanitizer desativado). Revisão adicional confirmou
+  o ajuste e explicitou a limitação de arredondamentos do modelo.
+
+### Consolidação local das três correções
+
+- O usuário autorizou consolidar VarChar, clustering/hash e BNL em commit
+  local antes de continuar a matriz. Conferidos diff, escopo e hashes da
+  última evidência. Reexecutados 107 testes C++ e 48 Python, todos aprovados.

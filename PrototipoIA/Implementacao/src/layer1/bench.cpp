@@ -613,6 +613,8 @@ std::string join_params(const Plan& p) {
                << "; fan_in=" << p.fan_in << "; passes_ext=" << p.merge_passes_outer << "; passes_int="
                << p.merge_passes_inner << "; group_pages=" << p.group_pages;
             if constexpr (requires { p.desc_frames; }) os << "; desc_frames=" << p.desc_frames;   // CBD-005
+            os << "; final_fan_in=" << p.final_fan_in;
+            if constexpr (requires { p.ordered_extra_frames; }) os << "; ordered_extra_frames=" << p.ordered_extra_frames;
             break;
         case JoinAlgorithm::Hash:
             os << "; particoes=" << p.partitions << "; niveis=" << p.levels << "; build_pages=" << p.build_pages

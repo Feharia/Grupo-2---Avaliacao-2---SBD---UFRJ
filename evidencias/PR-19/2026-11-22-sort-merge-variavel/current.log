@@ -1,0 +1,13 @@
+max_varchar=24 encoded_bytes=7 schema_record_size=30 b=3
+M=5 run_pages=2 runs=6/6 rows=1000 checksum=6419884852493350448 reads=19 writes=13
+M=16 run_pages=13 runs=1/1 rows=1000 checksum=6419884852493350448 reads=12 writes=6
+direct M=5 frames=5 rows=1000 checksum=6419884852493350448
+max_varchar=1000 encoded_bytes=7 schema_record_size=1006 b=3
+M=5 inviavel=lista de runs não cabe em m
+M=16 run_pages=13 runs=20/20 rows=1000 checksum=6419884852493350448 reads=12 writes=6
+direct M=5 frames=5 rows=1000 checksum=6419884852493350448
+max_varchar=4050 encoded_bytes=7 schema_record_size=4056 b=3
+M=5 inviavel=lista de runs não cabe em m
+M=16 run_pages=1 runs=1/1 inviavel=não cabe em M: lista de runs passou do número previsto pelo plano
+direct M=5 frames=5 rows=1000 checksum=6419884852493350448
+exit_code=1
