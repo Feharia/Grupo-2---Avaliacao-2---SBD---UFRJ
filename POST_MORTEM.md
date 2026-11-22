@@ -1138,3 +1138,28 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   parâmetros viraram templates e só usam esses campos se existirem
   (`if constexpr (requires ...)`). Localmente, a comparação contra a main
   passou: 168 cenários e 29 alertas (os já descritos no `docs/IO.md`).
+
+## 2026-11-22 — Regressões locais de SlottedPage e prefetch do PR #19
+
+- Trabalho delimitado aos dois casos solicitados pelo usuário, na branch
+  `fix/pr19-slot-prefetch`, criada da base `f8177711ac3f6816f321948dff8bef798018b934`
+  em worktree separado. A revisão ampla do PR continua pendente.
+- Adicionadas regressões antes da implementação. O teste unitário da
+  SlottedPage deriva do layout declarado em `page.hpp`, com região livre
+  entre `free_lo` e `free_hi`. O teste de integração BufferPool/FileManager
+  deriva do ciclo de alocação e cobre blocos nunca alocados e liberados,
+  continuidade do prefetch após lacunas, cache e leituras esperadas.
+- Na base com os novos testes, ambos falharam. O slot na região livre era
+  aceito e operações posteriores alteravam a página. O prefetch lia oito
+  blocos em cenários com um ou dois alocados e impedia a alocação seguinte.
+- Correção mínima em `page.cpp` e `buffer_pool.cpp`: usar `free_hi` como
+  limite inferior do registro e pular blocos livres no bitmap antes do
+  prefetch. Preservadas as interfaces públicas.
+- Depois da correção, as duas regressões e os 100 testes C++ da suíte
+  Release passaram (89 principais e 11 de memória).
+- Os mesmos 100 testes passaram em Debug com ASan/UBSan (199,80 s), com
+  LeakSanitizer desativado. Os avisos preexistentes de compilação dos testes
+  constam dos logs. O usuário autorizou em seguida o stageamento e o commit
+  local das duas correções com testes e evidências.
+- Logs, patch dos testes e comandos de reprodução estão em
+  `evidencias/PR-19/2026-11-22-slot-prefetch/`.

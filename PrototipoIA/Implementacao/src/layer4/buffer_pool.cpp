@@ -241,6 +241,7 @@ void BufferPool::prefetch(BlockId start, Region& r, Intent intent) {
     for (std::uint32_t k = 1; k < cfg_.extent_blocks; ++k) {
         const BlockId b{start.file, start.block + k};
         if (b.block >= nb) break;
+        if (files_.is_free(b.file, b.block)) continue;
         if (page_table_.count(b)) continue;
         if (r.free.empty() && r.policy->candidates() == 0) break;   // só expulsa páginas não fixadas (150)
         const FrameId f = obtain_frame(r);

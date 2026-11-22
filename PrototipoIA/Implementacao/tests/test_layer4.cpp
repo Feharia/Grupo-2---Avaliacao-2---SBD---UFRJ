@@ -238,6 +238,33 @@ TEST(BufferPool, MigracaoParaOSubpoolContaComoAcerto) {
     EXPECT_EQ(d.reads(), 0u);
 }
 
+// Leitura antecipada só pode trazer blocos alocados, inclusive quando há lacunas no extent.
+TEST(BufferPool, PrefetchIgnoraBlocosLivres) {
+    for (const bool released : {false, true}) {
+        auto cfg = test_config(released ? "bp_pref_liberado" : "bp_pref_novo");
+        cfg.prefetch = true;
+        cfg.extent_blocks = 8;
+        BufferPool pool(cfg);
+        const FileId file = file_with_blocks(pool, "a.dat", FileKind::Data, released ? 3 : 1);
+        if (released) pool.free_block(BlockId{file, 2});
+        Reservation reservation = pool.reserve(8);
+        const auto before = pool.snapshot();
+        { auto guard = pool.fetch(BlockId{file, 1}, kSeqOnce, reservation.id()); }
+        EXPECT_EQ((pool.snapshot() - before).global.reads(), released ? 2u : 1u);
+        if (released) {
+            const auto cached = pool.snapshot();
+            auto guard = pool.fetch(BlockId{file, 3}, kRandomReuse, reservation.id());
+            EXPECT_EQ((pool.snapshot() - cached).global.reads(), 0u);
+            EXPECT_TRUE(guard.read()[100] == std::byte{3});
+        }
+        EXPECT_NO_THROW({
+            auto allocated = pool.allocate(file, reservation.id());
+            EXPECT_EQ(allocated.first.block, 2u);
+            EXPECT_TRUE(allocated.second.read()[100] == std::byte{0});
+        });
+    }
+}
+
 TEST(BufferPool, PrefetchLeAteOFimDoExtent) {
     auto cfg = test_config("bp_pref");
     cfg.prefetch = true;

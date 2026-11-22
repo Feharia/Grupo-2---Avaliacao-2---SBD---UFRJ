@@ -1,0 +1,16 @@
+e02196d58282458fd027256a8fbfa1533af8101d1566a61bff2680ce6fae8671  PrototipoIA/Implementacao/src/layer3/page.cpp
+06910c0bc1e29b43767b6e17e45354cf1f473c45b0e509d2aafdcbec1d9d7683  PrototipoIA/Implementacao/src/layer4/buffer_pool.cpp
+c81daca2fde6f28ef32dcfdebf81a8bd0573ab2a7d97b338eb95c563f57e6aca  PrototipoIA/Implementacao/tests/test_layer3.cpp
+a39798dafd4b0606d3fff20d5163a386da2b8db20c62ee812addb438c09745c6  PrototipoIA/Implementacao/tests/test_layer4.cpp
+470365967b90d78ab45863e54a638c3ae2d9a6a93ff8c760fa273452adbc8f1c  evidencias/PR-19/2026-11-22-slot-prefetch/asan-details.log
+7548857d12769c6eae9c35ffc1c72a9c5f17eada2909f78ed4595effe571e889  evidencias/PR-19/2026-11-22-slot-prefetch/asan.log
+f106928a219ca70b85e2684deef0a8741218a15ba0047aa8dca57a446ee7ffc5  evidencias/PR-19/2026-11-22-slot-prefetch/build-asan.log
+7a4508d7623aedbefa19390a4f5f268fcba08279bfe7a9f68c1ce0aaee103beb  evidencias/PR-19/2026-11-22-slot-prefetch/build-green.log
+e95c4bcce849dd2f34cd1d91f49767d4d150fabb5152636db435fd458193dddf  evidencias/PR-19/2026-11-22-slot-prefetch/build-red.log
+23c9c362a1243fe2e4412e1bbe697279d3f971095b322a5b15f585a036d0dd40  evidencias/PR-19/2026-11-22-slot-prefetch/configure-asan.log
+95a35c04562d292eb118c1fa3853b69c0c85264b53fadf30db8b7878689f5b6d  evidencias/PR-19/2026-11-22-slot-prefetch/configure.log
+545cedc2d6d8668dfc12c8451d6fdb25fc8daabeeeed8e2bf4e4a2821fcb1b1d  evidencias/PR-19/2026-11-22-slot-prefetch/green.log
+b930399231e34b05ab53c282d57d2e0be945b1cd02309724f810441a202be338  evidencias/PR-19/2026-11-22-slot-prefetch/red.log
+852de2f839693ad1ac44124096c5928cb5e629f25eec3e8894dc9024eff7753c  evidencias/PR-19/2026-11-22-slot-prefetch/suite-details.log
+69f0ba0fae81506b03bcd1f6e2ccaa57a10b7e281c4e0fe48b068b42ef82caba  evidencias/PR-19/2026-11-22-slot-prefetch/suite.log
+ce973a2a2d2a50febf0b3dfa2dd050dacb627e3e3be6cbca3fe655f474a9d6f1  evidencias/PR-19/2026-11-22-slot-prefetch/testes.patch

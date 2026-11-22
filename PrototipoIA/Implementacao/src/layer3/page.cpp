@@ -45,8 +45,8 @@ PageHeader sp_header(std::span<const std::byte> p) {
 // slot i (i < nslots, já conferido por sp_header); um slot vivo precisa estar na área de registros
 Slot checked_slot(std::span<const std::byte> p, const PageHeader& h, std::uint16_t i) {
     const Slot s = slot_at(p, i);
-    if (s.len != 0 && (s.off < h.free_lo || static_cast<std::uint32_t>(s.off) + s.len > page_size(p)))
-        malformed("slot com offset fora do bloco");
+    if (s.len != 0 && (s.off < h.free_hi || static_cast<std::uint32_t>(s.off) + s.len > page_size(p)))
+        malformed("slot fora da área de registros");
     return s;
 }
 }  // namespace

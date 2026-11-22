@@ -67,6 +67,26 @@ TEST(SlottedPage, SlotsNaoSaoRenumerados) {
     EXPECT_EQ(read_header(page).live, 3);
 }
 
+// O layout define [free_lo, free_hi) como espaço livre e free_hi como início dos registros.
+TEST(SlottedPage, RejeitaSlotNaRegiaoLivre) {
+    std::vector<std::byte> valid(4096);
+    sp_init(valid, PageType::Heap);
+    const std::vector<std::byte> record(4, std::byte{7});
+    ASSERT_TRUE(sp_insert(valid, record).has_value());
+    const PageHeader header = read_header(valid);
+    EXPECT_TRUE(std::equal(record.begin(), record.end(), sp_record(valid, 0).begin()));
+
+    for (const std::uint16_t offset : {header.free_lo, static_cast<std::uint16_t>(header.free_hi - 1)}) {
+        auto page = valid;
+        store<std::uint16_t>(page.data() + kPageHeader, offset);
+        const auto original = page;
+        EXPECT_THROW(sp_record(page, 0), std::out_of_range);
+        EXPECT_THROW(sp_compact(page), std::out_of_range);
+        EXPECT_THROW(sp_insert(page, record), std::out_of_range);
+        EXPECT_TRUE(page == original);
+    }
+}
+
 // CBD-008 (issue #3): a auditoria reproduziu, com ASan, leitura fora do bloco numa página de 4.096 B
 // com nslots = 65535. Os metadados lidos do disco são conferidos antes de qualquer acesso ao
 // diretório; página malformada vira std::out_of_range em todas as funções da SlottedPage.
