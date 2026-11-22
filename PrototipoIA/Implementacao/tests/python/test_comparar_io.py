@@ -28,7 +28,7 @@ def sample():
 
 
 def metadata():
-    return {"protocolo": "io-rapido-v1", "commit": "a" * 40,
+    return {"protocolo": "io-rapido-v2", "commit": "a" * 40,
             "validado_sqlite_tuplas": True,
             "assinatura": {"dados": {"dados/a.csv": "abc"}, "config": {"block_size": 4096},
                            "manifesto": {"m_juncao": "32"}}, "tool_hash": "abc"}
@@ -137,25 +137,36 @@ class IoComparisonTest(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(ValueError):
                 self.compare(left=metadata() | change)
 
+    def test_protocols_cannot_be_mixed(self):
+        with self.assertRaises(ValueError):
+            self.compare(right=metadata() | {"protocolo": "io-rapido-v1"})
+
     def test_different_commit_is_expected(self):
         self.assertEqual(self.compare(right=metadata() | {"commit": "b" * 40})["cenarios"], 1)
 
-    def measurement(self, root, name, row):
+    def measurement(self, root, name, row, profile="io-rapido-v2"):
         directory = root / name
         (directory / "smoke").mkdir(parents=True)
         csv_path = directory / "smoke/resultados.csv"
         with csv_path.open("w", newline="") as file:
             writer = csv.DictWriter(file, fieldnames=list(row))
             writer.writeheader()
-            inventory_path = path.with_name("io_cenarios_v1.json")
+            inventory_path = path.with_name(io.PROFILES[profile])
             for n, key in enumerate(json.loads(inventory_path.read_text())):
                 fixture = (row if n == 0 else sample()) | dict(zip(
                     ("politica", "operacao", "variante", "algoritmo"), key))
                 writer.writerow(fixture)
-        meta = metadata() | {"resultados_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),
+        meta = metadata() | {"protocolo": profile, "resultados_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),
                              "inventario_sha256": hashlib.sha256(inventory_path.read_bytes()).hexdigest()}
         (directory / "medicao.json").write_text(json.dumps(meta))
         return directory
+
+    def test_historical_v1_remains_readable(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = self.measurement(Path(temporary), "historico", sample(), profile="io-rapido-v1")
+            rows, meta = io.read_measurement(directory)
+            self.assertEqual(len(rows), 168)
+            self.assertEqual(meta["protocolo"], "io-rapido-v1")
 
     def test_changed_csv_after_validation_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:

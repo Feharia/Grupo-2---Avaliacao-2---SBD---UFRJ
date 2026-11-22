@@ -1,5 +1,11 @@
 # Bancada de teste de CBD: protótipo gerado por IA
 
+Revisão de 22/11/2026: a bancada separa heaps sem índices das variantes
+indexadas e verifica a configuração física pelos metadados. A rodada
+corrigida e suas limitações estão nas [evidências](../../evidencias/PR-19/2026-11-22-matriz-fisica/README.md).
+Os números de `resultados_exemplo/` e da análise de 17/11 abaixo
+representam o snapshot anterior à correção da matriz física.
+
 Este é um protótipo funcional da arquitetura descrita em `../HANDOFF_ARQUITETURA_2026-11-08.md` (decisões 1 a 45 e 100 a 175, com as emendas de 08/11 e da auditoria de 10/11) e no diagrama `../diagrama_camadas_v5.png`. É **código bruto gerado por IA**, ainda sem revisão do grupo. O `PROMPTS.md` traz o log de prompts e as correções que a própria IA fez durante a geração.
 
 Estado em 17/11/2026 (commit `49be2d4`, rodada definitiva em `resultados_exemplo/`):

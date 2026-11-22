@@ -9,6 +9,8 @@ import re
 import shlex
 import sys
 
+PROFILES = {"io-rapido-v1": "io_cenarios_v1.json", "io-rapido-v2": "io_cenarios_v2.json"}
+
 KEY = ("politica", "operacao", "tipo", "tamanho", "config", "seletividade",
        "variante", "algoritmo", "externa", "interna", "m", "rep")
 METRICS = ("leituras", "gravacoes", "total", "flush_writes", "total_com_flush")
@@ -18,7 +20,7 @@ def ensure_inventory(rows, required):
     actual = {tuple(row[field] for field in ("politica", "operacao", "variante", "algoritmo"))
               for row in rows if row["status"] == "ok"}
     if actual != required:
-        raise ValueError(f"inventário io-rapido-v1 incompatível: {len(required - actual)} ausentes; {len(actual - required)} extras")
+        raise ValueError(f"inventário de I/O incompatível: {len(required - actual)} ausentes; {len(actual - required)} extras")
 
 
 def compiler_options(entries, source):
@@ -70,11 +72,12 @@ def delta(before, after):
 
 def compare_rows(before, after, left, right):
     for metadata in (left, right):
-        if (metadata.get("protocolo") != "io-rapido-v1"
+        if (metadata.get("protocolo") not in PROFILES
                 or metadata.get("validado_sqlite_tuplas") is not True
                 or not metadata.get("assinatura") or not metadata.get("tool_hash")):
             raise ValueError("metadados ausentes, protocolo desconhecido ou medição não validada")
-    if left["assinatura"] != right["assinatura"] or left["tool_hash"] != right["tool_hash"]:
+    if (left["protocolo"] != right["protocolo"] or left["assinatura"] != right["assinatura"]
+            or left["tool_hash"] != right["tool_hash"]):
         raise ValueError("protocolo incompatível: dados, consultas, parâmetros, Config ou ferramentas diferentes")
     old, new = index_rows(before), index_rows(after)
     if old.keys() != new.keys():
@@ -113,7 +116,10 @@ def read_measurement(directory):
         raise ValueError("resultados.csv foi alterado depois da validação")
     with csv_path.open(newline="", encoding="utf-8") as file:
         rows = list(csv.DictReader(file))
-    profile = Path(__file__).with_name("io_cenarios_v1.json")
+    profile_name = PROFILES.get(metadata.get("protocolo"))
+    if not profile_name:
+        raise ValueError("protocolo desconhecido")
+    profile = Path(__file__).with_name(profile_name)
     if hashlib.sha256(profile.read_bytes()).hexdigest() != metadata.get("inventario_sha256"):
         raise ValueError("inventário versionado diferente do usado na medição")
     ensure_inventory(rows, {tuple(key) for key in json.loads(profile.read_text())})

@@ -19,6 +19,32 @@ import importlib.util
 import os
 import sys
 
+PRIMARIOS = {"primary_btree", "primary_hash"}
+SECUNDARIOS = {"secondary_hash", "secondary_btree", "clustering_btree"}
+IDENTIDADE = ("politica", "operacao", "variante", "algoritmo")
+
+
+def configuracao_fisica(config, a, b=None):
+    """Presença dos métodos no campo do predicado, independentemente do caminho escolhido."""
+    def primario(methods):
+        return bool(methods & PRIMARIOS)
+
+    def secundario(methods):
+        return bool(methods & SECUNDARIOS)
+
+    def nenhum(methods):
+        return not methods & (PRIMARIOS | SECUNDARIOS)
+
+    if b is None:
+        return {"a": nenhum(a), "b": primario(a), "c": secundario(a)}.get(config, False)
+    return {
+        "a": nenhum(a) and nenhum(b),
+        "b": (primario(a) and nenhum(b)) or (nenhum(a) and primario(b)),
+        "c": primario(a) and primario(b),
+        "d": (primario(a) and secundario(b)) or (secundario(a) and primario(b)),
+        "e": secundario(a) and secundario(b),
+    }.get(config, False)
+
 _spec = importlib.util.spec_from_file_location("matriz", os.path.join(os.path.dirname(os.path.abspath(__file__)), "matriz.py"))
 matriz = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(matriz)
@@ -51,6 +77,7 @@ def verificar(saida, aceitar_reduzida=False):
     man = ler_manifesto(os.path.join(saida, "manifesto.txt"))
 
     politicas = sorted({r["politica"] for r in brutos})
+    minimo = 1
     if not aceitar_reduzida:
         try:
             escala = float(man.get("escala", "0").replace(",", "."))
@@ -68,6 +95,50 @@ def verificar(saida, aceitar_reduzida=False):
         for p in matriz.POLITICAS:
             if p not in politicas:
                 falhas.append(f"política {p} ausente do resultados.csv")
+
+    configs, metodos = {}, {}
+    for r in ler_csv(os.path.join(saida, "configuracoes.csv")):
+        key = tuple(r.get(k, "") for k in IDENTIDADE)
+        if key in configs:
+            falhas.append(f"metadados de configuração duplicados: {key}")
+        configs[key] = r
+    for r in ler_csv(os.path.join(saida, "metodos.csv")):
+        metodo = r.get("metodo", "")
+        if metodo not in PRIMARIOS | SECUNDARIOS | {"scan"}:
+            falhas.append(f"método físico desconhecido: {metodo}")
+        metodos.setdefault((r.get("politica"), r.get("tabela"), r.get("campo")), set()).add(metodo)
+
+    executadas = {}
+    for r in brutos:
+        if r["status"] not in ("ok", "inviavel"):
+            continue
+        key = tuple(r[k] for k in IDENTIDADE)
+        if r["status"] == "ok":
+            reps = executadas.setdefault(key, set())
+            if r["rep"] in reps:
+                falhas.append(f"repetição duplicada: {key} rep={r['rep']}")
+            reps.add(r["rep"])
+        elif not r.get("motivo", "").strip():
+            falhas.append(f"inviável sem motivo: {key}")
+        meta = configs.get(key)
+        if not meta:
+            falhas.append(f"sem metadados físicos para {key}")
+            continue
+        campos = []
+        for lado in ("externa", "interna") if r["algoritmo"] else ("externa",):
+            campo = meta.get("campo_" + lado, "")
+            tabela = meta.get(lado, "")
+            methods = metodos.get((r["politica"], tabela, campo))
+            if not campo or tabela != r[lado] or methods is None:
+                falhas.append(f"metadados físicos inconsistentes: {key} {lado}")
+                break
+            campos.append(methods)
+        else:
+            if not configuracao_fisica(r["config"], *campos):
+                falhas.append(f"configuração física não confere com {r['config']}: {key}")
+    for key, reps in executadas.items():
+        if len(reps) < max(1, minimo) or any(not rep.isdigit() or int(rep) < 1 for rep in reps):
+            falhas.append(f"repetições executadas insuficientes ou inválidas: {key} ({len(reps)})")
 
     blocos = {}
     for r in ler_csv(os.path.join(saida, "estatisticas.csv")):
@@ -106,6 +177,8 @@ def verificar(saida, aceitar_reduzida=False):
     resumo = (f"matriz obrigatória: {len(matriz.obrigatorias())} células por política, {', '.join(politicas)}; "
               f"{cont['ok']} executadas, {cont['nao_aplicavel']} não aplicáveis, {cont['inviavel']} inviáveis, "
               f"{cont['ausente']} ausentes; porte conferido em {portes} execuções de junção")
+    if cont["ok"] == 0:
+        falhas.append("nenhuma célula obrigatória executada com sucesso")
     return falhas, avisos, resumo
 
 

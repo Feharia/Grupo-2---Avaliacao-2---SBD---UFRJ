@@ -1,0 +1,4 @@
+matriz obrigatória: 60 células por política, LRU, MRU; 108 executadas, 12 não aplicáveis, 0 inviáveis, 0 ausentes; porte conferido em 114 execuções de junção
+  FALHA rodada reduzida (escala 0.1): não prova a matriz nem o porte
+  FALHA repetições mínimas 1..1: o enunciado pede pelo menos 3
+matriz: REPROVADA (2 falhas)

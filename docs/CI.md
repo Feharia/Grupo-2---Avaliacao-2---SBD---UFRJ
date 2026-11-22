@@ -40,6 +40,15 @@ verifica ASan/UBSan e não valida vazamentos com LeakSanitizer.
 
 ## Cobertura da bancada reduzida
 
+A matriz integral cruza `metodos.csv` (métodos disponíveis em cada campo)
+com `configuracoes.csv` (operandos e campos efetivamente escolhidos).
+O `verificar_matriz.py` exige configurações físicas consistentes e
+repetições efetivamente executadas. O `compare.py` também rejeita saída
+vazia e combinações declaradas ausentes. A CLI `--so` declara e confere
+apenas as operações selecionadas. Seus testes de integração usam
+`BUILD_DIR/bancada`, já disponível no ambiente do workflow.
+
+
 O comando é `bancada --rapido --tuplas --saida DIRETORIO_NOVO`. Depois, a
 referência SQLite é gerada, o inventário de execuções é verificado e
 `compare.py --tuplas` compara contagens, checksums e multiconjuntos de tuplas.

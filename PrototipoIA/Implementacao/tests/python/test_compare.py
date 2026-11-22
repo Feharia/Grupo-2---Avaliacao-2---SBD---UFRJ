@@ -29,6 +29,7 @@ class CompareTest(unittest.TestCase):
         self.ref = [("j_x", "*", "2", "10"), ("sel_x", "1", "1", "7")]
         self.ops = ["j_x", "sel_x"]
         self.dumps = True
+        self.plano = None
 
     def nome(self, r):
         v = "".join(c if c.isalnum() else "_" for c in r["variante"])
@@ -53,6 +54,12 @@ class CompareTest(unittest.TestCase):
                     (self.out / "tuplas_motor" / self.nome(r)).write_text("aa\nbb\n")
             (self.out / "tuplas_ref" / "j_x_todas.txt").write_text("bb\naa\n")
             (self.out / "tuplas_ref" / "sel_x_1.txt").write_text("aa\nbb\n")
+        if self.plano is not None:
+            with (self.out / "configuracoes.csv").open("w", newline="") as f:
+                fields = ["politica", "operacao", "variante", "algoritmo"]
+                w = csv.DictWriter(f, fieldnames=fields)
+                w.writeheader()
+                w.writerows({k: r[k] for k in fields} for r in self.plano)
         p = subprocess.run([sys.executable, "-I", str(SCRIPT), str(self.out), *args], capture_output=True, text=True)
         return p.returncode, p.stdout
 
@@ -107,6 +114,23 @@ class CompareTest(unittest.TestCase):
         code, out = self.roda("--tuplas")
         self.assertEqual(code, 1)
         self.assertIn("tuplas diferem", out)
+        self.assertIn("em 1 combinações", out)
+
+    def test_diretorio_vazio_reprova(self):
+        result = subprocess.run([sys.executable, "-I", str(SCRIPT), str(self.out)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 1)
+
+    def test_nenhuma_medicao_reprova(self):
+        for r in self.rows:
+            r["status"] = "inviavel"
+        self.assertEqual(self.roda()[0], 1)
+
+    def test_combinacao_declarada_ausente_reprova(self):
+        self.plano = list(self.rows)
+        self.rows = self.rows[1:]
+        code, out = self.roda()
+        self.assertEqual(code, 1)
+        self.assertIn("combinação declarada sem execução", out)
 
 
 if __name__ == "__main__":

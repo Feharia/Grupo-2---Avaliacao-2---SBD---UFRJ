@@ -17,8 +17,8 @@ correspondente (SAIDA/tuplas_ref), como multiconjuntos ordenados (decisão 166).
 
 Colunas: o motor emite, para cada par, os campos das duas relações, e o SQL de referência é
 SELECT x.*, y.* ... ON x.a = y.b, com as duas colunas da junção. A conferência por checksum e por
-multiconjunto vale para essa forma; o NATURAL JOIN do enunciado mostraria a coluna comum uma vez,
-sem mudar o número de linhas.
+multiconjunto vale para os pares PK/FK explícitos do exercício. NATURAL JOIN literal também
+compararia outras colunas homônimas; requer renomeá-las para representar a mesma operação.
 """
 import csv
 import glob
@@ -49,6 +49,9 @@ def main():
     for r in ler_csv(os.path.join(outdir, "referencia.csv")):
         ref[(r["operacao"], r["rep"])] = (int(r["linhas"]), int(r["checksum"]))
     rows = ler_csv(os.path.join(outdir, "resultados.csv"))
+    if not rows or not ref:
+        print("Conferência inválida: resultados ou referência ausentes/vazios")
+        return 1
     declaradas = {r["operacao"] for r in ler_csv(os.path.join(outdir, "operacoes.csv"))} | {op for op, _ in ref}
 
     checked = 0
@@ -77,10 +80,18 @@ def main():
     vazio = {"politica": "", "variante": "", "algoritmo": "", "rep": ""}
     for op in sorted(declaradas - {r["operacao"] for r in rows}):
         ausentes.append((dict(vazio, operacao=op), "operação declarada sem nenhuma linha no resultados.csv"))
+    campos = ("politica", "operacao", "variante", "algoritmo")
+    previstas = {tuple(r[k] for k in campos) for r in ler_csv(os.path.join(outdir, "configuracoes.csv"))}
+    presentes = {tuple(r[k] for k in campos) for r in rows}
+    for key in sorted(previstas - presentes):
+        ausentes.append((dict(zip(campos, key), rep=""), "combinação declarada sem execução no resultados.csv"))
+    if checked == 0:
+        ausentes.append((dict(vazio, operacao="*"), "nenhuma medição conferida"))
 
     if tuplas:
         tdir, rdir = os.path.join(outdir, "tuplas_motor"), os.path.join(outdir, "tuplas_ref")
         existentes = {os.path.basename(p) for p in glob.glob(os.path.join(tdir, "*.txt"))}
+        combinacao_dump = {nome_dump(r): tuple(r[k] for k in campos) for r in rows if r["status"] == "ok"}
         for r in rows:
             if r["status"] == "ok" and nome_dump(r) not in existentes:
                 ausentes.append((r, "linha medida sem o dump das tuplas do motor"))
@@ -93,6 +104,8 @@ def main():
                 refpath = os.path.join(rdir, "%s_todas.txt" % op)
             if not os.path.exists(refpath):
                 ausentes.append((info, "dump do motor sem a referência do SQLite"))
+                if name in combinacao_dump:
+                    combos_falha.add(combinacao_dump[name])
                 continue
             with open(os.path.join(tdir, name)) as a, open(refpath) as b:
                 mine, theirs = sorted(a.read().split()), sorted(b.read().split())
@@ -100,6 +113,8 @@ def main():
                 only_m = len(set(mine) - set(theirs))
                 only_r = len(set(theirs) - set(mine))
                 bad.append((info, "tuplas diferem: %d só no motor, %d só no SQLite" % (only_m, only_r)))
+                if name in combinacao_dump:
+                    combos_falha.add(combinacao_dump[name])
 
     others = ", ".join("%s: %d" % kv for kv in sorted(skipped.items())) or "nenhuma"
     print("conferidas: %d linhas medidas em %d combinações; sem execução: %s; ausentes: %d; divergências: %d"

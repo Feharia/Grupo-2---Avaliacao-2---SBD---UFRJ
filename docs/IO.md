@@ -1,11 +1,20 @@
 # Suíte pequena para regressão de I/O
 
-O perfil `io-rapido-v1` compara **168 execuções de consultas**, incluindo
+O perfil `io-rapido-v2` compara **168 execuções de consultas**, incluindo
 seleções em heap/B+/hash e índices secundários, BNL, hash join, sort-merge,
 LRU e MRU. Reutiliza a escala reduzida da bancada existente. Não substitui
 a matriz experimental integral exigida no trabalho.
 
-**Revisão do inventário (13/11/2026, auditoria P04/P05).** O inventário
+**Revisão física de 22/11/2026.** O perfil v2 conserva 168 combinações e
+usa heaps sem índices nas configurações que exigem ausência de métodos
+no campo do predicado. Os identificadores desses scans passaram a usar
+`*_heap_sem_indices`. Ambos os motores devem ser medidos novamente com
+o driver e inventário v2. Comparações entre v1 e v2 são recusadas.
+O inventário v1 permanece preservado para suas medições históricas.
+A mudança de protocolo também acrescenta `metodos.csv` e
+`configuracoes.csv` aos metadados de configuração dos experimentos.
+
+**Histórico do perfil v1 — revisão do inventário (13/11/2026, auditoria P04/P05).** O inventário
 passou de 108 para 168 identidades, só com acréscimos: as 8 células do
 NATURAL JOIN que faltavam (P×P b–e, P×G c–e, G×G e) × 3 algoritmos × 2
 políticas, com as duas variantes da configuração c. A seletividade baixa
@@ -69,7 +78,7 @@ e 8 de BNL com MRU (+0,9% a +8,3%), pelas molduras do diretório retidas.
   fontes e saída. As flags e a versão do compilador precisam coincidir.
 - SHA256 de dados, esquema, consultas, constantes e lotes, além dos hashes
   de driver/ferramentas, precisam coincidir. O inventário
-  `tools/io_cenarios_v1.json` fixa as 168 identidades, incluindo variantes;
+  `tools/io_cenarios_v2.json` fixa as 168 identidades, incluindo variantes;
   remover uma delas dos dois lados também falha.
 - Ambos os lados passam pela referência SQLite do candidato, comparação de
   contagens/checksums e multiconjuntos de tuplas e verificação de cobertura.

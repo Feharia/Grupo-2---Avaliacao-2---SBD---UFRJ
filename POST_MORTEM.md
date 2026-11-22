@@ -1270,3 +1270,57 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
 - O usuário autorizou consolidar VarChar, clustering/hash e BNL em commit
   local antes de continuar a matriz. Conferidos diff, escopo e hashes da
   última evidência. Reexecutados 107 testes C++ e 48 Python, todos aprovados.
+
+## 2026-11-22 — Matriz física e conferência do PR #19
+
+- As três correções anteriores foram consolidadas no commit local
+  `b1c0de5`, autorizado pelo usuário. A continuação tratou da matriz e dos
+  validadores, seguindo os §§5.1 e 5.2 do PDF revisado.
+- Configurações sem índice usavam Scan em heaps com índices no campo do
+  predicado. Criadas quatro variantes heap sem índices. A bancada publica
+  metodos.csv a partir de access_paths e configuracoes.csv com a ordem real
+  dos operandos e campos. O verificador cruza os metadados; não infere
+  ausência de índice a partir da escolha de Scan.
+- Novos testes negativos falharam no validador anterior. Agora são
+  conferidas repetições efetivas e configuração física, além de motivos de
+  inviabilidade. Uma rodada vazia de sucessos não é aprovada como matriz.
+- O perfil de I/O foi versionado como v2, com 168 identidades renomeadas
+  para os heaps sem índices. O v1 foi preservado e comparações cruzadas são
+  recusadas. Os métodos/configurações também entram nos hashes do perfil.
+- O conferidor passa a reprovar saída vazia, ausência total de medições e
+  combinações declaradas ausentes. Falhas em tuplas retiram a combinação da
+  contagem aprovada. O filtro --so é aplicado antes dos SQLs/lotes; filtro
+  sem correspondência retorna 2. Testes unitários e de integração tiveram
+  falhas antes e sucesso depois.
+- Validação final: 107 testes C++ Release e ASan/UBSan (64,39 s), 63 Python
+  com BUILD_DIR habilitando integração real da CLI. LeakSanitizer desligado.
+  Revisões adicionais dos dois diffs sem bloqueadores. Resultados antigos
+  sem inventário continuam conferíveis; sua completude é limitada ao que
+  os arquivos históricos declaravam.
+- Rodada integral: 1.159 linhas, 168 combinações, zero ausências e
+  divergências SQLite. Matriz: 108 células executadas e 12 não aplicáveis,
+  60 por política, portes e configuração física aprovados. A rodada
+  reduzida foi conferida com tuplas e corretamente recusada como prova
+  integral por escala/repetições. Convergência temporal no teto é declarada.
+- A rodada integral antecedeu apenas o ajuste de --so, sem impacto na
+  execução padrão; seu fonte está preservado junto dos CSVs. O manifesto
+  informa o SHA base porque o driver foi modificado localmente.
+- I/O v2: 168 cenários com driver comum e zero mudanças de contadores. As
+  configurações históricas v1 e as novas v2 não são intercambiáveis.
+- Evidências em `2026-11-22-matriz-fisica/` e `2026-11-22-conferencia/`,
+  sob evidencias/PR-19. Parecer local em docs/REVISAO_PR_19.md. Gráficos e
+  tamanho de bloco no manifesto da #18 permanecem pendentes. A main e o
+  remoto continuam sem as alterações desta revisão; os ajustes novos
+  permanecem sem commit.
+
+### Consolidação e publicação autorizadas
+
+- O usuário autorizou o commit dos ajustes de matriz/validadores, envio da
+  branch e acompanhamento do Actions para incorporação ao PR #19.
+- Conferidos novamente diff e estado do worktree; reexecutados 107 testes
+  C++ e 63 Python, todos aprovados. Preservadas as evidências anteriores
+  de ASan/UBSan, SQLite integral e comparação de I/O.
+- A tentativa de consultar o PR pela API falhou por conectividade;
+  git ls-remote falhou com `Could not resolve hostname github.com`.
+  O commit local pode ser consolidado. Envio, Actions e atualização da
+  branch remota do PR continuam pendentes de uma conexão funcional.

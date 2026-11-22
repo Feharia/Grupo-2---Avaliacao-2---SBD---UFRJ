@@ -1,0 +1,1068 @@
+--- a/POST_MORTEM.md
++++ b/POST_MORTEM.md
+@@ -1270,3 +1270,57 @@
+ - O usuário autorizou consolidar VarChar, clustering/hash e BNL em commit
+   local antes de continuar a matriz. Conferidos diff, escopo e hashes da
+   última evidência. Reexecutados 107 testes C++ e 48 Python, todos aprovados.
++
++## 2026-11-22 — Matriz física e conferência do PR #19
++
++- As três correções anteriores foram consolidadas no commit local
++  `b1c0de5`, autorizado pelo usuário. A continuação tratou da matriz e dos
++  validadores, seguindo os §§5.1 e 5.2 do PDF revisado.
++- Configurações sem índice usavam Scan em heaps com índices no campo do
++  predicado. Criadas quatro variantes heap sem índices. A bancada publica
++  metodos.csv a partir de access_paths e configuracoes.csv com a ordem real
++  dos operandos e campos. O verificador cruza os metadados; não infere
++  ausência de índice a partir da escolha de Scan.
++- Novos testes negativos falharam no validador anterior. Agora são
++  conferidas repetições efetivas e configuração física, além de motivos de
++  inviabilidade. Uma rodada vazia de sucessos não é aprovada como matriz.
++- O perfil de I/O foi versionado como v2, com 168 identidades renomeadas
++  para os heaps sem índices. O v1 foi preservado e comparações cruzadas são
++  recusadas. Os métodos/configurações também entram nos hashes do perfil.
++- O conferidor passa a reprovar saída vazia, ausência total de medições e
++  combinações declaradas ausentes. Falhas em tuplas retiram a combinação da
++  contagem aprovada. O filtro --so é aplicado antes dos SQLs/lotes; filtro
++  sem correspondência retorna 2. Testes unitários e de integração tiveram
++  falhas antes e sucesso depois.
++- Validação final: 107 testes C++ Release e ASan/UBSan (64,39 s), 63 Python
++  com BUILD_DIR habilitando integração real da CLI. LeakSanitizer desligado.
++  Revisões adicionais dos dois diffs sem bloqueadores. Resultados antigos
++  sem inventário continuam conferíveis; sua completude é limitada ao que
++  os arquivos históricos declaravam.
++- Rodada integral: 1.159 linhas, 168 combinações, zero ausências e
++  divergências SQLite. Matriz: 108 células executadas e 12 não aplicáveis,
++  60 por política, portes e configuração física aprovados. A rodada
++  reduzida foi conferida com tuplas e corretamente recusada como prova
++  integral por escala/repetições. Convergência temporal no teto é declarada.
++- A rodada integral antecedeu apenas o ajuste de --so, sem impacto na
++  execução padrão; seu fonte está preservado junto dos CSVs. O manifesto
++  informa o SHA base porque o driver foi modificado localmente.
++- I/O v2: 168 cenários com driver comum e zero mudanças de contadores. As
++  configurações históricas v1 e as novas v2 não são intercambiáveis.
++- Evidências em `2026-11-22-matriz-fisica/` e `2026-11-22-conferencia/`,
++  sob evidencias/PR-19. Parecer local em docs/REVISAO_PR_19.md. Gráficos e
++  tamanho de bloco no manifesto da #18 permanecem pendentes. A main e o
++  remoto continuam sem as alterações desta revisão; os ajustes novos
++  permanecem sem commit.
++
++### Consolidação e publicação autorizadas
++
++- O usuário autorizou o commit dos ajustes de matriz/validadores, envio da
++  branch e acompanhamento do Actions para incorporação ao PR #19.
++- Conferidos novamente diff e estado do worktree; reexecutados 107 testes
++  C++ e 63 Python, todos aprovados. Preservadas as evidências anteriores
++  de ASan/UBSan, SQLite integral e comparação de I/O.
++- A tentativa de consultar o PR pela API falhou por conectividade;
++  git ls-remote falhou com `Could not resolve hostname github.com`.
++  O commit local pode ser consolidado. Envio, Actions e atualização da
++  branch remota do PR continuam pendentes de uma conexão funcional.
+--- a/PrototipoIA/Implementacao/README.md
++++ b/PrototipoIA/Implementacao/README.md
+@@ -1,4 +1,10 @@
+ # Bancada de teste de CBD: protótipo gerado por IA
++
++Revisão de 22/11/2026: a bancada separa heaps sem índices das variantes
++indexadas e verifica a configuração física pelos metadados. A rodada
++corrigida e suas limitações estão nas [evidências](../../evidencias/PR-19/2026-11-22-matriz-fisica/README.md).
++Os números de `resultados_exemplo/` e da análise de 17/11 abaixo
++representam o snapshot anterior à correção da matriz física.
+ 
+ Este é um protótipo funcional da arquitetura descrita em `../HANDOFF_ARQUITETURA_2026-11-08.md` (decisões 1 a 45 e 100 a 175, com as emendas de 08/11 e da auditoria de 10/11) e no diagrama `../diagrama_camadas_v5.png`. É **código bruto gerado por IA**, ainda sem revisão do grupo. O `PROMPTS.md` traz o log de prompts e as correções que a própria IA fez durante a geração.
+ 
+--- a/PrototipoIA/Implementacao/src/layer1/bench.cpp
++++ b/PrototipoIA/Implementacao/src/layer1/bench.cpp
+@@ -286,6 +286,10 @@
+     Spec s;
+     using SK = StructureKind;
+     s.variants = {
++        {"curso_heap_sem_indices", "curso", SK::Heap, "", {}},
++        {"disciplina_heap_sem_indices", "disciplina", SK::Heap, "", {}},
++        {"aluno_heap_sem_indices", "aluno", SK::Heap, "", {}},
++        {"inscricao_heap_sem_indices", "inscricao", SK::Heap, "", {}},
+         // P05 (decisão 175): no heap, secundário de campo UNIQUE é hash e de NOT UNIQUE é B+ (§4.2)
+         {"curso_heap", "curso", SK::Heap, "", {{SK::SecHash, "codigo"}}},
+         {"curso_bt_codigo", "curso", SK::BTree, "codigo", {}},
+@@ -317,23 +321,23 @@
+     const std::string pts = "SELECT a.* FROM lote l JOIN aluno a ON a.{f} = l.k";
+     // igualdade em UNIQUE: nível próprio ("pontual"); 1% e 50% são o caso 3 (170)
+     s.ops.push_back(sel("sel_pt_dre", "igualdade_unique", "pontual", OpKind::Points, "dre", pts,
+-                        {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
++                        {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
+                          {"aluno_h_dre", PK::PrimaryHash, "dre", "b"}}));
+     s.ops.push_back(sel("sel_pt_cpf", "igualdade_unique", "pontual", OpKind::Points, "cpf", pts,
+-                        {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryHash, "cpf", "c"}}));
++                        {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryHash, "cpf", "c"}}));
+     const std::string rg = "SELECT a.* FROM aluno a WHERE a.{f} >= {lo} AND a.{f} <= {hi}";
+     // seletividade baixa de 1% (enunciado v2, §5.2 e §6.2; decisão 174); os ids *_baixa ficam, pelo CI
+     for (auto [suf, sv, lbl] : {std::tuple{"baixa", 0.01, "1%"}, std::tuple{"alta", 0.5, "50%"}}) {
+         const bool baixa = sv < 0.1;
+         // faixa em UNIQUE: o hash primário sai como caso 4; o índice secundário (c) é o caso 2 (170)
+         s.ops.push_back(sel(std::string("sel_rg_dre_") + suf, "faixa_unique", lbl, OpKind::Range, "dre", rg,
+-                            {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
++                            {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
+                              {"aluno_h_dre", PK::PrimaryHash, "dre", "b"}}, sv, "meio"));
+         s.ops.push_back(sel(std::string("sel_rg_cr_") + suf, "faixa_not_unique", lbl, OpKind::Range, "cr", rg,
+-                            {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "cr", "c"}},
++                            {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "cr", "c"}},
+                             sv, baixa ? "topo" : "base"));
+         s.ops.push_back(sel(std::string("sel_rg_curso_") + suf, "faixa_not_unique", lbl, OpKind::Range, "curso", rg,
+-                            {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso", "b"},
++                            {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso", "b"},
+                              {"aluno_bt_curso", PK::SecondaryBTreeClustering, "curso", "c"},
+                              {"aluno_h_curso", PK::SecondaryBTreeClustering, "curso", "c"},
+                              {"aluno_h_curso", PK::PrimaryHash, "curso", "b"}}, sv, baixa ? "meio" : "base"));
+@@ -349,8 +353,8 @@
+     };
+     s.ops.push_back(join("j_mestre_detalhe", "natural_join", "maior_maior",
+                          "SELECT x.*, y.* FROM aluno x JOIN inscricao y ON x.dre = y.dre", "dre", "dre",
+-                         {{{"aluno_heap", PK::Scan, ""}, {"inscricao_heap", PK::Scan, ""}, "a"},
+-                          {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::Scan, ""}, "b"},
++                         {{{"aluno_heap_sem_indices", PK::Scan, ""}, {"inscricao_heap_sem_indices", PK::Scan, ""}, "a"},
++                          {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap_sem_indices", PK::Scan, ""}, "b"},
+                           {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_bt_dre", PK::PrimaryBTree, "dre"}, "c"},
+                           {{"aluno_h_dre", PK::PrimaryHash, "dre"}, {"inscricao_h_dre", PK::PrimaryHash, "dre"}, "c"},
+                           {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::SecondaryBTreeNonClustering, "dre"}, "d"},
+@@ -358,16 +362,16 @@
+                          true));
+     s.ops.push_back(join("j_pequenas", "natural_join", "menor_menor",
+                          "SELECT x.*, y.* FROM curso x JOIN disciplina y ON x.codigo = y.curso", "codigo", "curso",
+-                         {{{"curso_heap", PK::Scan, ""}, {"disciplina_heap", PK::Scan, ""}, "a"},
+-                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap", PK::Scan, ""}, "b"},
++                         {{{"curso_heap_sem_indices", PK::Scan, ""}, {"disciplina_heap_sem_indices", PK::Scan, ""}, "a"},
++                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap_sem_indices", PK::Scan, ""}, "b"},
+                           {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_bt_curso", PK::PrimaryBTree, "curso"}, "c"},
+                           {{"curso_h_codigo", PK::PrimaryHash, "codigo"}, {"disciplina_h_curso", PK::PrimaryHash, "curso"}, "c"},
+                           {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap", PK::SecondaryBTreeNonClustering, "curso"}, "d"},
+                           {{"curso_heap", PK::SecondaryHash, "codigo"}, {"disciplina_heap", PK::SecondaryBTreeNonClustering, "curso"}, "e"}}));
+     s.ops.push_back(join("j_grande_pequena", "natural_join", "menor_maior",
+                          "SELECT x.*, y.* FROM curso x JOIN aluno y ON x.codigo = y.curso", "codigo", "curso",
+-                         {{{"curso_heap", PK::Scan, ""}, {"aluno_heap", PK::Scan, ""}, "a"},
+-                          {{"curso_heap", PK::Scan, ""}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "b"},
++                         {{{"curso_heap_sem_indices", PK::Scan, ""}, {"aluno_heap_sem_indices", PK::Scan, ""}, "a"},
++                          {{"curso_heap_sem_indices", PK::Scan, ""}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "b"},
+                           {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "c"},
+                           {{"curso_h_codigo", PK::PrimaryHash, "codigo"}, {"aluno_h_curso", PK::PrimaryHash, "curso"}, "c"},
+                           {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "curso"}, "d"},
+@@ -375,7 +379,7 @@
+     // tipos 2 e 3: só as configurações a e e existem; b, c e d são o caso 1 (170)
+     s.ops.push_back(join("j_unique", "equijoin_unique", "maior_maior",
+                          "SELECT x.*, y.* FROM aluno x JOIN detalhes y ON x.cpf = y.cpf", "cpf", "cpf",
+-                         {{{"aluno_heap", PK::Scan, ""}, {"detalhes_heap", PK::Scan, ""}, "a"}}));
++                         {{{"aluno_heap_sem_indices", PK::Scan, ""}, {"detalhes_heap", PK::Scan, ""}, "a"}}));
+     s.ops.push_back(join("j_not_unique", "equijoin_not_unique", "maior_maior",
+                          "SELECT x.*, y.* FROM aluno x JOIN turma y ON x.professor_orientador = y.professor",
+                          "professor_orientador", "professor",
+@@ -747,6 +751,13 @@
+         } else return usage();
+     }
+     if (spec.min_reps < 1 || spec.max_reps < spec.min_reps) return usage();
++    if (!spec.only.empty()) {
++        std::erase_if(spec.ops, [&](const OpDef& op) { return op.id.find(spec.only) == std::string::npos; });
++        if (spec.ops.empty()) {
++            std::cerr << "nenhuma operação corresponde ao filtro --so\n";
++            return 2;
++        }
++    }
+ 
+     // load_spec: validações (129)
+     const std::uint32_t work = Config{}.area_frames[3];
+@@ -817,6 +828,11 @@
+     Csv params(out_dir / "parametros.csv");   // BENCH-008
+     params.row({"politica", "operacao", "variante", "algoritmo", "parametros"});
+ 
++    Csv methods(out_dir / "metodos.csv");
++    methods.row({"politica", "tabela", "campo", "metodo"});
++    Csv configurations(out_dir / "configuracoes.csv");
++    configurations.row({"politica", "operacao", "variante", "algoritmo",
++                        "externa", "campo_externa", "interna", "campo_interna"});
+     for (Policy pol : spec.policies) {
+         const std::string pname = to_string(pol);
+         Config cfg;
+@@ -829,6 +845,16 @@
+         mon.flush_all();   // faz parte da carga; não é medido (14)
+         write_occupancy(mon, built, occ, pname, "antes");
+         write_stats(mon, built, stats, pname);
++        for (const auto& [name, table] : built.tables) {
++            for (const auto& method : mon.access_paths(table)) {
++                if (method.kind == PathKind::Scan) {
++                    for (const auto& field : mon.schema(table).fields)
++                        methods.row({pname, name, field.name, "scan"});
++                } else {
++                    methods.row({pname, name, mon.schema(table).field(method.field).name, to_string(method.kind)});
++                }
++            }
++        }
+         declare_not_applicable(results, pname, spec);
+ 
+         auto shape_for = [&](const std::string& op, const std::string& variant, const std::string& alg, int rep) {
+@@ -858,6 +884,7 @@
+                     const FieldType ft = mon.schema(t).field(f).type;
+                     const std::string variant = ref.table + ":" + to_string(ref.kind);
+                     const Cell cell{op.tipo, op.tamanho, ref.config, op.seletividade};
++                    configurations.row({pname, op.id, variant, "", ref.table, op.field, "", ""});
+                     SelectParams sp;
+                     sp.m = spec.m_select;
+                     access.row({pname, op.id, ref.config, variant, "", executed_access(path), ""});
+@@ -922,6 +949,9 @@
+                         const JoinInput& outer = fo ? in0 : in1;
+                         const JoinInput& inner = fo ? in1 : in0;
+                         const std::string vname = variant + (fo == first_outer ? "" : " (papeis trocados)");
++                        configurations.row({pname, op.id, vname, to_string(alg),
++                                            fo ? r0.table : r1.table, fo ? op.field0 : op.field1,
++                                            fo ? r1.table : r0.table, fo ? op.field1 : op.field0});
+                         {   // acesso executado, lido do plano (sem E/S, decisão 160)
+                             const auto planned = mon.plan_join(alg, outer, inner, spec.m_join, JoinParams{});
+                             std::string ae = "não executada", ai = "não executada";
+--- /dev/null
++++ b/PrototipoIA/Implementacao/tests/python/test_bench_filter.py
+@@ -0,0 +1,34 @@
++"""Integração da CLI da bancada com o SQLite e o filtro de operações."""
++import csv
++import os
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++SOURCE = Path(__file__).resolve().parents[2]
++BINARY = Path(os.environ.get("BUILD_DIR", SOURCE / "build")) / "bancada"
++
++
++@unittest.skipUnless(BINARY.is_file(), "defina BUILD_DIR para o build CMake da bancada")
++class BenchFilterTest(unittest.TestCase):
++    def test_consulta_filtrada_confere_com_sqlite(self):
++        with tempfile.TemporaryDirectory() as temporary:
++            out = Path(temporary) / "saida"
++            commands = [
++                [str(BINARY), "--rapido", "--tuplas", "--so", "j_pequenas", "--saida", str(out)],
++                [sys.executable, "-I", str(SOURCE / "tools/reference.py"), str(out), "--tuplas"],
++                [sys.executable, "-I", str(SOURCE / "tools/compare.py"), str(out), "--tuplas"],
++            ]
++            for command in commands:
++                result = subprocess.run(command, capture_output=True, text=True)
++                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++            with (out / "operacoes.csv").open(newline="") as f:
++                self.assertEqual({r["operacao"] for r in csv.DictReader(f)}, {"j_pequenas"})
++
++    def test_filtro_sem_correspondencia_reprova(self):
++        with tempfile.TemporaryDirectory() as temporary:
++            result = subprocess.run([str(BINARY), "--rapido", "--so", "consulta_inexistente",
++                                     "--saida", str(Path(temporary) / "saida")], capture_output=True, text=True)
++            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+--- a/PrototipoIA/Implementacao/tests/python/test_comparar_io.py
++++ b/PrototipoIA/Implementacao/tests/python/test_comparar_io.py
+@@ -28,7 +28,7 @@
+ 
+ 
+ def metadata():
+-    return {"protocolo": "io-rapido-v1", "commit": "a" * 40,
++    return {"protocolo": "io-rapido-v2", "commit": "a" * 40,
+             "validado_sqlite_tuplas": True,
+             "assinatura": {"dados": {"dados/a.csv": "abc"}, "config": {"block_size": 4096},
+                            "manifesto": {"m_juncao": "32"}}, "tool_hash": "abc"}
+@@ -137,25 +137,36 @@
+             with self.subTest(change=change), self.assertRaises(ValueError):
+                 self.compare(left=metadata() | change)
+ 
++    def test_protocols_cannot_be_mixed(self):
++        with self.assertRaises(ValueError):
++            self.compare(right=metadata() | {"protocolo": "io-rapido-v1"})
++
+     def test_different_commit_is_expected(self):
+         self.assertEqual(self.compare(right=metadata() | {"commit": "b" * 40})["cenarios"], 1)
+ 
+-    def measurement(self, root, name, row):
++    def measurement(self, root, name, row, profile="io-rapido-v2"):
+         directory = root / name
+         (directory / "smoke").mkdir(parents=True)
+         csv_path = directory / "smoke/resultados.csv"
+         with csv_path.open("w", newline="") as file:
+             writer = csv.DictWriter(file, fieldnames=list(row))
+             writer.writeheader()
+-            inventory_path = path.with_name("io_cenarios_v1.json")
++            inventory_path = path.with_name(io.PROFILES[profile])
+             for n, key in enumerate(json.loads(inventory_path.read_text())):
+                 fixture = (row if n == 0 else sample()) | dict(zip(
+                     ("politica", "operacao", "variante", "algoritmo"), key))
+                 writer.writerow(fixture)
+-        meta = metadata() | {"resultados_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),
++        meta = metadata() | {"protocolo": profile, "resultados_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),
+                              "inventario_sha256": hashlib.sha256(inventory_path.read_bytes()).hexdigest()}
+         (directory / "medicao.json").write_text(json.dumps(meta))
+         return directory
++
++    def test_historical_v1_remains_readable(self):
++        with tempfile.TemporaryDirectory() as temporary:
++            directory = self.measurement(Path(temporary), "historico", sample(), profile="io-rapido-v1")
++            rows, meta = io.read_measurement(directory)
++            self.assertEqual(len(rows), 168)
++            self.assertEqual(meta["protocolo"], "io-rapido-v1")
+ 
+     def test_changed_csv_after_validation_rejected(self):
+         with tempfile.TemporaryDirectory() as temporary:
+--- a/PrototipoIA/Implementacao/tests/python/test_compare.py
++++ b/PrototipoIA/Implementacao/tests/python/test_compare.py
+@@ -29,6 +29,7 @@
+         self.ref = [("j_x", "*", "2", "10"), ("sel_x", "1", "1", "7")]
+         self.ops = ["j_x", "sel_x"]
+         self.dumps = True
++        self.plano = None
+ 
+     def nome(self, r):
+         v = "".join(c if c.isalnum() else "_" for c in r["variante"])
+@@ -53,6 +54,12 @@
+                     (self.out / "tuplas_motor" / self.nome(r)).write_text("aa\nbb\n")
+             (self.out / "tuplas_ref" / "j_x_todas.txt").write_text("bb\naa\n")
+             (self.out / "tuplas_ref" / "sel_x_1.txt").write_text("aa\nbb\n")
++        if self.plano is not None:
++            with (self.out / "configuracoes.csv").open("w", newline="") as f:
++                fields = ["politica", "operacao", "variante", "algoritmo"]
++                w = csv.DictWriter(f, fieldnames=fields)
++                w.writeheader()
++                w.writerows({k: r[k] for k in fields} for r in self.plano)
+         p = subprocess.run([sys.executable, "-I", str(SCRIPT), str(self.out), *args], capture_output=True, text=True)
+         return p.returncode, p.stdout
+ 
+@@ -107,6 +114,23 @@
+         code, out = self.roda("--tuplas")
+         self.assertEqual(code, 1)
+         self.assertIn("tuplas diferem", out)
++        self.assertIn("em 1 combinações", out)
++
++    def test_diretorio_vazio_reprova(self):
++        result = subprocess.run([sys.executable, "-I", str(SCRIPT), str(self.out)], capture_output=True, text=True)
++        self.assertEqual(result.returncode, 1)
++
++    def test_nenhuma_medicao_reprova(self):
++        for r in self.rows:
++            r["status"] = "inviavel"
++        self.assertEqual(self.roda()[0], 1)
++
++    def test_combinacao_declarada_ausente_reprova(self):
++        self.plano = list(self.rows)
++        self.rows = self.rows[1:]
++        code, out = self.roda()
++        self.assertEqual(code, 1)
++        self.assertIn("combinação declarada sem execução", out)
+ 
+ 
+ if __name__ == "__main__":
+--- a/PrototipoIA/Implementacao/tests/python/test_verificar_matriz.py
++++ b/PrototipoIA/Implementacao/tests/python/test_verificar_matriz.py
+@@ -41,14 +41,14 @@
+         for tam, (a, b) in PARES.items():
+             for cfg in "abcde":
+                 for alg in ("bnl", "sort_merge", "hash"):
+-                    rows.append(linha(pol, "natural_join", tam, cfg, "", alg, externa=a, interna=b))
++                    rows.append(linha(pol, "natural_join", tam, cfg, "", alg, externa=a + "_" + tam + "_" + cfg, interna=b + "_" + tam + "_" + cfg))
+         for cfg in "abc":
+-            rows.append(linha(pol, "igualdade_unique", "", cfg, "pontual", "", externa="aluno", m="2"))
++            rows.append(linha(pol, "igualdade_unique", "", cfg, "pontual", "", externa="aluno_sel_" + cfg, m="2"))
+             for s in ("1%", "50%"):
+                 rows.append(linha(pol, "igualdade_unique", "", cfg, s, "", status="nao_aplicavel",
+                                   motivo="caso 3: igualdade em UNIQUE devolve 1 registro", m="2"))
+-                rows.append(linha(pol, "faixa_not_unique", "", cfg, s, "", externa="aluno", m="2"))
+-    return rows
++                rows.append(linha(pol, "faixa_not_unique", "", cfg, s, "", externa="aluno_sel_" + cfg, m="2"))
++    return [dict(r, rep=str(rep)) for r in rows for rep in (1, 2, 3)]
+ 
+ 
+ class VerificadorTest(unittest.TestCase):
+@@ -59,6 +59,22 @@
+         self.rows = matriz_completa()
+         self.blocos = dict(BLOCOS)
+         self.manifesto = {"escala": "1", "reps": "3..10"}
++        self.configs, self.metodos = {}, {}
++        roles = {"a": "NN", "b": "PN", "c": "PP", "d": "PS", "e": "SS"}
++        for r in self.rows:
++            if r["status"] != "ok":
++                continue
++            key = (r["politica"], r["operacao"], r["variante"], r["algoritmo"])
++            self.configs[key] = dict(zip(
++                ("politica", "operacao", "variante", "algoritmo"), key),
++                externa=r["externa"], campo_externa="k", interna=r["interna"],
++                campo_interna="k" if r["interna"] else "")
++            kinds = roles[r["config"]] if r["algoritmo"] else {"a": "N", "b": "P", "c": "S"}[r["config"]]
++            for table, kind in zip((r["externa"], r["interna"]), kinds):
++                self.metodos[(r["politica"], table, "k", "scan")] = True
++                if kind != "N":
++                    method = "primary_btree" if kind == "P" else "secondary_btree"
++                    self.metodos[(r["politica"], table, "k", method)] = True
+ 
+     def roda(self, aceitar_reduzida=False):
+         with open(self.out / "resultados.csv", "w", newline="", encoding="utf-8") as f:
+@@ -69,8 +85,19 @@
+             w = csv.writer(f)
+             w.writerow(["politica", "tabela", "estrutura", "b"])
+             for pol in ("LRU", "MRU"):
+-                for t, b in self.blocos.items():
+-                    w.writerow([pol, t, t + ":heap", b])
++                tables = {c[t] for c in self.configs.values() for t in ("externa", "interna") if c[t]}
++                for t in sorted(tables):
++                    base = next(name for name in BLOCOS if t.startswith(name + "_"))
++                    w.writerow([pol, t, t + ":heap", self.blocos[base]])
++        with (self.out / "configuracoes.csv").open("w", newline="") as f:
++            w = csv.DictWriter(f, fieldnames=["politica", "operacao", "variante", "algoritmo",
++                                            "externa", "campo_externa", "interna", "campo_interna"])
++            w.writeheader()
++            w.writerows(self.configs.values())
++        with (self.out / "metodos.csv").open("w", newline="") as f:
++            w = csv.writer(f)
++            w.writerow(["politica", "tabela", "campo", "metodo"])
++            w.writerows(self.metodos)
+         (self.out / "manifesto.txt").write_text("".join(f"{k}: {v}\n" for k, v in self.manifesto.items()),
+                                                encoding="utf-8")
+         return verificador.verificar(str(self.out), aceitar_reduzida)
+@@ -138,6 +165,40 @@
+         falhas, _, _ = self.roda()
+         self.assertEqual(falhas, ["política MRU ausente do resultados.csv"])
+ 
++    def test_scan_em_tabela_indexada_nao_prova_config_a(self):
++        self.metodos[("LRU", "curso_menor_menor_a", "k", "secondary_hash")] = True
++        self.assertTrue(any("configuração física" in f for f in self.roda()[0]))
++
++    def test_indice_em_outro_campo_nao_muda_config_a(self):
++        self.metodos[("LRU", "curso_menor_menor_a", "outro", "secondary_hash")] = True
++        self.assertEqual(self.roda()[0], [])
++
++    def test_config_b_com_secundario_na_outra_tabela_reprova(self):
++        self.metodos[("LRU", "disciplina_menor_menor_b", "k", "secondary_btree")] = True
++        self.assertTrue(any("configuração física" in f for f in self.roda()[0]))
++
++    def test_config_c_sem_primarias_reprova(self):
++        self.metodos.pop(("LRU", "curso_menor_menor_c", "k", "primary_btree"))
++        self.assertTrue(any("configuração física" in f for f in self.roda()[0]))
++
++    def test_selecao_a_indexada_reprova(self):
++        self.metodos[("LRU", "aluno_sel_a", "k", "secondary_hash")] = True
++        self.assertTrue(any("configuração física" in f for f in self.roda()[0]))
++
++    def test_sem_metadados_fisicos_reprova(self):
++        self.configs.clear()
++        self.assertTrue(any("metadados" in f for f in self.roda()[0]))
++
++    def test_repeticao_unica_reprova_ainda_com_manifesto_tres(self):
++        self.rows = [r for r in self.rows if r["rep"] == "1"]
++        self.assertTrue(any("repetições executadas" in f for f in self.roda()[0]))
++
++    def test_tudo_inviavel_sem_motivo_reprova(self):
++        for r in self.rows:
++            if r["status"] == "ok":
++                r["status"], r["motivo"] = "inviavel", ""
++        self.assertTrue(self.roda()[0])
++
+     def test_inventario(self):
+         matriz = carregar("matriz")
+         cel = matriz.obrigatorias()
+--- a/PrototipoIA/Implementacao/tools/comparar_io.py
++++ b/PrototipoIA/Implementacao/tools/comparar_io.py
+@@ -9,6 +9,8 @@
+ import shlex
+ import sys
+ 
++PROFILES = {"io-rapido-v1": "io_cenarios_v1.json", "io-rapido-v2": "io_cenarios_v2.json"}
++
+ KEY = ("politica", "operacao", "tipo", "tamanho", "config", "seletividade",
+        "variante", "algoritmo", "externa", "interna", "m", "rep")
+ METRICS = ("leituras", "gravacoes", "total", "flush_writes", "total_com_flush")
+@@ -18,7 +20,7 @@
+     actual = {tuple(row[field] for field in ("politica", "operacao", "variante", "algoritmo"))
+               for row in rows if row["status"] == "ok"}
+     if actual != required:
+-        raise ValueError(f"inventário io-rapido-v1 incompatível: {len(required - actual)} ausentes; {len(actual - required)} extras")
++        raise ValueError(f"inventário de I/O incompatível: {len(required - actual)} ausentes; {len(actual - required)} extras")
+ 
+ 
+ def compiler_options(entries, source):
+@@ -70,11 +72,12 @@
+ 
+ def compare_rows(before, after, left, right):
+     for metadata in (left, right):
+-        if (metadata.get("protocolo") != "io-rapido-v1"
++        if (metadata.get("protocolo") not in PROFILES
+                 or metadata.get("validado_sqlite_tuplas") is not True
+                 or not metadata.get("assinatura") or not metadata.get("tool_hash")):
+             raise ValueError("metadados ausentes, protocolo desconhecido ou medição não validada")
+-    if left["assinatura"] != right["assinatura"] or left["tool_hash"] != right["tool_hash"]:
++    if (left["protocolo"] != right["protocolo"] or left["assinatura"] != right["assinatura"]
++            or left["tool_hash"] != right["tool_hash"]):
+         raise ValueError("protocolo incompatível: dados, consultas, parâmetros, Config ou ferramentas diferentes")
+     old, new = index_rows(before), index_rows(after)
+     if old.keys() != new.keys():
+@@ -113,7 +116,10 @@
+         raise ValueError("resultados.csv foi alterado depois da validação")
+     with csv_path.open(newline="", encoding="utf-8") as file:
+         rows = list(csv.DictReader(file))
+-    profile = Path(__file__).with_name("io_cenarios_v1.json")
++    profile_name = PROFILES.get(metadata.get("protocolo"))
++    if not profile_name:
++        raise ValueError("protocolo desconhecido")
++    profile = Path(__file__).with_name(profile_name)
+     if hashlib.sha256(profile.read_bytes()).hexdigest() != metadata.get("inventario_sha256"):
+         raise ValueError("inventário versionado diferente do usado na medição")
+     ensure_inventory(rows, {tuple(key) for key in json.loads(profile.read_text())})
+--- a/PrototipoIA/Implementacao/tools/compare.py
++++ b/PrototipoIA/Implementacao/tools/compare.py
+@@ -17,8 +17,8 @@
+ 
+ Colunas: o motor emite, para cada par, os campos das duas relações, e o SQL de referência é
+ SELECT x.*, y.* ... ON x.a = y.b, com as duas colunas da junção. A conferência por checksum e por
+-multiconjunto vale para essa forma; o NATURAL JOIN do enunciado mostraria a coluna comum uma vez,
+-sem mudar o número de linhas.
++multiconjunto vale para os pares PK/FK explícitos do exercício. NATURAL JOIN literal também
++compararia outras colunas homônimas; requer renomeá-las para representar a mesma operação.
+ """
+ import csv
+ import glob
+@@ -49,6 +49,9 @@
+     for r in ler_csv(os.path.join(outdir, "referencia.csv")):
+         ref[(r["operacao"], r["rep"])] = (int(r["linhas"]), int(r["checksum"]))
+     rows = ler_csv(os.path.join(outdir, "resultados.csv"))
++    if not rows or not ref:
++        print("Conferência inválida: resultados ou referência ausentes/vazios")
++        return 1
+     declaradas = {r["operacao"] for r in ler_csv(os.path.join(outdir, "operacoes.csv"))} | {op for op, _ in ref}
+ 
+     checked = 0
+@@ -77,10 +80,18 @@
+     vazio = {"politica": "", "variante": "", "algoritmo": "", "rep": ""}
+     for op in sorted(declaradas - {r["operacao"] for r in rows}):
+         ausentes.append((dict(vazio, operacao=op), "operação declarada sem nenhuma linha no resultados.csv"))
++    campos = ("politica", "operacao", "variante", "algoritmo")
++    previstas = {tuple(r[k] for k in campos) for r in ler_csv(os.path.join(outdir, "configuracoes.csv"))}
++    presentes = {tuple(r[k] for k in campos) for r in rows}
++    for key in sorted(previstas - presentes):
++        ausentes.append((dict(zip(campos, key), rep=""), "combinação declarada sem execução no resultados.csv"))
++    if checked == 0:
++        ausentes.append((dict(vazio, operacao="*"), "nenhuma medição conferida"))
+ 
+     if tuplas:
+         tdir, rdir = os.path.join(outdir, "tuplas_motor"), os.path.join(outdir, "tuplas_ref")
+         existentes = {os.path.basename(p) for p in glob.glob(os.path.join(tdir, "*.txt"))}
++        combinacao_dump = {nome_dump(r): tuple(r[k] for k in campos) for r in rows if r["status"] == "ok"}
+         for r in rows:
+             if r["status"] == "ok" and nome_dump(r) not in existentes:
+                 ausentes.append((r, "linha medida sem o dump das tuplas do motor"))
+@@ -93,6 +104,8 @@
+                 refpath = os.path.join(rdir, "%s_todas.txt" % op)
+             if not os.path.exists(refpath):
+                 ausentes.append((info, "dump do motor sem a referência do SQLite"))
++                if name in combinacao_dump:
++                    combos_falha.add(combinacao_dump[name])
+                 continue
+             with open(os.path.join(tdir, name)) as a, open(refpath) as b:
+                 mine, theirs = sorted(a.read().split()), sorted(b.read().split())
+@@ -100,6 +113,8 @@
+                 only_m = len(set(mine) - set(theirs))
+                 only_r = len(set(theirs) - set(mine))
+                 bad.append((info, "tuplas diferem: %d só no motor, %d só no SQLite" % (only_m, only_r)))
++                if name in combinacao_dump:
++                    combos_falha.add(combinacao_dump[name])
+ 
+     others = ", ".join("%s: %d" % kv for kv in sorted(skipped.items())) or "nenhuma"
+     print("conferidas: %d linhas medidas em %d combinações; sem execução: %s; ausentes: %d; divergências: %d"
+--- /dev/null
++++ b/PrototipoIA/Implementacao/tools/io_cenarios_v2.json
+@@ -0,0 +1,170 @@
++[
++  ["LRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree", "bnl"],
++  ["LRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree", "hash"],
++  ["LRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree", "sort_merge"],
++  ["LRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_heap:secondary_btree", "bnl"],
++  ["LRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_heap:secondary_btree", "hash"],
++  ["LRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_heap:secondary_btree", "sort_merge"],
++  ["LRU", "j_grande_pequena", "curso_h_codigo:primary_hash x aluno_h_curso:primary_hash", "bnl"],
++  ["LRU", "j_grande_pequena", "curso_h_codigo:primary_hash x aluno_h_curso:primary_hash", "hash"],
++  ["LRU", "j_grande_pequena", "curso_h_codigo:primary_hash x aluno_h_curso:primary_hash", "sort_merge"],
++  ["LRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree", "bnl"],
++  ["LRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree", "hash"],
++  ["LRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree", "sort_merge"],
++  ["LRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan", "bnl"],
++  ["LRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan", "hash"],
++  ["LRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan", "sort_merge"],
++  ["LRU", "j_grande_pequena", "curso_heap:secondary_hash x aluno_heap:secondary_btree", "bnl"],
++  ["LRU", "j_grande_pequena", "curso_heap:secondary_hash x aluno_heap:secondary_btree", "hash"],
++  ["LRU", "j_grande_pequena", "curso_heap:secondary_hash x aluno_heap:secondary_btree", "sort_merge"],
++  ["LRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree", "bnl"],
++  ["LRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree", "hash"],
++  ["LRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree", "sort_merge"],
++  ["LRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan", "bnl"],
++  ["LRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan", "hash"],
++  ["LRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan", "sort_merge"],
++  ["LRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree", "bnl"],
++  ["LRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree", "hash"],
++  ["LRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree", "sort_merge"],
++  ["LRU", "j_mestre_detalhe", "aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash", "bnl"],
++  ["LRU", "j_mestre_detalhe", "aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash", "hash"],
++  ["LRU", "j_mestre_detalhe", "aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash", "sort_merge"],
++  ["LRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan", "bnl"],
++  ["LRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan", "hash"],
++  ["LRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan", "sort_merge"],
++  ["LRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan (papeis trocados)", "bnl"],
++  ["LRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan (papeis trocados)", "hash"],
++  ["LRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan (papeis trocados)", "sort_merge"],
++  ["LRU", "j_mestre_detalhe", "aluno_heap:secondary_hash x inscricao_heap:secondary_btree", "bnl"],
++  ["LRU", "j_mestre_detalhe", "aluno_heap:secondary_hash x inscricao_heap:secondary_btree", "hash"],
++  ["LRU", "j_mestre_detalhe", "aluno_heap:secondary_hash x inscricao_heap:secondary_btree", "sort_merge"],
++  ["LRU", "j_not_unique", "aluno_heap:secondary_btree x turma_heap:secondary_btree", "bnl"],
++  ["LRU", "j_not_unique", "aluno_heap:secondary_btree x turma_heap:secondary_btree", "hash"],
++  ["LRU", "j_not_unique", "aluno_heap:secondary_btree x turma_heap:secondary_btree", "sort_merge"],
++  ["LRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree", "bnl"],
++  ["LRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree", "hash"],
++  ["LRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree", "sort_merge"],
++  ["LRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan", "bnl"],
++  ["LRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan", "hash"],
++  ["LRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan", "sort_merge"],
++  ["LRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree", "bnl"],
++  ["LRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree", "hash"],
++  ["LRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree", "sort_merge"],
++  ["LRU", "j_pequenas", "curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash", "bnl"],
++  ["LRU", "j_pequenas", "curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash", "hash"],
++  ["LRU", "j_pequenas", "curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash", "sort_merge"],
++  ["LRU", "j_pequenas", "curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan", "bnl"],
++  ["LRU", "j_pequenas", "curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan", "hash"],
++  ["LRU", "j_pequenas", "curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan", "sort_merge"],
++  ["LRU", "j_pequenas", "curso_heap:secondary_hash x disciplina_heap:secondary_btree", "bnl"],
++  ["LRU", "j_pequenas", "curso_heap:secondary_hash x disciplina_heap:secondary_btree", "hash"],
++  ["LRU", "j_pequenas", "curso_heap:secondary_hash x disciplina_heap:secondary_btree", "sort_merge"],
++  ["LRU", "j_unique", "aluno_heap_sem_indices:scan x detalhes_heap:scan", "bnl"],
++  ["LRU", "j_unique", "aluno_heap_sem_indices:scan x detalhes_heap:scan", "hash"],
++  ["LRU", "j_unique", "aluno_heap_sem_indices:scan x detalhes_heap:scan", "sort_merge"],
++  ["LRU", "sel_pt_cpf", "aluno_heap_sem_indices:scan", ""],
++  ["LRU", "sel_pt_cpf", "aluno_heap:secondary_hash", ""],
++  ["LRU", "sel_pt_dre", "aluno_bt_dre:primary_btree", ""],
++  ["LRU", "sel_pt_dre", "aluno_h_dre:primary_hash", ""],
++  ["LRU", "sel_pt_dre", "aluno_heap_sem_indices:scan", ""],
++  ["LRU", "sel_rg_cr_alta", "aluno_heap_sem_indices:scan", ""],
++  ["LRU", "sel_rg_cr_alta", "aluno_heap:secondary_btree", ""],
++  ["LRU", "sel_rg_cr_baixa", "aluno_heap_sem_indices:scan", ""],
++  ["LRU", "sel_rg_cr_baixa", "aluno_heap:secondary_btree", ""],
++  ["LRU", "sel_rg_curso_alta", "aluno_bt_curso:clustering_btree", ""],
++  ["LRU", "sel_rg_curso_alta", "aluno_bt_curso:primary_btree", ""],
++  ["LRU", "sel_rg_curso_alta", "aluno_h_curso:clustering_btree", ""],
++  ["LRU", "sel_rg_curso_alta", "aluno_heap_sem_indices:scan", ""],
++  ["LRU", "sel_rg_curso_baixa", "aluno_bt_curso:clustering_btree", ""],
++  ["LRU", "sel_rg_curso_baixa", "aluno_bt_curso:primary_btree", ""],
++  ["LRU", "sel_rg_curso_baixa", "aluno_h_curso:clustering_btree", ""],
++  ["LRU", "sel_rg_curso_baixa", "aluno_heap_sem_indices:scan", ""],
++  ["LRU", "sel_rg_dre_alta", "aluno_bt_dre:primary_btree", ""],
++  ["LRU", "sel_rg_dre_alta", "aluno_heap_sem_indices:scan", ""],
++  ["LRU", "sel_rg_dre_baixa", "aluno_bt_dre:primary_btree", ""],
++  ["LRU", "sel_rg_dre_baixa", "aluno_heap_sem_indices:scan", ""],
++  ["MRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree", "bnl"],
++  ["MRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree", "hash"],
++  ["MRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree", "sort_merge"],
++  ["MRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_heap:secondary_btree", "bnl"],
++  ["MRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_heap:secondary_btree", "hash"],
++  ["MRU", "j_grande_pequena", "curso_bt_codigo:primary_btree x aluno_heap:secondary_btree", "sort_merge"],
++  ["MRU", "j_grande_pequena", "curso_h_codigo:primary_hash x aluno_h_curso:primary_hash", "bnl"],
++  ["MRU", "j_grande_pequena", "curso_h_codigo:primary_hash x aluno_h_curso:primary_hash", "hash"],
++  ["MRU", "j_grande_pequena", "curso_h_codigo:primary_hash x aluno_h_curso:primary_hash", "sort_merge"],
++  ["MRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree", "bnl"],
++  ["MRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree", "hash"],
++  ["MRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree", "sort_merge"],
++  ["MRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan", "bnl"],
++  ["MRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan", "hash"],
++  ["MRU", "j_grande_pequena", "curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan", "sort_merge"],
++  ["MRU", "j_grande_pequena", "curso_heap:secondary_hash x aluno_heap:secondary_btree", "bnl"],
++  ["MRU", "j_grande_pequena", "curso_heap:secondary_hash x aluno_heap:secondary_btree", "hash"],
++  ["MRU", "j_grande_pequena", "curso_heap:secondary_hash x aluno_heap:secondary_btree", "sort_merge"],
++  ["MRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree", "bnl"],
++  ["MRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree", "hash"],
++  ["MRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree", "sort_merge"],
++  ["MRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan", "bnl"],
++  ["MRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan", "hash"],
++  ["MRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan", "sort_merge"],
++  ["MRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree", "bnl"],
++  ["MRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree", "hash"],
++  ["MRU", "j_mestre_detalhe", "aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree", "sort_merge"],
++  ["MRU", "j_mestre_detalhe", "aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash", "bnl"],
++  ["MRU", "j_mestre_detalhe", "aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash", "hash"],
++  ["MRU", "j_mestre_detalhe", "aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash", "sort_merge"],
++  ["MRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan", "bnl"],
++  ["MRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan", "hash"],
++  ["MRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan", "sort_merge"],
++  ["MRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan (papeis trocados)", "bnl"],
++  ["MRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan (papeis trocados)", "hash"],
++  ["MRU", "j_mestre_detalhe", "aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan (papeis trocados)", "sort_merge"],
++  ["MRU", "j_mestre_detalhe", "aluno_heap:secondary_hash x inscricao_heap:secondary_btree", "bnl"],
++  ["MRU", "j_mestre_detalhe", "aluno_heap:secondary_hash x inscricao_heap:secondary_btree", "hash"],
++  ["MRU", "j_mestre_detalhe", "aluno_heap:secondary_hash x inscricao_heap:secondary_btree", "sort_merge"],
++  ["MRU", "j_not_unique", "aluno_heap:secondary_btree x turma_heap:secondary_btree", "bnl"],
++  ["MRU", "j_not_unique", "aluno_heap:secondary_btree x turma_heap:secondary_btree", "hash"],
++  ["MRU", "j_not_unique", "aluno_heap:secondary_btree x turma_heap:secondary_btree", "sort_merge"],
++  ["MRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree", "bnl"],
++  ["MRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree", "hash"],
++  ["MRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree", "sort_merge"],
++  ["MRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan", "bnl"],
++  ["MRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan", "hash"],
++  ["MRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan", "sort_merge"],
++  ["MRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree", "bnl"],
++  ["MRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree", "hash"],
++  ["MRU", "j_pequenas", "curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree", "sort_merge"],
++  ["MRU", "j_pequenas", "curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash", "bnl"],
++  ["MRU", "j_pequenas", "curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash", "hash"],
++  ["MRU", "j_pequenas", "curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash", "sort_merge"],
++  ["MRU", "j_pequenas", "curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan", "bnl"],
++  ["MRU", "j_pequenas", "curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan", "hash"],
++  ["MRU", "j_pequenas", "curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan", "sort_merge"],
++  ["MRU", "j_pequenas", "curso_heap:secondary_hash x disciplina_heap:secondary_btree", "bnl"],
++  ["MRU", "j_pequenas", "curso_heap:secondary_hash x disciplina_heap:secondary_btree", "hash"],
++  ["MRU", "j_pequenas", "curso_heap:secondary_hash x disciplina_heap:secondary_btree", "sort_merge"],
++  ["MRU", "j_unique", "aluno_heap_sem_indices:scan x detalhes_heap:scan", "bnl"],
++  ["MRU", "j_unique", "aluno_heap_sem_indices:scan x detalhes_heap:scan", "hash"],
++  ["MRU", "j_unique", "aluno_heap_sem_indices:scan x detalhes_heap:scan", "sort_merge"],
++  ["MRU", "sel_pt_cpf", "aluno_heap_sem_indices:scan", ""],
++  ["MRU", "sel_pt_cpf", "aluno_heap:secondary_hash", ""],
++  ["MRU", "sel_pt_dre", "aluno_bt_dre:primary_btree", ""],
++  ["MRU", "sel_pt_dre", "aluno_h_dre:primary_hash", ""],
++  ["MRU", "sel_pt_dre", "aluno_heap_sem_indices:scan", ""],
++  ["MRU", "sel_rg_cr_alta", "aluno_heap_sem_indices:scan", ""],
++  ["MRU", "sel_rg_cr_alta", "aluno_heap:secondary_btree", ""],
++  ["MRU", "sel_rg_cr_baixa", "aluno_heap_sem_indices:scan", ""],
++  ["MRU", "sel_rg_cr_baixa", "aluno_heap:secondary_btree", ""],
++  ["MRU", "sel_rg_curso_alta", "aluno_bt_curso:clustering_btree", ""],
++  ["MRU", "sel_rg_curso_alta", "aluno_bt_curso:primary_btree", ""],
++  ["MRU", "sel_rg_curso_alta", "aluno_h_curso:clustering_btree", ""],
++  ["MRU", "sel_rg_curso_alta", "aluno_heap_sem_indices:scan", ""],
++  ["MRU", "sel_rg_curso_baixa", "aluno_bt_curso:clustering_btree", ""],
++  ["MRU", "sel_rg_curso_baixa", "aluno_bt_curso:primary_btree", ""],
++  ["MRU", "sel_rg_curso_baixa", "aluno_h_curso:clustering_btree", ""],
++  ["MRU", "sel_rg_curso_baixa", "aluno_heap_sem_indices:scan", ""],
++  ["MRU", "sel_rg_dre_alta", "aluno_bt_dre:primary_btree", ""],
++  ["MRU", "sel_rg_dre_alta", "aluno_heap_sem_indices:scan", ""],
++  ["MRU", "sel_rg_dre_baixa", "aluno_bt_dre:primary_btree", ""],
++  ["MRU", "sel_rg_dre_baixa", "aluno_heap_sem_indices:scan", ""]
++]
+--- a/PrototipoIA/Implementacao/tools/medir_io.py
++++ b/PrototipoIA/Implementacao/tools/medir_io.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Executa e valida o perfil io-rapido-v1 em diretório novo; usa Python padrão."""
++"""Executa e valida o perfil io-rapido-v2 em diretório novo; usa Python padrão."""
+ import argparse
+ import csv
+ import hashlib
+@@ -54,7 +54,7 @@
+     driver = TOOLS.parent / "src/layer1/bench.cpp"
+     # Mesmo driver nos dois lados: fixa fill, variantes e preparação do cache.
+     # Headers e biblioteca são da revisão medida, evitando misturar ABIs.
+-    run("driver-build", [compiler, "-std=c++20", "-O3", "-DNDEBUG", '-DCBD_FLAGS="io-rapido-v1 -O3 -DNDEBUG"',
++    run("driver-build", [compiler, "-std=c++20", "-O3", "-DNDEBUG", '-DCBD_FLAGS="io-rapido-v2 -O3 -DNDEBUG"',
+                          "-I", source / "src", driver, build_dir / "libcbd_motor.a", "-o", binary])
+     run("config-probe-build", [compiler, "-std=c++20", "-O2", "-Wall", "-Wextra", "-Wpedantic",
+                                "-I", source / "src", TOOLS / "config_io.cpp", "-o", output / "config_io"])
+@@ -67,7 +67,7 @@
+     run("sqlite", [sys.executable, "-I", TOOLS / "reference.py", smoke, "--tuplas"])
+     run("cobertura", [sys.executable, "-I", TOOLS / "validar_smoke_ci.py", smoke])
+     run("comparacao-sqlite", [sys.executable, "-I", TOOLS / "compare.py", smoke, "--tuplas"])
+-    inventory = TOOLS / "io_cenarios_v1.json"
++    inventory = TOOLS / "io_cenarios_v2.json"
+     with (smoke / "resultados.csv").open(newline="") as file:
+         rows = list(csv.DictReader(file))
+     comparison.index_rows(rows)
+@@ -76,16 +76,17 @@
+     expected = {"escala": "0.1", "semente": "20261122", "reps": "1..1",
+                 "m_juncao": "32", "m_selecao": "2", "lote": "100"}
+     if any(manifest.get(key) != value for key, value in expected.items()):
+-        raise ValueError("a bancada não respeitou o perfil io-rapido-v1")
+-    inputs = [smoke / name for name in ("esquema.csv", "constantes.csv", "operacoes.csv")]
++        raise ValueError("a bancada não respeitou o perfil io-rapido-v2")
++    inputs = [smoke / name for name in ("esquema.csv", "constantes.csv", "operacoes.csv",
++                                       "metodos.csv", "configuracoes.csv")]
+     inputs += sorted((smoke / "dados").glob("*.csv")) + sorted((smoke / "lotes").glob("*.csv"))
+     if not list((smoke / "dados").glob("*.csv")) or not list((smoke / "lotes").glob("*.csv")):
+         raise ValueError("dados ou lotes ausentes")
+     hashes = {name: sha(TOOLS / name) for name in
+-              ("medir_io.py", "comparar_io.py", "config_io.cpp", "io_cenarios_v1.json", "validar_smoke_ci.py", "reference.py", "compare.py")}
++              ("medir_io.py", "comparar_io.py", "config_io.cpp", "io_cenarios_v2.json", "validar_smoke_ci.py", "reference.py", "compare.py")}
+     hashes["driver_bancada.cpp"] = sha(driver)
+     metadata = {
+-        "protocolo": "io-rapido-v1", "commit": commit, "validado_sqlite_tuplas": True,
++        "protocolo": "io-rapido-v2", "commit": commit, "validado_sqlite_tuplas": True,
+         "assinatura": {"manifesto": {key: manifest[key] for key in PARAMETERS}, "config": config,
+                        "opcoes_compilacao_motor": flags,
+                        "dados": {str(path.relative_to(smoke)): sha(path) for path in inputs}},
+--- a/PrototipoIA/Implementacao/tools/verificar_matriz.py
++++ b/PrototipoIA/Implementacao/tools/verificar_matriz.py
+@@ -19,6 +19,32 @@
+ import os
+ import sys
+ 
++PRIMARIOS = {"primary_btree", "primary_hash"}
++SECUNDARIOS = {"secondary_hash", "secondary_btree", "clustering_btree"}
++IDENTIDADE = ("politica", "operacao", "variante", "algoritmo")
++
++
++def configuracao_fisica(config, a, b=None):
++    """Presença dos métodos no campo do predicado, independentemente do caminho escolhido."""
++    def primario(methods):
++        return bool(methods & PRIMARIOS)
++
++    def secundario(methods):
++        return bool(methods & SECUNDARIOS)
++
++    def nenhum(methods):
++        return not methods & (PRIMARIOS | SECUNDARIOS)
++
++    if b is None:
++        return {"a": nenhum(a), "b": primario(a), "c": secundario(a)}.get(config, False)
++    return {
++        "a": nenhum(a) and nenhum(b),
++        "b": (primario(a) and nenhum(b)) or (nenhum(a) and primario(b)),
++        "c": primario(a) and primario(b),
++        "d": (primario(a) and secundario(b)) or (secundario(a) and primario(b)),
++        "e": secundario(a) and secundario(b),
++    }.get(config, False)
++
+ _spec = importlib.util.spec_from_file_location("matriz", os.path.join(os.path.dirname(os.path.abspath(__file__)), "matriz.py"))
+ matriz = importlib.util.module_from_spec(_spec)
+ _spec.loader.exec_module(matriz)
+@@ -51,6 +77,7 @@
+     man = ler_manifesto(os.path.join(saida, "manifesto.txt"))
+ 
+     politicas = sorted({r["politica"] for r in brutos})
++    minimo = 1
+     if not aceitar_reduzida:
+         try:
+             escala = float(man.get("escala", "0").replace(",", "."))
+@@ -68,6 +95,50 @@
+         for p in matriz.POLITICAS:
+             if p not in politicas:
+                 falhas.append(f"política {p} ausente do resultados.csv")
++
++    configs, metodos = {}, {}
++    for r in ler_csv(os.path.join(saida, "configuracoes.csv")):
++        key = tuple(r.get(k, "") for k in IDENTIDADE)
++        if key in configs:
++            falhas.append(f"metadados de configuração duplicados: {key}")
++        configs[key] = r
++    for r in ler_csv(os.path.join(saida, "metodos.csv")):
++        metodo = r.get("metodo", "")
++        if metodo not in PRIMARIOS | SECUNDARIOS | {"scan"}:
++            falhas.append(f"método físico desconhecido: {metodo}")
++        metodos.setdefault((r.get("politica"), r.get("tabela"), r.get("campo")), set()).add(metodo)
++
++    executadas = {}
++    for r in brutos:
++        if r["status"] not in ("ok", "inviavel"):
++            continue
++        key = tuple(r[k] for k in IDENTIDADE)
++        if r["status"] == "ok":
++            reps = executadas.setdefault(key, set())
++            if r["rep"] in reps:
++                falhas.append(f"repetição duplicada: {key} rep={r['rep']}")
++            reps.add(r["rep"])
++        elif not r.get("motivo", "").strip():
++            falhas.append(f"inviável sem motivo: {key}")
++        meta = configs.get(key)
++        if not meta:
++            falhas.append(f"sem metadados físicos para {key}")
++            continue
++        campos = []
++        for lado in ("externa", "interna") if r["algoritmo"] else ("externa",):
++            campo = meta.get("campo_" + lado, "")
++            tabela = meta.get(lado, "")
++            methods = metodos.get((r["politica"], tabela, campo))
++            if not campo or tabela != r[lado] or methods is None:
++                falhas.append(f"metadados físicos inconsistentes: {key} {lado}")
++                break
++            campos.append(methods)
++        else:
++            if not configuracao_fisica(r["config"], *campos):
++                falhas.append(f"configuração física não confere com {r['config']}: {key}")
++    for key, reps in executadas.items():
++        if len(reps) < max(1, minimo) or any(not rep.isdigit() or int(rep) < 1 for rep in reps):
++            falhas.append(f"repetições executadas insuficientes ou inválidas: {key} ({len(reps)})")
+ 
+     blocos = {}
+     for r in ler_csv(os.path.join(saida, "estatisticas.csv")):
+@@ -106,6 +177,8 @@
+     resumo = (f"matriz obrigatória: {len(matriz.obrigatorias())} células por política, {', '.join(politicas)}; "
+               f"{cont['ok']} executadas, {cont['nao_aplicavel']} não aplicáveis, {cont['inviavel']} inviáveis, "
+               f"{cont['ausente']} ausentes; porte conferido em {portes} execuções de junção")
++    if cont["ok"] == 0:
++        falhas.append("nenhuma célula obrigatória executada com sucesso")
+     return falhas, avisos, resumo
+ 
+ 
+--- a/README.md
++++ b/README.md
+@@ -1,4 +1,10 @@
+ # Grupo-2---Avaliacao-2---SBD---UFRJ
++
++Revisão de 22/11/2026: a bancada separa heaps sem índices das variantes
++indexadas e verifica a configuração física pelos metadados. A rodada
++corrigida e suas limitações estão nas [evidências](evidencias/PR-19/2026-11-22-matriz-fisica/README.md).
++Os números de `resultados_exemplo/` e da análise de 17/11 abaixo
++representam o snapshot anterior à correção da matriz física.
+ 
+ Repositório com o trabalho da Avaliação 2 de Construção de Banco de Dados (2026.2) da UFRJ, do professor Milton R. Ramirez: uma bancada de teste que mede quantos blocos cada operação relacional transfere entre os arquivos do banco e o buffer pool, sob diferentes configurações do gerente de armazenamento.
+ 
+--- a/docs/CI.md
++++ b/docs/CI.md
+@@ -39,6 +39,15 @@
+ verifica ASan/UBSan e não valida vazamentos com LeakSanitizer.
+ 
+ ## Cobertura da bancada reduzida
++
++A matriz integral cruza `metodos.csv` (métodos disponíveis em cada campo)
++com `configuracoes.csv` (operandos e campos efetivamente escolhidos).
++O `verificar_matriz.py` exige configurações físicas consistentes e
++repetições efetivamente executadas. O `compare.py` também rejeita saída
++vazia e combinações declaradas ausentes. A CLI `--so` declara e confere
++apenas as operações selecionadas. Seus testes de integração usam
++`BUILD_DIR/bancada`, já disponível no ambiente do workflow.
++
+ 
+ O comando é `bancada --rapido --tuplas --saida DIRETORIO_NOVO`. Depois, a
+ referência SQLite é gerada, o inventário de execuções é verificado e
+--- a/docs/IO.md
++++ b/docs/IO.md
+@@ -1,11 +1,20 @@
+ # Suíte pequena para regressão de I/O
+ 
+-O perfil `io-rapido-v1` compara **168 execuções de consultas**, incluindo
++O perfil `io-rapido-v2` compara **168 execuções de consultas**, incluindo
+ seleções em heap/B+/hash e índices secundários, BNL, hash join, sort-merge,
+ LRU e MRU. Reutiliza a escala reduzida da bancada existente. Não substitui
+ a matriz experimental integral exigida no trabalho.
+ 
+-**Revisão do inventário (13/11/2026, auditoria P04/P05).** O inventário
++**Revisão física de 22/11/2026.** O perfil v2 conserva 168 combinações e
++usa heaps sem índices nas configurações que exigem ausência de métodos
++no campo do predicado. Os identificadores desses scans passaram a usar
++`*_heap_sem_indices`. Ambos os motores devem ser medidos novamente com
++o driver e inventário v2. Comparações entre v1 e v2 são recusadas.
++O inventário v1 permanece preservado para suas medições históricas.
++A mudança de protocolo também acrescenta `metodos.csv` e
++`configuracoes.csv` aos metadados de configuração dos experimentos.
++
++**Histórico do perfil v1 — revisão do inventário (13/11/2026, auditoria P04/P05).** O inventário
+ passou de 108 para 168 identidades, só com acréscimos: as 8 células do
+ NATURAL JOIN que faltavam (P×P b–e, P×G c–e, G×G e) × 3 algoritmos × 2
+ políticas, com as duas variantes da configuração c. A seletividade baixa
+@@ -69,7 +78,7 @@
+   fontes e saída. As flags e a versão do compilador precisam coincidir.
+ - SHA256 de dados, esquema, consultas, constantes e lotes, além dos hashes
+   de driver/ferramentas, precisam coincidir. O inventário
+-  `tools/io_cenarios_v1.json` fixa as 168 identidades, incluindo variantes;
++  `tools/io_cenarios_v2.json` fixa as 168 identidades, incluindo variantes;
+   remover uma delas dos dois lados também falha.
+ - Ambos os lados passam pela referência SQLite do candidato, comparação de
+   contagens/checksums e multiconjuntos de tuplas e verificação de cobertura.
+--- /dev/null
++++ b/docs/REVISAO_PR_19.md
+@@ -0,0 +1,61 @@
++# Parecer local sobre o PR #19
++
++PR examinado no SHA `f8177711ac3f6816f321948dff8bef798018b934`, base
++`4091762d65a52495c02c9cf63da5bc630998ff4d`. Foram lidos os cinco prints,
++o PDF e as duas exportações de chat de wpp-msgs. Seus relatos serviram como
++guia para conferir fontes, requisitos e testes.
++
++As correções locais estão em `fix/pr19-slot-prefetch`, no worktree
++`pr19-slot-prefetch`. A main permanece em `4091762` e o remoto não foi
++alterado nesta revisão. As numerações CBD variam entre pacotes de contexto;
++os números de issue abaixo são os do GitHub.
++
++## Resultado da revisão e ajustes
++
++| Área | Resultado e evidência |
++|---|---|
++| SlottedPage e prefetch (#2/#3) | Dois casos residuais reproduzidos, regressões antes/depois e correções no commit local `2f0148c`. |
++| Sort-merge variável (#7) | Lista de runs dimensionada pelo máximo declarado causava inviabilidade indevida. Corrigido com maior registro observado, preservando cobrança em M. |
++| Fontes clustering/hash (#4/#7) | Cursor retém índice e dados; conta final corrigida, inclusive com duplicatas e passes adicionais. |
++| BNL (#6) | Página densa com M=3 agora funciona; rodada vazia eliminada; leituras dirigidas de 5 para 3. Estimativa passou a considerar limite do diretório. |
++| Matriz física (#11–#14) | Heaps sem índices separados dos indexados. Validador cruza campos e métodos reais, verifica repetições e recusa sucesso vazio. Rodada integral aprovada. |
++| Conferidor (#15) | Rejeita ausência total de medições e combinações declaradas ausentes. Contagem de tuplas corrigida; --so conferido com SQLite. |
++| Estimativas e convergência (#16/#17) | Parâmetros e convergência ficam registrados. Aproximações de cache, distribuição e fronteiras de páginas permanecem explicitadas. |
++
++As três correções de operadores foram consolidadas em `b1c0de5`, depois
++de 107 testes C++ e 48 Python aprovados. A matriz e os verificadores foram
++corrigidos na continuação da revisão, com as evidências descritas abaixo.
++
++## Validação final disponível
++
++- 107 testes C++ aprovados em Release e ASan/UBSan.
++- 63 testes Python aprovados, com integração da CLI e SQLite habilitada.
++- Rodada integral na escala 1, LRU/MRU e 3 a 10 repetições: 1.159 linhas em
++  168 combinações conferidas com SQLite, sem divergências ou ausências.
++- Matriz com 60 células por política, 108 executadas e 12 não aplicáveis
++  pelo caso 3, sem inviáveis ou ausentes. Portes e configuração física
++  conferidos. Rodada reduzida também conferida com tuplas completas.
++- Perfil de I/O v2: 168 cenários pareados sob o driver comum e zero
++  mudanças de leituras, gravações ou flush entre os motores comparados.
++
++## Limites e recomendação
++
++O SHA original do PR precisa incorporar os ajustes funcionais e de
++validação antes do merge. O CI hospedado da branch local ainda precisa
++ser executado após seu envio autorizado. Este parecer não declara todas
++as issues encerradas por um único resultado positivo da suíte.
++
++O contrato de memória usa as exclusões documentadas na decisão 173. Os
++testes de alocações cobrem seus casos declarados; não medem todo o RSS do
++processo. LeakSanitizer permaneceu desativado. As estimativas continuam
++modelos aproximados e casos de não convergência temporal aparecem no CSV.
++
++O material do WhatsApp deixava a #18 fora do fechamento. O commit
++`dc1b1ea` contém `Closes #18`, mas gráficos e tamanho do bloco no manifesto
++continuam pendentes do escopo relatado pelo colega. A rodada corrigida
++preserva CSVs e tabelas, e essa pendência deve permanecer visível no
++acompanhamento da issue.
++
++Os resultados de exemplo de 17/11 foram preservados como histórico. As
++evidências atualizadas, fontes, patches e comandos estão nas pastas
++`evidencias/PR-19/2026-11-22-*`, com registros no POST_MORTEM.md.
+--- /dev/null
++++ b/docs/superpowers/plans/2026-11-22-matriz-fisica.md
+@@ -0,0 +1,45 @@
++# Matriz física dos experimentos
++
++Plano de execução autorizado pelo usuário nesta conversa. Implementação
++direta no worktree atual, com revisão ao final e commits apenas quando
++autorizados.
++
++Objetivo: atender às configurações físicas dos §§5.1 e 5.2 do PDF revisado
++de 04/11/2026 e impedir aprovação de uma matriz apenas pelos rótulos.
++
++Arquitetura: conservar as quatro camadas e os operadores. A bancada recebe
++quatro heaps sem índices adicionais às variantes indexadas existentes.
++Metadados de métodos vêm de `Monitor::access_paths`; outro CSV identifica
++os campos e tabelas de cada combinação. O validador cruza esses arquivos
++com as linhas executadas e suas repetições.
++
++Tecnologias: C++20, CMake/CTest, Python padrão, SQLite.
++
++## Sequência
++
++- [x] Consolidar correções anteriores e verificar C++/Python.
++- [x] Acrescentar testes negativos de configuração física, campos ausentes,
++  métodos em outro campo, repetições incompletas e ausência de execução.
++- [x] Observar falhas no validador atual, preservando logs.
++- [x] Em `bench.cpp`, acrescentar variantes sem índice e publicar
++  `metodos.csv`/`configuracoes.csv` com dados das interfaces reais.
++- [x] Em `verificar_matriz.py`, validar as condições a–e e a–c para os
++  campos declarados, verificar repetições reais e motivos de inviabilidade.
++- [x] Atualizar o perfil de I/O para v2 com inventário explícito de 168
++  combinações renomeadas. Preservar v1 e recusar comparação entre protocolos.
++- [x] Executar suíte Python/C++, smoke com tuplas e rodada integral com
++  SQLite, matriz e tabelas. Preservar resultados anteriores de exemplo.
++- [x] Revisar o diff e registrar mudanças, comandos e limitações no
++  POST_MORTEM.md e em evidências próprias.
++
++## Condições verificadas
++
++Método em outro campo não conta como índice do predicado. Ordem dos
++operandos pode mudar entre algoritmos. Clustering em seleção c pode
++coexistir com organização primária no campo. Rodada reduzida pode testar
++função, mas não certifica o porte da matriz integral. Status inviável exige
++motivo e mantém metadados físicos; sucesso requer as repetições efetivas.
++
++Os casos adicionais do `compare.py` foram corrigidos em seguida, com
++testes específicos de saída vazia e `--so`. O perfil comum de I/O
++continuará compilando o mesmo driver contra as duas bibliotecas.

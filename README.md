@@ -1,5 +1,11 @@
 # Grupo-2---Avaliacao-2---SBD---UFRJ
 
+Revisão de 22/11/2026: a bancada separa heaps sem índices das variantes
+indexadas e verifica a configuração física pelos metadados. A rodada
+corrigida e suas limitações estão nas [evidências](evidencias/PR-19/2026-11-22-matriz-fisica/README.md).
+Os números de `resultados_exemplo/` e da análise de 17/11 abaixo
+representam o snapshot anterior à correção da matriz física.
+
 Repositório com o trabalho da Avaliação 2 de Construção de Banco de Dados (2026.2) da UFRJ, do professor Milton R. Ramirez: uma bancada de teste que mede quantos blocos cada operação relacional transfere entre os arquivos do banco e o buffer pool, sob diferentes configurações do gerente de armazenamento.
 
 O [gate de correção](docs/CI.md) verifica builds, testes com GoogleTest,

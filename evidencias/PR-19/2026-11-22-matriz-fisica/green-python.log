@@ -1,0 +1,23 @@
+test_config_b_com_secundario_na_outra_tabela_reprova (test_verificar_matriz.VerificadorTest.test_config_b_com_secundario_na_outra_tabela_reprova) ... ok
+test_config_c_sem_primarias_reprova (test_verificar_matriz.VerificadorTest.test_config_c_sem_primarias_reprova) ... ok
+test_indice_em_outro_campo_nao_muda_config_a (test_verificar_matriz.VerificadorTest.test_indice_em_outro_campo_nao_muda_config_a) ... ok
+test_inventario (test_verificar_matriz.VerificadorTest.test_inventario) ... ok
+test_inviavel_aparece_mas_nao_reprova (test_verificar_matriz.VerificadorTest.test_inviavel_aparece_mas_nao_reprova) ... ok
+test_juncao_obrigatoria_nao_aplicavel_reprova (test_verificar_matriz.VerificadorTest.test_juncao_obrigatoria_nao_aplicavel_reprova) ... ok
+test_matriz_completa_aprova (test_verificar_matriz.VerificadorTest.test_matriz_completa_aprova) ... ok
+test_omitir_uma_celula_reprova (test_verificar_matriz.VerificadorTest.test_omitir_uma_celula_reprova) ... ok
+test_politica_ausente_reprova (test_verificar_matriz.VerificadorTest.test_politica_ausente_reprova) ... ok
+test_porte_falso_reprova (test_verificar_matriz.VerificadorTest.test_porte_falso_reprova) ... ok
+test_repeticao_unica_reprova_ainda_com_manifesto_tres (test_verificar_matriz.VerificadorTest.test_repeticao_unica_reprova_ainda_com_manifesto_tres) ... ok
+test_rodada_reduzida_nao_prova_a_matriz (test_verificar_matriz.VerificadorTest.test_rodada_reduzida_nao_prova_a_matriz) ... ok
+test_scan_em_tabela_indexada_nao_prova_config_a (test_verificar_matriz.VerificadorTest.test_scan_em_tabela_indexada_nao_prova_config_a) ... ok
+test_selecao_a_indexada_reprova (test_verificar_matriz.VerificadorTest.test_selecao_a_indexada_reprova) ... ok
+test_selecao_nao_aplicavel_fora_do_caso_3_reprova (test_verificar_matriz.VerificadorTest.test_selecao_nao_aplicavel_fora_do_caso_3_reprova) ... ok
+test_sem_metadados_fisicos_reprova (test_verificar_matriz.VerificadorTest.test_sem_metadados_fisicos_reprova) ... ok
+test_tudo_inviavel_sem_motivo_reprova (test_verificar_matriz.VerificadorTest.test_tudo_inviavel_sem_motivo_reprova) ... ok
+test_variante_nao_aplicavel_com_outra_executada_aprova (test_verificar_matriz.VerificadorTest.test_variante_nao_aplicavel_com_outra_executada_aprova) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.299s
+
+OK

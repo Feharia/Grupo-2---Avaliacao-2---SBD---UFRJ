@@ -286,6 +286,10 @@ Spec spec_padrao() {
     Spec s;
     using SK = StructureKind;
     s.variants = {
+        {"curso_heap_sem_indices", "curso", SK::Heap, "", {}},
+        {"disciplina_heap_sem_indices", "disciplina", SK::Heap, "", {}},
+        {"aluno_heap_sem_indices", "aluno", SK::Heap, "", {}},
+        {"inscricao_heap_sem_indices", "inscricao", SK::Heap, "", {}},
         // P05 (decisão 175): no heap, secundário de campo UNIQUE é hash e de NOT UNIQUE é B+ (§4.2)
         {"curso_heap", "curso", SK::Heap, "", {{SK::SecHash, "codigo"}}},
         {"curso_bt_codigo", "curso", SK::BTree, "codigo", {}},
@@ -317,23 +321,23 @@ Spec spec_padrao() {
     const std::string pts = "SELECT a.* FROM lote l JOIN aluno a ON a.{f} = l.k";
     // igualdade em UNIQUE: nível próprio ("pontual"); 1% e 50% são o caso 3 (170)
     s.ops.push_back(sel("sel_pt_dre", "igualdade_unique", "pontual", OpKind::Points, "dre", pts,
-                        {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
+                        {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
                          {"aluno_h_dre", PK::PrimaryHash, "dre", "b"}}));
     s.ops.push_back(sel("sel_pt_cpf", "igualdade_unique", "pontual", OpKind::Points, "cpf", pts,
-                        {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryHash, "cpf", "c"}}));
+                        {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryHash, "cpf", "c"}}));
     const std::string rg = "SELECT a.* FROM aluno a WHERE a.{f} >= {lo} AND a.{f} <= {hi}";
     // seletividade baixa de 1% (enunciado v2, §5.2 e §6.2; decisão 174); os ids *_baixa ficam, pelo CI
     for (auto [suf, sv, lbl] : {std::tuple{"baixa", 0.01, "1%"}, std::tuple{"alta", 0.5, "50%"}}) {
         const bool baixa = sv < 0.1;
         // faixa em UNIQUE: o hash primário sai como caso 4; o índice secundário (c) é o caso 2 (170)
         s.ops.push_back(sel(std::string("sel_rg_dre_") + suf, "faixa_unique", lbl, OpKind::Range, "dre", rg,
-                            {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
+                            {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_bt_dre", PK::PrimaryBTree, "dre", "b"},
                              {"aluno_h_dre", PK::PrimaryHash, "dre", "b"}}, sv, "meio"));
         s.ops.push_back(sel(std::string("sel_rg_cr_") + suf, "faixa_not_unique", lbl, OpKind::Range, "cr", rg,
-                            {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "cr", "c"}},
+                            {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "cr", "c"}},
                             sv, baixa ? "topo" : "base"));
         s.ops.push_back(sel(std::string("sel_rg_curso_") + suf, "faixa_not_unique", lbl, OpKind::Range, "curso", rg,
-                            {{"aluno_heap", PK::Scan, "", "a"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso", "b"},
+                            {{"aluno_heap_sem_indices", PK::Scan, "", "a"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso", "b"},
                              {"aluno_bt_curso", PK::SecondaryBTreeClustering, "curso", "c"},
                              {"aluno_h_curso", PK::SecondaryBTreeClustering, "curso", "c"},
                              {"aluno_h_curso", PK::PrimaryHash, "curso", "b"}}, sv, baixa ? "meio" : "base"));
@@ -349,8 +353,8 @@ Spec spec_padrao() {
     };
     s.ops.push_back(join("j_mestre_detalhe", "natural_join", "maior_maior",
                          "SELECT x.*, y.* FROM aluno x JOIN inscricao y ON x.dre = y.dre", "dre", "dre",
-                         {{{"aluno_heap", PK::Scan, ""}, {"inscricao_heap", PK::Scan, ""}, "a"},
-                          {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::Scan, ""}, "b"},
+                         {{{"aluno_heap_sem_indices", PK::Scan, ""}, {"inscricao_heap_sem_indices", PK::Scan, ""}, "a"},
+                          {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap_sem_indices", PK::Scan, ""}, "b"},
                           {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_bt_dre", PK::PrimaryBTree, "dre"}, "c"},
                           {{"aluno_h_dre", PK::PrimaryHash, "dre"}, {"inscricao_h_dre", PK::PrimaryHash, "dre"}, "c"},
                           {{"aluno_bt_dre", PK::PrimaryBTree, "dre"}, {"inscricao_heap", PK::SecondaryBTreeNonClustering, "dre"}, "d"},
@@ -358,16 +362,16 @@ Spec spec_padrao() {
                          true));
     s.ops.push_back(join("j_pequenas", "natural_join", "menor_menor",
                          "SELECT x.*, y.* FROM curso x JOIN disciplina y ON x.codigo = y.curso", "codigo", "curso",
-                         {{{"curso_heap", PK::Scan, ""}, {"disciplina_heap", PK::Scan, ""}, "a"},
-                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap", PK::Scan, ""}, "b"},
+                         {{{"curso_heap_sem_indices", PK::Scan, ""}, {"disciplina_heap_sem_indices", PK::Scan, ""}, "a"},
+                          {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap_sem_indices", PK::Scan, ""}, "b"},
                           {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_bt_curso", PK::PrimaryBTree, "curso"}, "c"},
                           {{"curso_h_codigo", PK::PrimaryHash, "codigo"}, {"disciplina_h_curso", PK::PrimaryHash, "curso"}, "c"},
                           {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"disciplina_heap", PK::SecondaryBTreeNonClustering, "curso"}, "d"},
                           {{"curso_heap", PK::SecondaryHash, "codigo"}, {"disciplina_heap", PK::SecondaryBTreeNonClustering, "curso"}, "e"}}));
     s.ops.push_back(join("j_grande_pequena", "natural_join", "menor_maior",
                          "SELECT x.*, y.* FROM curso x JOIN aluno y ON x.codigo = y.curso", "codigo", "curso",
-                         {{{"curso_heap", PK::Scan, ""}, {"aluno_heap", PK::Scan, ""}, "a"},
-                          {{"curso_heap", PK::Scan, ""}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "b"},
+                         {{{"curso_heap_sem_indices", PK::Scan, ""}, {"aluno_heap_sem_indices", PK::Scan, ""}, "a"},
+                          {{"curso_heap_sem_indices", PK::Scan, ""}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "b"},
                           {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"aluno_bt_curso", PK::PrimaryBTree, "curso"}, "c"},
                           {{"curso_h_codigo", PK::PrimaryHash, "codigo"}, {"aluno_h_curso", PK::PrimaryHash, "curso"}, "c"},
                           {{"curso_bt_codigo", PK::PrimaryBTree, "codigo"}, {"aluno_heap", PK::SecondaryBTreeNonClustering, "curso"}, "d"},
@@ -375,7 +379,7 @@ Spec spec_padrao() {
     // tipos 2 e 3: só as configurações a e e existem; b, c e d são o caso 1 (170)
     s.ops.push_back(join("j_unique", "equijoin_unique", "maior_maior",
                          "SELECT x.*, y.* FROM aluno x JOIN detalhes y ON x.cpf = y.cpf", "cpf", "cpf",
-                         {{{"aluno_heap", PK::Scan, ""}, {"detalhes_heap", PK::Scan, ""}, "a"}}));
+                         {{{"aluno_heap_sem_indices", PK::Scan, ""}, {"detalhes_heap", PK::Scan, ""}, "a"}}));
     s.ops.push_back(join("j_not_unique", "equijoin_not_unique", "maior_maior",
                          "SELECT x.*, y.* FROM aluno x JOIN turma y ON x.professor_orientador = y.professor",
                          "professor_orientador", "professor",
@@ -747,6 +751,13 @@ int main(int argc, char** argv) {
         } else return usage();
     }
     if (spec.min_reps < 1 || spec.max_reps < spec.min_reps) return usage();
+    if (!spec.only.empty()) {
+        std::erase_if(spec.ops, [&](const OpDef& op) { return op.id.find(spec.only) == std::string::npos; });
+        if (spec.ops.empty()) {
+            std::cerr << "nenhuma operação corresponde ao filtro --so\n";
+            return 2;
+        }
+    }
 
     // load_spec: validações (129)
     const std::uint32_t work = Config{}.area_frames[3];
@@ -817,6 +828,11 @@ int main(int argc, char** argv) {
     Csv params(out_dir / "parametros.csv");   // BENCH-008
     params.row({"politica", "operacao", "variante", "algoritmo", "parametros"});
 
+    Csv methods(out_dir / "metodos.csv");
+    methods.row({"politica", "tabela", "campo", "metodo"});
+    Csv configurations(out_dir / "configuracoes.csv");
+    configurations.row({"politica", "operacao", "variante", "algoritmo",
+                        "externa", "campo_externa", "interna", "campo_interna"});
     for (Policy pol : spec.policies) {
         const std::string pname = to_string(pol);
         Config cfg;
@@ -829,6 +845,16 @@ int main(int argc, char** argv) {
         mon.flush_all();   // faz parte da carga; não é medido (14)
         write_occupancy(mon, built, occ, pname, "antes");
         write_stats(mon, built, stats, pname);
+        for (const auto& [name, table] : built.tables) {
+            for (const auto& method : mon.access_paths(table)) {
+                if (method.kind == PathKind::Scan) {
+                    for (const auto& field : mon.schema(table).fields)
+                        methods.row({pname, name, field.name, "scan"});
+                } else {
+                    methods.row({pname, name, mon.schema(table).field(method.field).name, to_string(method.kind)});
+                }
+            }
+        }
         declare_not_applicable(results, pname, spec);
 
         auto shape_for = [&](const std::string& op, const std::string& variant, const std::string& alg, int rep) {
@@ -858,6 +884,7 @@ int main(int argc, char** argv) {
                     const FieldType ft = mon.schema(t).field(f).type;
                     const std::string variant = ref.table + ":" + to_string(ref.kind);
                     const Cell cell{op.tipo, op.tamanho, ref.config, op.seletividade};
+                    configurations.row({pname, op.id, variant, "", ref.table, op.field, "", ""});
                     SelectParams sp;
                     sp.m = spec.m_select;
                     access.row({pname, op.id, ref.config, variant, "", executed_access(path), ""});
@@ -922,6 +949,9 @@ int main(int argc, char** argv) {
                         const JoinInput& outer = fo ? in0 : in1;
                         const JoinInput& inner = fo ? in1 : in0;
                         const std::string vname = variant + (fo == first_outer ? "" : " (papeis trocados)");
+                        configurations.row({pname, op.id, vname, to_string(alg),
+                                            fo ? r0.table : r1.table, fo ? op.field0 : op.field1,
+                                            fo ? r1.table : r0.table, fo ? op.field1 : op.field0});
                         {   // acesso executado, lido do plano (sem E/S, decisão 160)
                             const auto planned = mon.plan_join(alg, outer, inner, spec.m_join, JoinParams{});
                             std::string ae = "não executada", ai = "não executada";

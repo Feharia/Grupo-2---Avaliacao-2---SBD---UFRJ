@@ -1,0 +1,6 @@
+[ 51%] Built target cbd_motor
+[ 62%] Building CXX object CMakeFiles/bancada.dir/src/layer1/bench.cpp.o
+[ 72%] Built target testes_memoria
+[ 96%] Built target testes
+[100%] Linking CXX executable bancada
+[100%] Built target bancada
