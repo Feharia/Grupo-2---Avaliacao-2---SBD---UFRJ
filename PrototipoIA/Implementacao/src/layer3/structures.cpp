@@ -1,10 +1,18 @@
 #include "layer3/structures.hpp"
 
 #include <algorithm>
+#include <initializer_list>
 
 namespace cbd {
 
 namespace {
+
+void file_occupancy(Occupancy& o, const BufferPool& pool, std::initializer_list<FileId> files) {
+    for (FileId file : files) {
+        o.file_total += pool.file_blocks(file);
+        o.reserved_free += pool.file_free_blocks(file);
+    }
+}
 
 RecordView view_of(std::span<const std::byte> r, const Schema* s) { return detail::make_view(r, s); }
 
@@ -293,6 +301,7 @@ Occupancy HeapFile::occupancy() {
     Occupancy o;
     o.data = last_;
     o.header = 1;
+    file_occupancy(o, pool_, {file_});
     return o;
 }
 
@@ -442,6 +451,7 @@ Occupancy HashFile::occupancy() {
     o.data = nbuckets_;
     o.overflow = overflow_;
     o.header = 1;
+    file_occupancy(o, pool_, {file_});
     return o;
 }
 
@@ -483,6 +493,7 @@ Occupancy BPlusTreeFile::occupancy() {
     o.data = shape.leaves;
     o.header = 2;   // dois arquivos (145)
     o.index_levels = shape.levels;
+    file_occupancy(o, pool_, {engine_.leaf_file(), engine_.node_file()});
     return o;
 }
 
@@ -609,6 +620,7 @@ Occupancy HashIndex::occupancy() {
     o.data = nbuckets_;
     o.overflow = overflow_;
     o.header = 1;
+    file_occupancy(o, pool_, {file_});
     return o;
 }
 
@@ -871,6 +883,7 @@ Occupancy BPlusIndex::occupancy() {
     o.overflow = *s.overflow_blocks;
     o.header = 1;
     o.index_levels = engine_.measure().levels;
+    file_occupancy(o, pool_, {file_});
     return o;
 }
 

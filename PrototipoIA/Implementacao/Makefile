@@ -16,6 +16,7 @@ CXXFLAGS += $(CXXSTD) $(OPT) $(WARN) -DCBD_FLAGS='"$(CXXSTD) $(OPT)"'
 LIB_SRC   := $(wildcard src/common/*.cpp src/layer4/*.cpp src/layer3/*.cpp src/layer2/*.cpp)
 LIB_OBJ   := $(LIB_SRC:%.cpp=$(BUILD)/%.o)
 BENCH_OBJ := $(BUILD)/src/layer1/bench.o
+VERIFY_OBJ := $(BUILD)/tests/support/bench_verify_failure.o
 TEST_SRC  := $(wildcard tests/*.cpp)
 TEST_OBJ  := $(TEST_SRC:%.cpp=$(BUILD)/%.o)
 MEM_SRC   := $(wildcard tests/memoria/*.cpp) tests/mini_main.cpp
@@ -23,9 +24,12 @@ MEM_OBJ   := $(MEM_SRC:%.cpp=$(BUILD)/%.o)
 
 .PHONY: all test asan rapido clean
 
-all: $(BUILD)/bancada $(BUILD)/testes $(BUILD)/testes_memoria
+all: $(BUILD)/bancada $(BUILD)/testes $(BUILD)/testes_memoria $(BUILD)/bancada_verify_failure
 
 $(BUILD)/bancada: $(LIB_OBJ) $(BENCH_OBJ)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+$(BUILD)/bancada_verify_failure: $(LIB_OBJ) $(VERIFY_OBJ)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 $(BUILD)/testes: $(LIB_OBJ) $(TEST_OBJ)
@@ -40,7 +44,7 @@ $(BUILD)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
--include $(LIB_OBJ:.o=.d) $(BENCH_OBJ:.o=.d) $(TEST_OBJ:.o=.d) $(MEM_OBJ:.o=.d)
+-include $(LIB_OBJ:.o=.d) $(BENCH_OBJ:.o=.d) $(VERIFY_OBJ:.o=.d) $(TEST_OBJ:.o=.d) $(MEM_OBJ:.o=.d)
 
 test: $(BUILD)/testes $(BUILD)/testes_memoria
 	./$(BUILD)/testes

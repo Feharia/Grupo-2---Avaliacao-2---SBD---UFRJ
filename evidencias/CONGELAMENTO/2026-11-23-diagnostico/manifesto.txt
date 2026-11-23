@@ -1,0 +1,13 @@
+data: 2026-11-23 01:07:11
+compilador: 13.3.0
+flags:  Release
+commit: 4339845c74815bf51a29fe85425d68af30095c42
+escala: 0.1
+semente: 20261122
+reps: 1..1
+tolerancia: 0.05
+m_juncao: 32
+m_selecao: 2
+lote: 100
+hash_especificacao: 1828a859a9238dde
+duracao_s: 0.6

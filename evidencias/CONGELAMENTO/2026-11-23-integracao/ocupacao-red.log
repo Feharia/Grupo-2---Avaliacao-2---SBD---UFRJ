@@ -1,0 +1,78 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from Occupancy
+[ RUN      ] Occupancy.HeapDistingueArquivoVazioEPrimeiroExtent
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.HeapDistingueArquivoVazioEPrimeiroExtent (0 ms)
+[ RUN      ] Occupancy.HeapCresceSemConfundirBlocosLidosComReservados
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.HeapCresceSemConfundirBlocosLidosComReservados (0 ms)
+[ RUN      ] Occupancy.HashReconciliaOverflowLiberadoEReutilizado
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.HashReconciliaOverflowLiberadoEReutilizado (0 ms)
+[ RUN      ] Occupancy.BPlusSomaDoisArquivosIncluindoCabecalhos
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.BPlusSomaDoisArquivosIncluindoCabecalhos (0 ms)
+[ RUN      ] Occupancy.HashSecundarioIncluiAFolgaDoArquivo
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.HashSecundarioIncluiAFolgaDoArquivo (0 ms)
+[ RUN      ] Occupancy.BPlusSecundariaContaPostingELiberacao
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/tmp/test_occupancy_freeze.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.BPlusSecundariaContaPostingELiberacao (0 ms)
+[----------] 6 tests from Occupancy (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 6 tests, listed below:
+[  FAILED  ] Occupancy.HeapDistingueArquivoVazioEPrimeiroExtent
+[  FAILED  ] Occupancy.HeapCresceSemConfundirBlocosLidosComReservados
+[  FAILED  ] Occupancy.HashReconciliaOverflowLiberadoEReutilizado
+[  FAILED  ] Occupancy.BPlusSomaDoisArquivosIncluindoCabecalhos
+[  FAILED  ] Occupancy.HashSecundarioIncluiAFolgaDoArquivo
+[  FAILED  ] Occupancy.BPlusSecundariaContaPostingELiberacao
+
+ 6 FAILED TESTS

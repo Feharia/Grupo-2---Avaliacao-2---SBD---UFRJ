@@ -1,0 +1,8 @@
+["/home/carlos/.pyenv/versions/3.11.14/bin/python3", "-I", "/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tools/medir_io.py", "--source", "/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao", "--build-dir", "/tmp/cbd-freeze-validacao-10reharx/release", "--commit", "8569e0e9f1894b6c647bf72888b4e5c0e9c1de9c", "--saida", "/tmp/cbd-freeze-validacao-10reharx/io-candidate"]
+I/O: driver-build
+I/O: config-probe-build
+I/O: bancada
+I/O: sqlite
+I/O: cobertura
+I/O: comparacao-sqlite
+Medição validada: 8569e0e9f1894b6c647bf72888b4e5c0e9c1de9c em 15.551 s

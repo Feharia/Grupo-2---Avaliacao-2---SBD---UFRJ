@@ -1378,3 +1378,143 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   As assinaturas dos CSVs de resultados foram conferidas contra os
   metadados. Esta etapa altera documentação/evidências; não exigiu nova
   execução do motor C++ já validado no HEAD funcional publicado.
+
+### Continuação após a interrupção do helper de publicação — 23/11
+
+- O usuário informou sucesso do Actions 45107904847 para `4339845` e
+  confirmou os pushes das duas branches. Os jobs seguintes ainda estavam
+  em execução; a interrupção do helper não os cancelou.
+- Nos JSONs preservados pelo helper, o PR permanecia aberto com o mesmo
+  texto, mas a API ainda informava o SHA anterior `a6b3d48` depois do push.
+  A checagem imediata tratava essa resposta como mudança inesperada.
+  O comportamento foi reproduzido com os arquivos reais antes do ajuste.
+- Preparada continuação com espera limitada pela atualização para
+  `4339845`, aceitando aguardar somente pelo SHA anterior conhecido.
+  Terceiro SHA, PR fechado ou alteração de destino interrompem; o texto
+  continua sendo reconferido antes do PATCH. Nenhum novo push ou merge.
+- Quatro casos do classificador e seis fluxos simulados aprovados,
+  incluindo timeout e edição concorrente; sintaxe Bash aprovada. Não foi
+  feita consulta remota independente para confirmar a causa do atraso.
+- Script `/tmp/atualizar-registros-pr19.sh` atualizado para a continuação;
+  versão anterior preservada. Evidências em
+  `evidencias/PR-19/2026-11-23-continuacao/`. Estes registros locais novos
+  permanecem sem commit; não alteram o SHA dos jobs já em execução.
+- Conclusão informada pelo usuário: execuções 45108319009 (push) e
+  45108324461 (pull_request) aprovadas para `4339845`; seis checks
+  bem-sucedidos, nenhum pendente ou com falha. Nos arquivos reais
+  `/tmp/pr19-continuacao-jcLS4f/pull-after.json` e `pull-final.json`,
+  o PR está aberto nesse SHA e título/descrição correspondem ao payload
+  preparado. A orientação de squash com mensagem revisada está publicada;
+  a mensagem histórica de fechamento da #18 continua exigindo esse cuidado
+  no merge futuro. Não houve merge nem novo commit nesta confirmação.
+
+### Avaliação do congelamento do programa — 23/11
+
+- O usuário pediu plano geral do que falta para congelar o código,
+  desconsiderando relatório/documentação. Avaliado o candidato `4339845`
+  do PR #19 e a main local `4091762`, sem pressupor que o backlog de 09/11
+  ainda corresponda ao programa. Não houve nova consulta remota.
+- Reexecutados os testes disponíveis: 96 casos C++ principais + 11 de
+  memória e 63 Python aprovados, com integração da CLI habilitada. As
+  fontes do motor conferem com as assinaturas da medição do candidato.
+- CBD-011 do contexto ainda se manifesta: em execução nova reduzida,
+  Curso heap tem 8 blocos usados, 1 livre reservado e arquivo de 9 blocos;
+  Disciplina tem 13 usados, 4 livres reservados e arquivo de 17 blocos.
+  `ocupacao.csv` exporta os usados como total sem separar o comprimento
+  lógico. Conferidos CSV, bitmap, cabeçalho e tamanho lógico, sem confundir
+  esse valor com ocupação física no SSD.
+- Identificada por leitura uma lacuna remanescente da validação de
+  manutenção (CBD-009): `bench.cpp` apenas imprime erro de `verify()` e
+  pode terminar com sucesso. Nenhuma corrupção foi reproduzida; falta
+  teste negativo desse caminho e propagação do erro. Há testes atuais de
+  RIDs, reorganização e clustering/hash; ampliar somente lacunas reais.
+- Plano salvo em
+  `docs/superpowers/plans/2026-11-23-congelamento-programa.md`: integrar
+  a base revisada, corrigir ocupação, fechar validação de manutenção e
+  executar aceitação do SHA final em checkout limpo. Aumento de I/O já
+  explicado, modelos aproximados e funcionalidades opcionais não são
+  tratados como novos bloqueadores. Gráficos ficam fora deste escopo.
+- Evidências em `evidencias/CONGELAMENTO/2026-11-23-diagnostico/`.
+  Nesta avaliação não houve alteração de implementação, novo teste,
+  commit, push, merge ou tag. O plano requer solicitação de execução.
+
+### Execução autorizada da sequência de congelamento — 23/11
+
+- O usuário autorizou seguir a sequência: integrar PR #19, corrigir
+  ocupação, fechar validação de manutenção e aceitar o candidato final.
+  A autorização inclui a integração por squash já proposta, preservando
+  a #18 pendente. Não é autorização para reescrever as branches publicadas.
+- A API do GitHub continua inacessível ao agente. Preparado
+  `/tmp/integrar-pr19.sh` para o terminal do usuário: HEAD exato `4339845`,
+  base conhecida, checks aprovados, vínculos da #18, mensagem explícita,
+  squash, conferência da árvore integrada e CI da main. Sem excluir branches
+  ou alterar o worktree main já modificado localmente. Seis fluxos simulados
+  passaram, incluindo falha posterior no CI e mudança de HEAD antes do merge.
+- Enquanto a integração aguarda execução externa, preparados seis testes
+  de integração de ocupação em arquivo temporário: Heap vazio/crescimento,
+  Hash/overflow/reuso, B+ de dois arquivos e índices secundários. Valores
+  derivados do layout e da alocação declarados, sem consultar a ocupação
+  implementada para calcular o esperado. Os seis falharam na base pela
+  ausência das métricas novas; nenhuma implementação foi modificada.
+- Evidências e roteiro em
+  `evidencias/CONGELAMENTO/2026-11-23-integracao/`. O merge real e seu CI
+  ainda não foram confirmados; a etapa 2 depende dessa confirmação para
+  trabalhar a partir da base integrada.
+
+### PR #19 integrado e correções locais de congelamento — 23/11
+
+- O usuário executou o roteiro: squash em
+  `a59f3336f23f4899667108447c57a8a8e9808544`, CI da main 45114931043
+  aprovado e #18 aberta. Conferidos os arquivos preservados e a igualdade
+  das árvores de a59f333 e 4339845. Criada `fix/congelamento-programa`
+  a partir da base integrada, preservando os registros locais e o outro
+  worktree main, que tem alterações anteriores do usuário.
+- Ocupação: seis testes C++ RED/GREEN e verificações Python do CSV com
+  bitmap/tamanho lógico. Novos campos `file_total` e `reserved_free` na API;
+  `usados`, `livres_reservados`, `total_arquivo` no CSV. O `total` histórico
+  foi preservado; a ferramenta de tabelas usa o total lógico quando existe.
+  Contagem de livres lê metadados em memória. Os cinco tipos de estrutura
+  são cobertos, inclusive B+ com dois arquivos e overflow liberado/reusado.
+  `TableStats.b`, planos, M e contadores de consultas permanecem os mesmos.
+- Revistos consumidores de Occupancy. A ABI mudou e exige recompilação;
+  o driver comum usa template/requires para headers antigos, sempre com
+  biblioteca da mesma revisão. Revisão independente sem bloqueadores.
+- Manutenção: teste negativo da CLI reproduziu código zero apesar de erro
+  no verificador. Executável separado de teste preserva a bancada e chama
+  o verify real antes da falha injetada, sem opção de produção. Corrigido
+  o caminho para retornar 1 e não anunciar conclusão normal.
+- Novo teste de conteúdo, VarChar e índices em Heap/Hash/B+ após inserção,
+  exclusão e reorganização passou; não houve novo defeito de tuplas.
+  Revisão apontou ausência do executável de injeção no Makefile, corrigida
+  com alvo separado e dependências. Revisor reexecutou a CLI: aprovada.
+- CMake Release/GoogleTest real: 114 casos C++ e 69 Python aprovados.
+  Make/shim: build, suítes e teste CLI aprovados. ASan/UBSan, comparação de
+  I/O e rodada integral do SHA final ainda serão executados em cópia limpa.
+- Evidências em `evidencias/CONGELAMENTO/2026-11-23-correcoes/`.
+
+### Aceitação do candidato em cópia limpa — 23/11
+
+- Commit de implementação `8569e0e9f1894b6c647bf72888b4e5c0e9c1de9c`,
+  em `fix/congelamento-programa`, com as correções de ocupação e manutenção.
+  Criado worktree separado, limpo antes/depois da aceitação, com builds
+  Release e ASan/UBSan do zero, GoogleTest real obrigatório.
+- 114 casos C++ aprovados em cada build; 69 Python aprovados. ASan/UBSan:
+  54,10 s, `detect_leaks=0` (LSan segue fora da validação).
+- Comparação contra a base integrada a59f333: 168 cenários v2 pareados,
+  zero alterações de leituras, escritas e flush. Os dois lados passaram
+  cobertura e comparação de multiconjuntos com SQLite na escala reduzida.
+- Integral: escala 1, LRU/MRU, M=32/2, lote 1000, 3..10 repetições,
+  seed 20261122. Foram 691 linhas medidas em 168 combinações, sem ausências
+  ou divergências de contagem/checksum com SQLite; matriz aprovada com
+  108 células executadas, 12 não aplicáveis e nenhuma inviável/ausente,
+  portes conferidos em 476 execuções de junção. Duração: 82,45 s.
+- E/S convergiu em todos os grupos. Onze atingiram o teto apenas por
+  variação temporal, corretamente declarada no CSV. Sem flush final não
+  zero, erro de manutenção ou nova falha de tuplas.
+- Resultados em `evidencias/CONGELAMENTO/2026-11-23-aceitacao/`, com logs,
+  CSVs, metadados, ambiente, fontes e hashes dos binários. A integral não
+  gerou dumps de tuplas completos; estes foram comparados na reduzida.
+- O programa desse commit satisfaz os critérios locais do plano para um
+  candidato congelável. Os registros de aceitação serão consolidados sem
+  mudar a árvore da implementação. A publicação/integração remota dessas
+  correções e seu CI ainda não foram executados neste ambiente sem rede.

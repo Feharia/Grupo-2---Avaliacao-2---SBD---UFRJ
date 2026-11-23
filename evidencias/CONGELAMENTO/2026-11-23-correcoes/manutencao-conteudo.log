@@ -1,0 +1,12 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = StorageManager.ManutencaoVariavelPreservaConteudoNosCaminhos
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from StorageManager
+[ RUN      ] StorageManager.ManutencaoVariavelPreservaConteudoNosCaminhos
+[       OK ] StorageManager.ManutencaoVariavelPreservaConteudoNosCaminhos (18 ms)
+[----------] 1 test from StorageManager (18 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (18 ms total)
+[  PASSED  ] 1 test.

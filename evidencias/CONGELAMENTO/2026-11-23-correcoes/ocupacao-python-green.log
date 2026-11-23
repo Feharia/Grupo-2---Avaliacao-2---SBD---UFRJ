@@ -1,0 +1,10 @@
+test_csv_reconcilia_arquivo_heap_com_bitmap (test_occupancy.OccupancyCliTest.test_csv_reconcilia_arquivo_heap_com_bitmap) ... ok
+test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) ... ok
+test_csv_historico_continua_legivel (test_occupancy.OccupancyTableTest.test_csv_historico_continua_legivel) ... ok
+test_ocupacao_muda_dentro_do_mesmo_extent (test_occupancy.OccupancyTableTest.test_ocupacao_muda_dentro_do_mesmo_extent) ... ok
+test_total_novo_inclui_folga_do_extent (test_occupancy.OccupancyTableTest.test_total_novo_inclui_folga_do_extent) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.274s
+
+OK

@@ -225,6 +225,8 @@ struct AccessPath {
 struct Occupancy {
     std::uint32_t data = 0, overflow = 0, header = 0, directory = 0;
     std::vector<std::uint32_t> index_levels;   // da raiz para baixo
+    std::uint64_t file_total = 0;             // comprimento lógico dos arquivos, incluindo cabeçalhos
+    std::uint64_t reserved_free = 0;          // blocos livres no bitmap, já reservados nos arquivos
 };
 
 // ------------------------------------------------------------------ resultado de operação

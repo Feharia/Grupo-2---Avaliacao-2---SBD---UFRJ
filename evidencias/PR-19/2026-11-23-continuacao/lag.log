@@ -1,0 +1,12 @@
+
+Evidências da continuação: /tmp/pr19-continuacao-nAZBlG
+API ainda informa o SHA anterior; aguardando atualização (1/30).
+API ainda informa o SHA anterior; aguardando atualização (2/30).
+
+Aguardando Actions: branch=fix/auditoria-p01-p15, evento=push, SHA=4339845c74815bf51a29fe85425d68af30095c42
+{"conclusion":"success"}
+
+Aguardando Actions: branch=fix/auditoria-p01-p15, evento=pull_request, SHA=4339845c74815bf51a29fe85425d68af30095c42
+{"conclusion":"success"}
+
+Descrição atualizada e CI aprovado para os registros já enviados. A #18 permanece pendente; o merge futuro deve ser por squash com mensagem revisada. Main não foi alterada.

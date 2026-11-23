@@ -1,0 +1,2 @@
+["/home/carlos/.pyenv/versions/3.11.14/bin/python3", "-I", "/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tools/comparar_io.py", "/tmp/cbd-freeze-validacao-10reharx/io-base", "/tmp/cbd-freeze-validacao-10reharx/io-candidate", "/tmp/cbd-freeze-validacao-10reharx/io-comparison"]
+I/O: 168 cenários; 0 alertas de aumento

@@ -1,0 +1,11 @@
+{
+  "sourceHead": "4339845c74815bf51a29fe85425d68af30095c42",
+  "mergeSha": "a59f3336f23f4899667108447c57a8a8e9808544",
+  "issue18": "open",
+  "ciMain": {
+    "conclusion": "success",
+    "headSha": "a59f3336f23f4899667108447c57a8a8e9808544",
+    "url": "https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ/actions/runs/45114931043"
+  },
+  "evidenceDir": "/tmp/pr19-integracao-vHkS0z"
+}

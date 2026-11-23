@@ -1,0 +1,11 @@
+["ctest", "--test-dir", "/tmp/cbd-freeze-validacao-10reharx/release", "--output-on-failure"]
+Internal ctest changing into directory: /tmp/cbd-freeze-validacao-10reharx/release
+Test project /tmp/cbd-freeze-validacao-10reharx/release
+    Start 1: testes
+1/2 Test #1: testes ...........................   Passed    1.44 sec
+    Start 2: testes_memoria
+2/2 Test #2: testes_memoria ...................   Passed    1.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   2.45 sec

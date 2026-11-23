@@ -1,0 +1,12 @@
+8a5803e43947237d0eedd5489b5115edc57d4fbc81fc0a17b63feb7600689426  evidencias/PR-19/2026-11-23-continuacao/README.md
+10d535419c0204ebb49e0ebc0848633eba876a9f3b19169680f09f79eec401ce  evidencias/PR-19/2026-11-23-continuacao/ci_failure.log
+b0354cb90ab73262d794c0732943f42417ea9b0a77c8887a31b6f7002e59911a  evidencias/PR-19/2026-11-23-continuacao/closed.log
+74f0428add7400e094cfd4151f760c80ae37a7f7fefdf770750d73efa27ad683  evidencias/PR-19/2026-11-23-continuacao/concluir-atualizacao-pr19.sh
+69053769dfe4b7db185971af955565f85c42f40423548fdb8143c120e1f604af  evidencias/PR-19/2026-11-23-continuacao/conclusao.json
+0a8fcc53c53dccc79393ef586eefe7ee420827a1808dbd51c54602e49d860820  evidencias/PR-19/2026-11-23-continuacao/concurrent.log
+a33d42362b16eb6461210a54071556826769a637602453f7fd66976c63102bf7  evidencias/PR-19/2026-11-23-continuacao/estado-preservado.json
+03424bb11c3302c8770340ef50a51239a46bf025c30794b58a24b9cd5c70c4a9  evidencias/PR-19/2026-11-23-continuacao/lag.log
+627660dc420cf0bd7bfddfd052ab088509713203aa8b1289819c4a4d7bb9fce0  evidencias/PR-19/2026-11-23-continuacao/other.log
+a9815e903c4373af2a4d9569e86197c8d5a410b96ba40237bb5b1748c6ba39bb  evidencias/PR-19/2026-11-23-continuacao/red.log
+25560e8f9ebf5ac4728d07e95563f00fb5d5cba179530eed53ea06e6e557e05b  evidencias/PR-19/2026-11-23-continuacao/timeout.log
+669775939c0ca77b979b7b4d021a7a51dac1a53c90db4e9efc5144c974a30865  POST_MORTEM.md

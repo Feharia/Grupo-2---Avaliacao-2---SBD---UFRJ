@@ -80,6 +80,7 @@ public:
     void          remove_file(FileId) noexcept;
     std::uint32_t header_blocks(FileId) const;
     std::uint32_t file_blocks(FileId) const;    // inclui o cabeçalho
+    std::uint32_t file_free_blocks(FileId) const;
     FileKind      file_kind(FileId) const;
     std::uint32_t block_size() const { return cfg_.block_size; }
     const Config& config() const { return cfg_; }

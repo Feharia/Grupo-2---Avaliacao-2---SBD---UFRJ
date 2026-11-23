@@ -1,5 +1,6 @@
 #include "layer4/file_manager.hpp"
 
+#include <algorithm>
 #include <system_error>
 
 namespace cbd {
@@ -209,6 +210,10 @@ std::uint32_t FileManager::header_blocks(FileId id) const {
     return file(id).kind == FileKind::Temp ? 0 : 1;
 }
 std::uint32_t FileManager::blocks(FileId id) const { return file(id).blocks; }
+std::uint32_t FileManager::free_blocks(FileId id) const {
+    const auto& bitmap = file(id).free_map;
+    return static_cast<std::uint32_t>(std::count(bitmap.begin(), bitmap.end(), true));
+}
 bool FileManager::is_free(FileId id, std::uint32_t b) const {
     const auto& of = file(id);
     return b < of.blocks ? static_cast<bool>(of.free_map[b]) : true;

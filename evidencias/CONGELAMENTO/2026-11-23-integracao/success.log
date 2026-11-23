@@ -1,0 +1,18 @@
+Evidências: /tmp/pr19-integracao-nKQGwc
+
+Integrando o PR #19 por squash, sem excluir suas branches.
+
+Merge realizado: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+{
+  "sourceHead": "4339845c74815bf51a29fe85425d68af30095c42",
+  "mergeSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "issue18": "open",
+  "ciMain": {
+    "conclusion": "success",
+    "headSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "url": "mock-main"
+  },
+  "evidenceDir": "/tmp/pr19-integracao-nKQGwc"
+}
+
+PR #19 integrado; CI da main aprovado. Alterações locais e branches preservadas.

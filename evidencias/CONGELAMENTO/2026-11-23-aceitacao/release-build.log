@@ -1,0 +1,51 @@
+[  3%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer2/algorithms.cpp.o
+[  6%] Building CXX object CMakeFiles/cbd_motor.dir/src/common/common.cpp.o
+[  9%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer2/monitor.cpp.o
+[ 12%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/bplus.cpp.o
+[ 15%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/catalog.cpp.o
+[ 18%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/handles.cpp.o
+[ 21%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/page.cpp.o
+[ 24%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/record.cpp.o
+[ 27%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/storage_manager.cpp.o
+[ 30%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/structures.cpp.o
+[ 33%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/buffer_pool.cpp.o
+[ 36%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/file_manager.cpp.o
+[ 39%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/posix_io.cpp.o
+[ 42%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/replacement_policy.cpp.o
+[ 45%] Linking CXX static library libcbd_motor.a
+[ 45%] Built target cbd_motor
+[ 51%] Building CXX object CMakeFiles/bancada_verify_failure.dir/tests/support/bench_verify_failure.cpp.o
+[ 51%] Building CXX object CMakeFiles/bancada.dir/src/layer1/bench.cpp.o
+[ 54%] Linking CXX executable bancada
+[ 54%] Built target bancada
+[ 57%] Building CXX object CMakeFiles/testes.dir/tests/test_bplus_bulk_load_integration.cpp.o
+[ 60%] Linking CXX executable bancada_verify_failure
+[ 60%] Built target bancada_verify_failure
+[ 63%] Building CXX object CMakeFiles/testes_memoria.dir/tests/memoria/contador.cpp.o
+[ 66%] Building CXX object CMakeFiles/testes_memoria.dir/tests/memoria/test_bnl.cpp.o
+[ 69%] Building CXX object CMakeFiles/testes_memoria.dir/tests/memoria/test_juncoes.cpp.o
+[ 72%] Building CXX object CMakeFiles/testes.dir/tests/test_convergencia.cpp.o
+[ 75%] Building CXX object CMakeFiles/testes.dir/tests/test_estimativas.cpp.o
+[ 78%] Building CXX object CMakeFiles/testes.dir/tests/test_layer2.cpp.o
+[ 81%] Building CXX object CMakeFiles/testes_memoria.dir/tests/memoria/test_scratch.cpp.o
+/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tests/test_layer2.cpp: In member function ‘virtual void Monitor_SelecaoComIndicesDentroDeM_Test::TestBody()’:
+/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tests/test_layer2.cpp:376:8: warning: suggest explicit braces to avoid ambiguous ‘else’ [-Wdangling-else]
+  376 |     if (*st.height > 1)   // cada descida pede a raiz pela reserva (pode ser acerto, se ela ainda estiver lá)
+      |        ^
+[ 84%] Linking CXX executable testes_memoria
+[ 84%] Built target testes_memoria
+[ 87%] Building CXX object CMakeFiles/testes.dir/tests/test_layer3.cpp.o
+/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tests/test_layer3.cpp: In member function ‘virtual void SlottedPage_PaginaMalformadaFalhaSemAcessoInvalido_Test::TestBody()’:
+/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tests/test_layer3.cpp:124:12: warning: suggest explicit braces to avoid ambiguous ‘else’ [-Wdangling-else]
+  124 |         if (!slot_case) EXPECT_THROW(sp_nslots(p), std::out_of_range);
+      |            ^
+/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tests/test_layer3.cpp: In member function ‘virtual void StorageManager_BPlusUnicaContraOraculo_Test::TestBody()’:
+/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tests/test_layer3.cpp:221:56: warning: missing initializer for member ‘cbd::KeyRange::lo’ [-Wmissing-field-initializers]
+  221 |     const auto got = keys_in_order(sm, t, 0, KeyRange{0}, PathKind::PrimaryBTree);
+      |                                                        ^
+/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tests/test_layer3.cpp:221:56: warning: missing initializer for member ‘cbd::KeyRange::hi’ [-Wmissing-field-initializers]
+[ 90%] Building CXX object CMakeFiles/testes.dir/tests/test_layer4.cpp.o
+[ 93%] Building CXX object CMakeFiles/testes.dir/tests/test_maintenance.cpp.o
+[ 96%] Building CXX object CMakeFiles/testes.dir/tests/test_occupancy.cpp.o
+[100%] Linking CXX executable testes
+[100%] Built target testes

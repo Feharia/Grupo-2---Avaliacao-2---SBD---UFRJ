@@ -1,0 +1,26 @@
+{
+  "fonte_checks": "Saída fornecida pelo usuário; não consultados novamente pela API nesta confirmação.",
+  "fonte_descricao": "/tmp/pr19-continuacao-jcLS4f/pull-final.json",
+  "state": "open",
+  "headSha": "4339845c74815bf51a29fe85425d68af30095c42",
+  "titulo_e_descricao_conferem_com_payload": true,
+  "body_sha256": "410eb65961f79de8559f71a13c8d40b0b7c28cc766a8aaa86f161371e0e3aed3",
+  "checks": {
+    "success": 6,
+    "failure": 0,
+    "pending": 0
+  },
+  "runs": [
+    {
+      "id": 45108319009,
+      "event": "push",
+      "conclusion": "success"
+    },
+    {
+      "id": 45108324461,
+      "event": "pull_request",
+      "conclusion": "success"
+    }
+  ],
+  "merge_executado": false
+}

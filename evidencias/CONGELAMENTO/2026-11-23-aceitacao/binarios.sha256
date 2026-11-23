@@ -1,0 +1,8 @@
+bd98db5157443345cef2294809667e35590bb03f78d88275809ec71bce69bc09  /tmp/cbd-freeze-validacao-10reharx/release/bancada
+baac5ca41c87a52ffcf2528f622d58320004cde9b5a77bd8ea8324d04c0f8787  /tmp/cbd-freeze-validacao-10reharx/release/testes
+4f8376e43c65b791fd7babf09dd71cfbe45e5c46b7865b55d41fdb49ea1da044  /tmp/cbd-freeze-validacao-10reharx/release/testes_memoria
+238dcc875e8384d49031e590c05388102c120cb6ed8aaf48cbdc9a44f21269a1  /tmp/cbd-freeze-validacao-10reharx/release/bancada_verify_failure
+306b57383b1a95af2e76876fda938c3b04ec834aaa28e120389f99c4c00cfa65  /tmp/cbd-freeze-validacao-10reharx/asan/bancada
+eedbff26864856cb81ccd03dc87adcbf69d8a58c8079b78b51a9ea275b30199e  /tmp/cbd-freeze-validacao-10reharx/asan/testes
+0d4b130aac8648491ecd0c9bff0e19e28b95e3642cd28867da4b121188c71642  /tmp/cbd-freeze-validacao-10reharx/asan/testes_memoria
+71921347a4658f7a01237506492c9dc4fa8d5253505672ec4b88a8da83cf609d  /tmp/cbd-freeze-validacao-10reharx/asan/bancada_verify_failure

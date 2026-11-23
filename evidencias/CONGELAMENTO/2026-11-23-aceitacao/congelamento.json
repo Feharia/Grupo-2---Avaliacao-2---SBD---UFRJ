@@ -1,0 +1,21 @@
+{
+  "estado": "candidato validado localmente",
+  "implementation_commit": "8569e0e9f1894b6c647bf72888b4e5c0e9c1de9c",
+  "implementation_tree": "6592ddbf73aeb73adacab23f678359c3e290e790",
+  "base_main": "a59f3336f23f4899667108447c57a8a8e9808544",
+  "tests_cpp_release": 114,
+  "tests_cpp_asan_ubsan": 114,
+  "tests_python": 69,
+  "io_scenarios": 168,
+  "io_deltas": 0,
+  "full_measured_rows": 691,
+  "full_combinations": 168,
+  "required_cells_ok": 108,
+  "required_cells_not_applicable": 12,
+  "required_cells_missing": 0,
+  "required_cells_infeasible": 0,
+  "convergence_io_ceiling": 0,
+  "convergence_time_only_ceiling": 11,
+  "lsan": false,
+  "remote_integration_pending": true
+}
