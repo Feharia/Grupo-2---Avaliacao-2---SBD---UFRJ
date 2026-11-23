@@ -1,0 +1,14 @@
+test_combinacao_declarada_ausente_reprova (test_compare.CompareTest.test_combinacao_declarada_ausente_reprova) ... ok
+test_diretorio_vazio_reprova (test_compare.CompareTest.test_diretorio_vazio_reprova) ... ok
+test_divergencias (test_compare.CompareTest.test_divergencias) ... ok
+test_dump_ausente (test_compare.CompareTest.test_dump_ausente) ... ok
+test_dump_sem_referencia (test_compare.CompareTest.test_dump_sem_referencia) ... ok
+test_linha_sem_referencia_e_ausente (test_compare.CompareTest.test_linha_sem_referencia_e_ausente) ... ok
+test_nenhuma_medicao_reprova (test_compare.CompareTest.test_nenhuma_medicao_reprova) ... ok
+test_operacao_declarada_sem_linha_e_ausente (test_compare.CompareTest.test_operacao_declarada_sem_linha_e_ausente) ... ok
+test_tudo_conferido (test_compare.CompareTest.test_tudo_conferido) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.346s
+
+OK

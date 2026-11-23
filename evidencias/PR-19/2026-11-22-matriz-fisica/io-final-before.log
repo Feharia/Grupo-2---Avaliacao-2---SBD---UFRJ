@@ -1,0 +1,7 @@
+I/O: driver-build
+I/O: config-probe-build
+I/O: bancada
+I/O: sqlite
+I/O: cobertura
+I/O: comparacao-sqlite
+Medição validada: b1c0de590748ba995de38199e788bde0229e0116 em 18.551 s

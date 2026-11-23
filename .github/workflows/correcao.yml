@@ -84,7 +84,8 @@ jobs:
 
       - name: Testes C++ (toda a suíte)
         env:
-          GTEST_OUTPUT: xml:${{ runner.temp }}/cbd-${{ matrix.mode }}/evidencias/gtest.xml
+          # diretório: um XML por executável (testes e testes_memoria), sem um sobrescrever o outro
+          GTEST_OUTPUT: xml:${{ runner.temp }}/cbd-${{ matrix.mode }}/evidencias/gtest/
         run: |
           ctest --test-dir "$BUILD_DIR" --output-on-failure --no-tests=error \
             --output-junit "$EVIDENCE_DIR/ctest.xml" \

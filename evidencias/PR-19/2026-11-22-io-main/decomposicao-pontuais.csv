@@ -1,0 +1,7 @@
+politica,operacao,variante,leituras_antes,leituras_depois,indice_antes,indice_depois,demais_antes,demais_depois
+LRU,sel_pt_dre,aluno_bt_dre:primary_btree,103,108,1,6,102,102
+LRU,sel_pt_dre,aluno_h_dre:primary_hash,99,99,0,0,99,99
+LRU,sel_pt_cpf,aluno_heap:secondary_hash,116,195,19,96,97,99
+MRU,sel_pt_dre,aluno_bt_dre:primary_btree,102,202,1,98,101,104
+MRU,sel_pt_dre,aluno_h_dre:primary_hash,99,99,0,0,99,99
+MRU,sel_pt_cpf,aluno_heap:secondary_hash,119,195,22,97,97,98

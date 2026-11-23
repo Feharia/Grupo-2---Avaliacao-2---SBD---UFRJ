@@ -1,0 +1,67 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = SlottedPage.RejeitaSlotNaRegiaoLivre:BufferPool.PrefetchIgnoraBlocosLivres
+[==========] Running 2 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from SlottedPage
+[ RUN      ] SlottedPage.RejeitaSlotNaRegiaoLivre
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer3.cpp:83: Failure
+Expected: sp_record(page, 0) throws an exception of type std::out_of_range.
+  Actual: it throws nothing.
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer3.cpp:84: Failure
+Expected: sp_compact(page) throws an exception of type std::out_of_range.
+  Actual: it throws nothing.
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer3.cpp:85: Failure
+Expected: sp_insert(page, record) throws an exception of type std::out_of_range.
+  Actual: it throws nothing.
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer3.cpp:86: Failure
+Value of: page == original
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer3.cpp:83: Failure
+Expected: sp_record(page, 0) throws an exception of type std::out_of_range.
+  Actual: it throws nothing.
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer3.cpp:84: Failure
+Expected: sp_compact(page) throws an exception of type std::out_of_range.
+  Actual: it throws nothing.
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer3.cpp:85: Failure
+Expected: sp_insert(page, record) throws an exception of type std::out_of_range.
+  Actual: it throws nothing.
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer3.cpp:86: Failure
+Value of: page == original
+  Actual: false
+Expected: true
+[  FAILED  ] SlottedPage.RejeitaSlotNaRegiaoLivre (0 ms)
+[----------] 1 test from SlottedPage (0 ms total)
+
+[----------] 1 test from BufferPool
+[ RUN      ] BufferPool.PrefetchIgnoraBlocosLivres
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer4.cpp:253: Failure
+Expected equality of these values:
+  (pool.snapshot() - before).global.reads()
+    Which is: 8
+  released ? 2u : 1u
+    Which is: 1
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer4.cpp:260: Failure
+Expected: { auto allocated = pool.allocate(file, reservation.id()); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("allocated.first.block", "2u", allocated.first.block, 2u))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer4.cpp", 262, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(allocated.second.read()[100] == std::byte{0})) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer4.cpp", 263, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, "allocated.second.read()[100] == std::byte{0}", "false", "true") .c_str()) = ::testing::Message(); } doesn't throw an exception.
+  Actual: it throws std::logic_error with description "allocate: bloco novo já estava no pool".
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer4.cpp:253: Failure
+Expected equality of these values:
+  (pool.snapshot() - before).global.reads()
+    Which is: 8
+  released ? 2u : 1u
+    Which is: 2
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer4.cpp:260: Failure
+Expected: { auto allocated = pool.allocate(file, reservation.id()); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("allocated.first.block", "2u", allocated.first.block, 2u))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer4.cpp", 262, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(allocated.second.read()[100] == std::byte{0})) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer4.cpp", 263, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, "allocated.second.read()[100] == std::byte{0}", "false", "true") .c_str()) = ::testing::Message(); } doesn't throw an exception.
+  Actual: it throws std::logic_error with description "allocate: bloco novo já estava no pool".
+[  FAILED  ] BufferPool.PrefetchIgnoraBlocosLivres (0 ms)
+[----------] 1 test from BufferPool (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] SlottedPage.RejeitaSlotNaRegiaoLivre
+[  FAILED  ] BufferPool.PrefetchIgnoraBlocosLivres
+
+ 2 FAILED TESTS
+exit_code=1

@@ -1,0 +1,42 @@
+test_consulta_filtrada_confere_com_sqlite (test_bench_filter.BenchFilterTest.test_consulta_filtrada_confere_com_sqlite) ... FAIL
+test_filtro_sem_correspondencia_reprova (test_bench_filter.BenchFilterTest.test_filtro_sem_correspondencia_reprova) ... FAIL
+
+======================================================================
+FAIL: test_consulta_filtrada_confere_com_sqlite (test_bench_filter.BenchFilterTest.test_consulta_filtrada_confere_com_sqlite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_bench_filter.py", line 26, in test_consulta_filtrada_confere_com_sqlite
+    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+AssertionError: 1 != 0 : conferidas: 36 linhas medidas em 36 combinações; sem execução: nenhuma; ausentes: 12; divergências: 0
+  AUSENTE  j_grande_pequena   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  j_mestre_detalhe   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  j_not_unique   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  j_unique   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  sel_pt_cpf   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  sel_pt_dre   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  sel_rg_cr_alta   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  sel_rg_cr_baixa   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  sel_rg_curso_alta   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  sel_rg_curso_baixa   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  sel_rg_dre_alta   rep=: operação declarada sem nenhuma linha no resultados.csv
+  AUSENTE  sel_rg_dre_baixa   rep=: operação declarada sem nenhuma linha no resultados.csv
+
+
+======================================================================
+FAIL: test_filtro_sem_correspondencia_reprova (test_bench_filter.BenchFilterTest.test_filtro_sem_correspondencia_reprova)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_bench_filter.py", line 34, in test_filtro_sem_correspondencia_reprova
+    self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+AssertionError: 0 != 2 : gerando a base (escala 0.1)...
+[LRU] construindo as tabelas...
+[LRU] carga de manutenção...
+[MRU] construindo as tabelas...
+[MRU] carga de manutenção...
+pronto em 0.6 s. Resultados em "/tmp/tmph0td87lq/saida"
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.584s
+
+FAILED (failures=2)

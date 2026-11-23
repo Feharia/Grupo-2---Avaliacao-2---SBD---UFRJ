@@ -36,13 +36,18 @@ public:
     BlockScan     scan_buckets(const AccessPath&, std::uint32_t first, std::uint32_t last, Intent, const Reservation&);
     std::uint32_t bucket_of(const AccessPath&, const Key&) const;
     SearchCursor  find(const AccessPath&, const Predicate&, Intent, const Reservation&);
-    RidCursor     probe(const AccessPath&, const Predicate&, Intent);
+    RidCursor     probe(const AccessPath&, const Predicate&, Intent, const Reservation&);   // índice pela reserva (172)
     PinnedRecord  fetch(TableId, RID, Intent, const Reservation&);
 
     // memória de trabalho e temporários
     TempFile      create_temp(const Schema&, const Reservation&);
+    // CBD-005: runs e partições de um mesmo operador compartilham uma única cópia do esquema (165)
+    TempFile      create_temp(std::shared_ptr<const Schema>, const Reservation&);
     ScratchSpace  create_scratch(const Schema&, const Reservation&, std::size_t pages);
     ScratchSpace  create_rid_scratch(const Reservation&, std::size_t pages);
+    // Retém n molduras anônimas da reserva enquanto o vetor viver: uma estrutura auxiliar cobrada em
+    // molduras (173) tira essas molduras do subpool, que não pode usá-las como cache (CBD-004).
+    std::vector<PageGuard> hold_frames(const Reservation&, std::size_t n);
 
     // estatística e ocupação
     TableStats    stats(TableId) const;                 // só lê o catálogo, sem E/S (160)

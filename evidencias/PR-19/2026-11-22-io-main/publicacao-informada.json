@@ -1,0 +1,35 @@
+{
+  "fonte": "Saída do terminal fornecida pelo usuário nesta conversa; não consultada novamente pela API.",
+  "headSha": "a6b3d48dd913e12f6aa1623954edd34ed13031ae",
+  "runs": [
+    {
+      "databaseId": 45084486986,
+      "conclusion": "success",
+      "url": "https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ/actions/runs/45084486986"
+    },
+    {
+      "databaseId": 45085068095,
+      "conclusion": "success",
+      "url": "https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ/actions/runs/45085068095"
+    },
+    {
+      "databaseId": 45085073054,
+      "conclusion": "success",
+      "url": "https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ/actions/runs/45085073054"
+    }
+  ],
+  "pr": {
+    "number": 19,
+    "state": "OPEN",
+    "baseRefName": "main",
+    "headRefName": "fix/auditoria-p01-p15",
+    "headRefOid": "a6b3d48dd913e12f6aa1623954edd34ed13031ae"
+  },
+  "checks_reportados": {
+    "successful": 6,
+    "failing": 0,
+    "pending": 0
+  },
+  "sha_candidato_relatorio_enviado": "85069edeed0d62c72ff7735bc71a377f1dffb5d2",
+  "limitacao": "O objeto 85069ed não está no banco Git local; a reprodução independente mede diretamente o HEAD a6b3d48, não o merge temporário do Actions."
+}

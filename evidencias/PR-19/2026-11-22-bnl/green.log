@@ -1,0 +1,22 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = Estimativas.Bnl:Monitor.BnlDividePaginaDensaComTresMolduras:Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia
+[==========] Running 3 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from Estimativas
+[ RUN      ] Estimativas.Bnl
+[       OK ] Estimativas.Bnl (0 ms)
+[----------] 1 test from Estimativas (0 ms total)
+
+[----------] 2 tests from Monitor
+[ RUN      ] Monitor.BnlDividePaginaDensaComTresMolduras
+[       OK ] Monitor.BnlDividePaginaDensaComTresMolduras (2 ms)
+[ RUN      ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia
+  [bnl] externa=169 pares=169 requisicoes=3 leituras=3 gravacoes=0
+  [bnl] externa=170 pares=170 requisicoes=3 leituras=3 gravacoes=0
+  [bnl] externa=171 pares=171 requisicoes=5 leituras=5 gravacoes=0
+[       OK ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia (2 ms)
+[----------] 2 tests from Monitor (4 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 2 test suites ran. (4 ms total)
+[  PASSED  ] 3 tests.

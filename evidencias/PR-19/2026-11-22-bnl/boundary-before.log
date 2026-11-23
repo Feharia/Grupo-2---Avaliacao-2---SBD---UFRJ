@@ -1,0 +1,27 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from Monitor
+[ RUN      ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia
+  [bnl] externa=169 pares=169 requisicoes=3 leituras=3 gravacoes=0
+PrototipoIA/Implementacao/tests/test_layer2.cpp:223: Failure
+Expected equality of these values:
+  result.delta.global.requests
+    Which is: 5
+  count <= 170 ? 3u : 5u
+    Which is: 3
+  [bnl] externa=170 pares=170 requisicoes=5 leituras=5 gravacoes=0
+unknown file: Failure
+C++ exception with description "inaplicável inesperado: diretório do BNL não cabe em m" thrown in the test body.
+[  FAILED  ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia (2 ms)
+[----------] 1 test from Monitor (2 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (2 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia
+
+ 1 FAILED TEST
+exit_code=1

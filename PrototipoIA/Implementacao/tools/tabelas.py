@@ -21,6 +21,12 @@ import re
 import statistics
 import sys
 from collections import Counter, OrderedDict, defaultdict
+import importlib.util
+
+# inventário da matriz e estado das células, os mesmos do verificador (BENCH-005)
+_spec = importlib.util.spec_from_file_location("matriz", os.path.join(os.path.dirname(os.path.abspath(__file__)), "matriz.py"))
+matriz = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(matriz)
 
 KEY = ("politica", "operacao", "tipo", "tamanho", "config", "seletividade",
        "variante", "algoritmo", "externa", "interna", "m")
@@ -39,7 +45,7 @@ TAMANHO = {"menor_menor": "menor ⋈ menor", "menor_maior": "menor ⋈ maior", "
 ALG = {"bnl": "BNL", "sort_merge": "sort-merge", "hash": "hash"}
 ALG_ORDEM = ("bnl", "sort_merge", "hash")
 TIPO_ORDEM = ("igualdade_unique", "faixa_unique", "faixa_not_unique")
-SELET_ORDEM = ("pontual", "0,1%", "50%")
+SELET_ORDEM = ("pontual", "0,1%", "1%", "50%")   # 0,1% só em saídas antigas (enunciado v1)
 # colunas da tabela "organização × caminho", na ordem em que aparecem
 CATEGORIAS = OrderedDict([
     (("heap", "scan"), "Heap (varredura)"),
@@ -158,6 +164,10 @@ class Base:
         self.fases = ler_csv(os.path.join(saida, "fases.csv"))
         self.stats = ler_csv(os.path.join(saida, "estatisticas.csv"))
         self.ocup = ler_csv(os.path.join(saida, "ocupacao.csv"))
+        self.convergencia = ler_csv(os.path.join(saida, "convergencia.csv"))
+        self.caminhos = ler_csv(os.path.join(saida, "caminhos.csv"))
+        self.parametros = {(r["politica"], r["operacao"], r["variante"], r["algoritmo"]): r["parametros"]
+                           for r in ler_csv(os.path.join(saida, "parametros.csv"))}   # BENCH-008
         self.manifesto = ler_manifesto(os.path.join(saida, "manifesto.txt"))
         conf = os.path.join(saida, "conferencia.txt")
         self.conferencia = open(conf, encoding="utf-8").read().strip() if os.path.exists(conf) else ""
@@ -328,19 +338,22 @@ def t_faixa(b):
         campo = b.campo_selecao(c["operacao"])
         vezes = c.total / melhor[c["operacao"]] if melhor[c["operacao"]] else None
         seq = 100.0 * c.leituras_seq / c.leituras if c.leituras else None
-        linhas.append([b.rotulo_op(c["operacao"], c["tipo"]), c["seletividade"], c["config"],
-                       caminho(c["variante"], campo), fmt_int(c.linhas), fmt_int(c.leituras), fmt_pct(seq, False),
+        efetiva = b.consts.get(c["operacao"], {}).get("seletividade_efetiva")
+        efetiva = float(efetiva) * 100 if efetiva else None
+        linhas.append([b.rotulo_op(c["operacao"], c["tipo"]), c["seletividade"], fmt_num(efetiva, 2) + "%" if efetiva is not None else "—",
+                       c["config"], caminho(c["variante"], campo), fmt_int(c.linhas), fmt_int(c.leituras), fmt_pct(seq, False),
                        fmt_int(c.estimado_transf), fmt_pct(c.erro), fmt_num(c.tempo_ms, 2), fmt_vezes(vezes)])
-        brutas.append([c["operacao"], c["seletividade"], c["config"], c["variante"], c.linhas, c.leituras, seq,
+        brutas.append([c["operacao"], c["seletividade"], efetiva, c["config"], c["variante"], c.linhas, c.leituras, seq,
                        c.estimado_transf, c.erro, c.tempo_ms, vezes])
     return Tabela(
         "03_selecao_faixa", "Seleção por faixa",
-        "“% seq.” é a fração das leituras que foram sequenciais. “× melhor” compara com o caminho de menor custo "
-        "na mesma consulta e seletividade.",
-        ["Consulta", "Selet.", "Config.", "Caminho", "Linhas", "Leituras", "% seq.", "Estimado", "Erro est.",
-         "Tempo (ms)", "× melhor"], linhas, brutas,
-        ["operacao", "seletividade", "config", "variante", "linhas", "leituras", "pct_seq", "estimado_transf",
-         "erro_pct", "tempo_ms", "vezes_melhor"])
+        "“Selet.” é o alvo; “Efetiva” é a fração de linhas que a faixa realmente devolve, feita de grupos inteiros "
+        "de valores iguais (decisão 174). “% seq.” é a fração das leituras que foram sequenciais. “× melhor” "
+        "compara com o caminho de menor custo na mesma consulta e seletividade.",
+        ["Consulta", "Selet.", "Efetiva", "Config.", "Caminho", "Linhas", "Leituras", "% seq.", "Estimado",
+         "Erro est.", "Tempo (ms)", "× melhor"], linhas, brutas,
+        ["operacao", "seletividade", "seletividade_efetiva_pct", "config", "variante", "linhas", "leituras", "pct_seq",
+         "estimado_transf", "erro_pct", "tempo_ms", "vezes_melhor"])
 
 
 def t_organizacoes(b):
@@ -530,16 +543,21 @@ def t_estimativa(b):
             onde = f"config. {pior['config']}: {operandos(b, pior)}"
         else:
             onde = f"config. {pior['config']}: {caminho(pior['variante'], b.campo_selecao(pior['operacao']))}"
+        params = b.parametros.get((pior["politica"], pior["operacao"], pior["variante"], pior["algoritmo"]), "")
         linhas.append([f, fmt_int(len(cs)), fmt_pct(statistics.median(abs_err), False), f"{dentro} de {len(cs)}",
-                       fmt_pct(pior.erro), f"{b.rotulo_op(pior['operacao'], pior['tipo'])} ({onde})"])
-        brutas.append([f, len(cs), statistics.median(abs_err), dentro, pior.erro, pior["operacao"], pior["variante"]])
+                       fmt_pct(pior.erro), f"{b.rotulo_op(pior['operacao'], pior['tipo'])} ({onde})", params or "—"])
+        brutas.append([f, len(cs), statistics.median(abs_err), dentro, pior.erro, pior["operacao"], pior["variante"],
+                       params])
     return Tabela(
         "09_estimado_x_medido", "Custo estimado × medido",
         "Erro = (estimado − medido) / medido, em blocos transferidos. As fórmulas são as dos livros (Elmasri e "
-        "Silberschatz), com os parâmetros medidos pela própria bancada.",
-        ["Família", "Combinações", "Mediana do erro absoluto", "Erro absoluto ≤ 10%", "Maior erro", "Onde"],
+        "Silberschatz), com os parâmetros medidos pela própria bancada. A última coluna traz os parâmetros que "
+        "entraram na fórmula da pior combinação; os de todas estão em parametros.csv.",
+        ["Família", "Combinações", "Mediana do erro absoluto", "Erro absoluto ≤ 10%", "Maior erro", "Onde",
+         "Parâmetros da pior"],
         linhas, brutas,
-        ["familia", "combinacoes", "mediana_abs_erro_pct", "ate_10pct", "maior_erro_pct", "operacao", "variante"])
+        ["familia", "combinacoes", "mediana_abs_erro_pct", "ate_10pct", "maior_erro_pct", "operacao", "variante",
+         "parametros"])
 
 
 def t_fases(b):
@@ -645,8 +663,110 @@ def t_nao_executadas(b):
         ["status", "caso", "linhas", "operacoes", "motivo"])
 
 
-GERADORES = (t_resumo, t_igualdade, t_faixa, t_organizacoes, t_juncoes, t_vencedor, t_ordem, t_politicas,
-             t_estimativa, t_fases, t_estruturas, t_ocupacao, t_nao_executadas)
+def t_acesso(b):
+    """P09: o acesso que cada algoritmo executa em cada configuração."""
+    rs = [r for r in b.caminhos if r["politica"] == b.politica and r["operacao"].startswith("j_")
+          and not r["variante"].endswith("(papeis trocados)")]
+    if not rs:
+        return Tabela("14_acesso_executado", "Acesso executado nas junções", "Sem caminhos.csv nesta saída.", [], [])
+    tipos = {c["operacao"]: c["tipo"] for c in b.combos}
+    grupos = OrderedDict()
+    for r in rs:
+        grupos.setdefault((r["operacao"], r["config"], r["variante"]), {})[r["algoritmo"]] = r
+    linhas, brutas = [], []
+    for (op, cfg, var), d in grupos.items():
+        lin = [b.rotulo_op(op, tipos.get(op, "")), cfg, var.replace(" x ", " × ")]
+        for a in ALG_ORDEM:
+            r = d.get(a)
+            lin.append(f"{r['acesso_externa']} · {r['acesso_interna']}" if r else "—")
+            brutas.append([op, cfg, var, a, r["acesso_externa"] if r else "", r["acesso_interna"] if r else ""])
+        linhas.append(lin)
+    return Tabela(
+        "14_acesso_executado", "Acesso executado nas junções",
+        "O que cada algoritmo lê de fato em cada entrada (externa · interna), tirado do plano. BNL, sort-merge e "
+        "partition-hash leem a organização primária: um índice secundário não clustering nunca é usado, então as "
+        "configurações que diferem só por ele medem o mesmo acesso (P09).",
+        ["Junção", "Config.", "Entradas", "BNL", "Sort-merge", "Hash"], linhas, brutas,
+        ["operacao", "config", "variante", "algoritmo", "acesso_externa", "acesso_interna"])
+
+
+def t_convergencia(b):
+    """P07: grupos que pararam no teto de repetições sem convergir."""
+    rs = [r for r in b.convergencia if r["parada"] != "nao_executada"]
+    if not rs:
+        return Tabela("15_convergencia", "Convergência das repetições", "Sem convergencia.csv nesta saída.", [], [])
+    tol = b.manifesto.get("tolerancia", "?")
+    teto = [r for r in rs if r["parada"] == "teto"]
+    so_tempo = sum(1 for r in teto if r["convergiu_io"] == "sim")
+    linhas = [[r["politica"], b.rotulo_op(r["operacao"], next((c["tipo"] for c in b.combos
+                                                               if c["operacao"] == r["operacao"]), "")),
+               r["variante"], ALG.get(r["algoritmo"], r["algoritmo"] or "seleção"), r["n_repeticoes"],
+               fmt_pct(100 * float(r["dispersao_io"]), False), fmt_pct(100 * float(r["dispersao_tempo"]), False),
+               r["convergiu_io"], r["convergiu_tempo"]] for r in teto]
+    brutas = [[r[k] for k in ("politica", "operacao", "variante", "algoritmo", "n_repeticoes", "dispersao_io",
+                              "dispersao_tempo", "convergiu_io", "convergiu_tempo")] for r in teto]
+    return Tabela(
+        "15_convergencia", "Convergência das repetições",
+        f"{len(rs)} grupos executados: {len(rs) - len(teto)} convergiram (E/S e tempo abaixo de {tol}) e "
+        f"{len(teto)} {'parou' if len(teto) == 1 else 'pararam'} no teto de repetições sem convergir "
+        f"({so_tempo} só no tempo, com a E/S estável). "
+        "A dispersão é (máx − mín)/média das últimas repetições. Na seleção pontual, o lote muda a cada repetição, "
+        "então a E/S também varia. Só os grupos que não convergiram aparecem abaixo.",
+        ["Política", "Consulta", "Variante", "Algoritmo", "Repetições", "Dispersão E/S", "Dispersão tempo",
+         "Convergiu E/S", "Convergiu tempo"], linhas, brutas,
+        ["politica", "operacao", "variante", "algoritmo", "n_repeticoes", "dispersao_io", "dispersao_tempo",
+         "convergiu_io", "convergiu_tempo"])
+
+
+def estado_celula(b, tipo, tamanho, config, selet, alg):
+    """Estado de uma célula da matriz do enunciado no resultados.csv (política escolhida)."""
+    return matriz.estado_celula(b.brutos, b.politica, tipo, tamanho, config, selet, alg)
+
+
+def t_cobertura(b):
+    """P15: a matriz do enunciado v2 célula por célula, gerada do resultados.csv (inventário em matriz.py)."""
+    cont = Counter()
+    linhas, brutas = [], []
+
+    def bloco(grupo, obrig, rotulo, celulas, colunas):
+        for chave, args_por_col in celulas:
+            lin = [grupo, rotulo(chave)]
+            for args in args_por_col:
+                if args is None:   # coluna que não existe para este tipo
+                    lin.append("—")
+                    continue
+                txt, st = estado_celula(b, *args)
+                if st == "ausente":
+                    txt = "**AUSENTE**" if obrig == "obrigatória" else "não implementada"
+                cont[(obrig, st)] += 1
+                lin.append(txt)
+                brutas.append([grupo, obrig, *args, st if st != "ausente" or obrig == "obrigatória" else "nao_implementado"])
+            linhas.append(lin)
+
+    for tipo, obrig in matriz.JUNCOES:
+        bloco(f"{TIPO[tipo]} ({obrig})", obrig, lambda k: f"{TAMANHO[k[0]]}, config. {k[1]}",
+              matriz.celulas_juncao(tipo), matriz.ALGORITMOS)
+    for tipo, obrig in matriz.SELECOES:
+        bloco(f"{TIPO[tipo]} ({obrig})", obrig, lambda k: f"config. {k}", matriz.celulas_selecao(tipo), None)
+    tot = lambda o: sum(n for (ob, _), n in cont.items() if ob == o)
+    resumo = "; ".join(
+        f"{rot}: {tot(o)} células, {cont[(o, 'ok')]} executadas, {cont[(o, 'nao_aplicavel')]} não aplicáveis, "
+        f"{cont[(o, 'inviavel')]} inviáveis e {cont[(o, 'ausente')]} {aus}"
+        for o, rot, aus in (("obrigatória", "obrigatórias", "ausentes"), ("opcional", "opcionais", "não implementadas")))
+    return Tabela(
+        "16_cobertura_matriz", "Cobertura da matriz do enunciado",
+        f"Cada célula do enunciado v2 (04/11/2026), lida do resultados.csv ({b.politica}). {resumo}. "
+        "Nas junções, as colunas são os algoritmos (BNL, sort-merge, hash); nas seleções, as seletividades "
+        "(pontual, 1%, 50%; a faixa não tem nível pontual). Igualdade em UNIQUE com 1% ou 50% é o caso 3: a "
+        "consulta devolve 1 linha e é medida no nível pontual. “AUSENTE” em negrito seria uma célula obrigatória "
+        "sem linha no CSV; “não implementada” é uma célula opcional que a bancada não monta.",
+        ["Grupo", "Célula", "1ª coluna", "2ª coluna", "3ª coluna"], linhas, brutas,
+        ["grupo", "obrigatoriedade", "tipo", "tamanho", "config", "seletividade", "algoritmo", "estado"])
+
+
+GERADORES = (t_resumo, t_cobertura, t_igualdade, t_faixa, t_organizacoes, t_juncoes, t_vencedor, t_ordem,
+             t_politicas, t_estimativa, t_fases, t_estruturas, t_ocupacao, t_nao_executadas, t_acesso,
+             t_convergencia)
 
 
 def main():

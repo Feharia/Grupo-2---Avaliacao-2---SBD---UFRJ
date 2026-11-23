@@ -157,6 +157,31 @@ TEST(BufferPool, FreeBlockDePaginaFixadaLanca) {
     EXPECT_TRUE(g2.read()[10] == std::byte{0});                         // sem dados antigos
 }
 
+// P06 da auditoria de 10/11: fetch de um bloco marcado como livre no bitmap precisa falhar,
+// inclusive depois de o bloco ter sido gravado; a realocação do mesmo bloco volta a valer.
+TEST(BufferPool, FetchDeBlocoLivreLanca) {
+    BufferPool pool(test_config("bp_fetch_livre"));
+    for (FileKind kind : {FileKind::Data, FileKind::Temp}) {
+        const FileId f = pool.create(kind == FileKind::Data ? "a.dat" : "t.tmp", kind);
+        BlockId b{};
+        {
+            auto [nb, g] = pool.allocate(f, kNoReservation);
+            g.write()[10] = std::byte{9};
+            b = nb;
+        }
+        { auto [outro, g] = pool.allocate(f, kNoReservation); }   // o arquivo continua com b < blocos
+        pool.flush_all();
+        pool.free_block(b);
+        EXPECT_THROW(pool.fetch(b, kRandomReuse, kNoReservation), std::logic_error);
+        pool.invalidate_all();
+        EXPECT_THROW(pool.fetch(b, kRandomReuse, kNoReservation), std::logic_error);   // também fora do pool
+        auto [b2, g2] = pool.allocate(f, kNoReservation);
+        EXPECT_EQ(b2.block, b.block);
+        g2.reset();
+        EXPECT_NO_THROW(pool.fetch(b2, kRandomReuse, kNoReservation));
+    }
+}
+
 TEST(BufferPool, FlushAllContaEDepoisZera) {
     BufferPool pool(test_config("bp_flush"));
     const FileId f = pool.create("a.dat", FileKind::Data);
@@ -211,6 +236,33 @@ TEST(BufferPool, MigracaoParaOSubpoolContaComoAcerto) {
     const auto d = (pool.snapshot() - s0).global;
     EXPECT_EQ(d.hits, 1u);
     EXPECT_EQ(d.reads(), 0u);
+}
+
+// Leitura antecipada só pode trazer blocos alocados, inclusive quando há lacunas no extent.
+TEST(BufferPool, PrefetchIgnoraBlocosLivres) {
+    for (const bool released : {false, true}) {
+        auto cfg = test_config(released ? "bp_pref_liberado" : "bp_pref_novo");
+        cfg.prefetch = true;
+        cfg.extent_blocks = 8;
+        BufferPool pool(cfg);
+        const FileId file = file_with_blocks(pool, "a.dat", FileKind::Data, released ? 3 : 1);
+        if (released) pool.free_block(BlockId{file, 2});
+        Reservation reservation = pool.reserve(8);
+        const auto before = pool.snapshot();
+        { auto guard = pool.fetch(BlockId{file, 1}, kSeqOnce, reservation.id()); }
+        EXPECT_EQ((pool.snapshot() - before).global.reads(), released ? 2u : 1u);
+        if (released) {
+            const auto cached = pool.snapshot();
+            auto guard = pool.fetch(BlockId{file, 3}, kRandomReuse, reservation.id());
+            EXPECT_EQ((pool.snapshot() - cached).global.reads(), 0u);
+            EXPECT_TRUE(guard.read()[100] == std::byte{3});
+        }
+        EXPECT_NO_THROW({
+            auto allocated = pool.allocate(file, reservation.id());
+            EXPECT_EQ(allocated.first.block, 2u);
+            EXPECT_TRUE(allocated.second.read()[100] == std::byte{0});
+        });
+    }
 }
 
 TEST(BufferPool, PrefetchLeAteOFimDoExtent) {

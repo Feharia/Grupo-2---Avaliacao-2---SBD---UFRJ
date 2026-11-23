@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 
+#include <unistd.h>   // mkdtemp: no macOS fica em unistd.h; no glibc, também em stdlib.h
+
 using namespace cbd;
 namespace spec = cbd001_spec;
 
@@ -495,7 +497,7 @@ TEST(BPlusBulkLoadIntegration, CargaEReorganizacaoPreservamIndiceSecundario) {
         {
             auto reservation = sm.reserve(2);
             for (std::int32_t key = 0; key < 22; ++key) {
-                auto cursor = sm.probe(secondary, Point{0, Key{key}}, kRandomReuse);
+                auto cursor = sm.probe(secondary, Point{0, Key{key}}, kRandomReuse, reservation);
                 const auto rid = cursor.next();
                 ASSERT_TRUE(rid.has_value());
                 auto record = sm.fetch(table, *rid, kRandomOnce, reservation);

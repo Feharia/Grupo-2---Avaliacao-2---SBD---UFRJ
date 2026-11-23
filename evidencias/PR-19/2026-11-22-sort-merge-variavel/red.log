@@ -1,0 +1,49 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = Monitor.SortMergeComVarCharCurtoIndependeDoMaximoDeclarado:Monitor.SortMergeVarCharAposManutencao:Monitor.SortMergeCapacidadeZeroViraInviavelNoPlano
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from Monitor
+[ RUN      ] Monitor.SortMergeComVarCharCurtoIndependeDoMaximoDeclarado
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:464: Failure
+Value of: std::holds_alternative<JoinPlan>(planned)
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:472: Failure
+Value of: std::holds_alternative<OpResult>(outcome)
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:464: Failure
+Value of: std::holds_alternative<JoinPlan>(planned)
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:472: Failure
+Value of: std::holds_alternative<OpResult>(outcome)
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:472: Failure
+Value of: std::holds_alternative<OpResult>(outcome)
+  Actual: false
+Expected: true
+[  FAILED  ] Monitor.SortMergeComVarCharCurtoIndependeDoMaximoDeclarado (12 ms)
+[ RUN      ] Monitor.SortMergeVarCharAposManutencao
+unknown file: Failure
+C++ exception with description "inaplicável inesperado: não cabe em M: lista de runs passou do número previsto pelo plano" thrown in the test body.
+[  FAILED  ] Monitor.SortMergeVarCharAposManutencao (4 ms)
+[ RUN      ] Monitor.SortMergeCapacidadeZeroViraInviavelNoPlano
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:509: Failure
+Value of: std::holds_alternative<NotApplicable>(planned)
+  Actual: false
+Expected: true
+[  FAILED  ] Monitor.SortMergeCapacidadeZeroViraInviavelNoPlano (0 ms)
+[----------] 3 tests from Monitor (17 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (17 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] Monitor.SortMergeComVarCharCurtoIndependeDoMaximoDeclarado
+[  FAILED  ] Monitor.SortMergeVarCharAposManutencao
+[  FAILED  ] Monitor.SortMergeCapacidadeZeroViraInviavelNoPlano
+
+ 3 FAILED TESTS
+exit_code=1

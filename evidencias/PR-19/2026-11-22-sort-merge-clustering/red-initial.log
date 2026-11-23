@@ -1,0 +1,33 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = Monitor.SortMergeClusteringHashContaIndiceEDados:Monitor.SortMergeDistingueClusteringHashDeClusteringBPlus
+[==========] Running 2 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 2 tests from Monitor
+[ RUN      ] Monitor.SortMergeClusteringHashContaIndiceEDados
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:596: Failure
+Value of: std::holds_alternative<NotApplicable>(rejected)
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:597: Failure
+Expected: { const auto outcome = m.join(JoinAlgorithm::SortMerge, outer, inner, minimum - 1, {}, params); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(std::holds_alternative<NotApplicable>(outcome))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp", 599, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, "std::holds_alternative<NotApplicable>(outcome)", "false", "true") .c_str()) = ::testing::Message(); } doesn't throw an exception.
+  Actual: it throws std::runtime_error with description "todas as molduras da região estão fixadas".
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:596: Failure
+Value of: std::holds_alternative<NotApplicable>(rejected)
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:597: Failure
+Expected: { const auto outcome = m.join(JoinAlgorithm::SortMerge, outer, inner, minimum - 1, {}, params); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(std::holds_alternative<NotApplicable>(outcome))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp", 599, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, "std::holds_alternative<NotApplicable>(outcome)", "false", "true") .c_str()) = ::testing::Message(); } doesn't throw an exception.
+  Actual: it throws std::runtime_error with description "todas as molduras da região estão fixadas".
+[  FAILED  ] Monitor.SortMergeClusteringHashContaIndiceEDados (0 ms)
+[ RUN      ] Monitor.SortMergeDistingueClusteringHashDeClusteringBPlus
+[       OK ] Monitor.SortMergeDistingueClusteringHashDeClusteringBPlus (0 ms)
+[----------] 2 tests from Monitor (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 1 test.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Monitor.SortMergeClusteringHashContaIndiceEDados
+
+ 1 FAILED TEST
+exit_code=1

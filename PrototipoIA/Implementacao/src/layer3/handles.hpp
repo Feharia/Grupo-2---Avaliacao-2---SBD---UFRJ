@@ -166,12 +166,26 @@ public:
     ScratchMatches probe(const Key&) const;
     void           clear();
     std::size_t    pages() const { return pages_.size(); }
+
+    // Orçamento de memória (decisão 173, P01 da auditoria de 10/11): os registros ocupam as páginas
+    // a partir do início, e o diretório (slot, chain e head, 4 B cada por registro, mais a folga
+    // de crescimento do vetor de slots) é cobrado como se ocupasse o fim delas. Sempre vale
+    // record_bytes() + aux_bytes() ≤ pages() × bloco; ordenar e montar o hash não alocam além disso.
+    static constexpr std::size_t kDirBytesPerRecord = 12;
+    static constexpr std::size_t kSlotStep = 32;          // entradas acrescentadas por vez ao vetor de slots
+    std::size_t    record_bytes() const;                  // fim do último registro gravado, contando sobras de página
+    std::size_t    aux_bytes() const;                     // bytes reservados pelos vetores do diretório
+    // Quantos registros de tamanho fixo (o máximo do esquema) cabem em `pages` páginas com o diretório.
+    static std::size_t capacity_for(const Schema&, std::size_t pages, std::uint32_t block_size);
+    // A mesma conta usando um limite observado para o tamanho dos registros codificados.
+    static std::size_t capacity_for(std::uint32_t record_bytes, std::size_t pages, std::uint32_t block_size);
 private:
     friend class StorageManager;
     friend class ScratchMatches;
     ScratchSpace(std::vector<PageGuard> pages, std::shared_ptr<const Schema>, std::uint32_t block_size);
     bool add_bytes(std::span<const std::byte>);
     std::span<const std::byte> item(std::size_t i) const;
+    std::span<const std::byte> item_at_slot(std::uint32_t slot) const;
     std::vector<PageGuard>        pages_;
     std::shared_ptr<const Schema> schema_;                // cópia própria (165); sintético no espaço de RIDs
     std::uint32_t                 bs_ = 0;

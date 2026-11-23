@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Executa e valida o perfil io-rapido-v1 em diretório novo; usa Python padrão."""
+"""Executa e valida o perfil io-rapido-v2 em diretório novo; usa Python padrão."""
 import argparse
 import csv
 import hashlib
@@ -54,7 +54,7 @@ def measure(source, output, commit, build_dir=None):
     driver = TOOLS.parent / "src/layer1/bench.cpp"
     # Mesmo driver nos dois lados: fixa fill, variantes e preparação do cache.
     # Headers e biblioteca são da revisão medida, evitando misturar ABIs.
-    run("driver-build", [compiler, "-std=c++20", "-O3", "-DNDEBUG", '-DCBD_FLAGS="io-rapido-v1 -O3 -DNDEBUG"',
+    run("driver-build", [compiler, "-std=c++20", "-O3", "-DNDEBUG", '-DCBD_FLAGS="io-rapido-v2 -O3 -DNDEBUG"',
                          "-I", source / "src", driver, build_dir / "libcbd_motor.a", "-o", binary])
     run("config-probe-build", [compiler, "-std=c++20", "-O2", "-Wall", "-Wextra", "-Wpedantic",
                                "-I", source / "src", TOOLS / "config_io.cpp", "-o", output / "config_io"])
@@ -67,7 +67,7 @@ def measure(source, output, commit, build_dir=None):
     run("sqlite", [sys.executable, "-I", TOOLS / "reference.py", smoke, "--tuplas"])
     run("cobertura", [sys.executable, "-I", TOOLS / "validar_smoke_ci.py", smoke])
     run("comparacao-sqlite", [sys.executable, "-I", TOOLS / "compare.py", smoke, "--tuplas"])
-    inventory = TOOLS / "io_cenarios_v1.json"
+    inventory = TOOLS / "io_cenarios_v2.json"
     with (smoke / "resultados.csv").open(newline="") as file:
         rows = list(csv.DictReader(file))
     comparison.index_rows(rows)
@@ -76,16 +76,17 @@ def measure(source, output, commit, build_dir=None):
     expected = {"escala": "0.1", "semente": "20261122", "reps": "1..1",
                 "m_juncao": "32", "m_selecao": "2", "lote": "100"}
     if any(manifest.get(key) != value for key, value in expected.items()):
-        raise ValueError("a bancada não respeitou o perfil io-rapido-v1")
-    inputs = [smoke / name for name in ("esquema.csv", "constantes.csv", "operacoes.csv")]
+        raise ValueError("a bancada não respeitou o perfil io-rapido-v2")
+    inputs = [smoke / name for name in ("esquema.csv", "constantes.csv", "operacoes.csv",
+                                       "metodos.csv", "configuracoes.csv")]
     inputs += sorted((smoke / "dados").glob("*.csv")) + sorted((smoke / "lotes").glob("*.csv"))
     if not list((smoke / "dados").glob("*.csv")) or not list((smoke / "lotes").glob("*.csv")):
         raise ValueError("dados ou lotes ausentes")
     hashes = {name: sha(TOOLS / name) for name in
-              ("medir_io.py", "comparar_io.py", "config_io.cpp", "io_cenarios_v1.json", "validar_smoke_ci.py", "reference.py", "compare.py")}
+              ("medir_io.py", "comparar_io.py", "config_io.cpp", "io_cenarios_v2.json", "validar_smoke_ci.py", "reference.py", "compare.py")}
     hashes["driver_bancada.cpp"] = sha(driver)
     metadata = {
-        "protocolo": "io-rapido-v1", "commit": commit, "validado_sqlite_tuplas": True,
+        "protocolo": "io-rapido-v2", "commit": commit, "validado_sqlite_tuplas": True,
         "assinatura": {"manifesto": {key: manifest[key] for key in PARAMETERS}, "config": config,
                        "opcoes_compilacao_motor": flags,
                        "dados": {str(path.relative_to(smoke)): sha(path) for path in inputs}},

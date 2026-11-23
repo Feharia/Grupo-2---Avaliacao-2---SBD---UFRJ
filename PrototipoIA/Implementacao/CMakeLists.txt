@@ -46,3 +46,17 @@ endif()
 target_include_directories(testes PRIVATE tests)
 enable_testing()
 add_test(NAME testes COMMAND testes)
+
+# Testes de memória auxiliar (CBD-003/004/005): executável próprio, porque troca o operator new
+# global para contar as alocações (tests/memoria/contador.hpp).
+file(GLOB CBD_MEM_TEST_SRC CONFIGURE_DEPENDS tests/memoria/*.cpp)
+if(GTest_FOUND)
+  add_executable(testes_memoria ${CBD_MEM_TEST_SRC})
+  target_compile_definitions(testes_memoria PRIVATE CBD_USE_GTEST)
+  target_link_libraries(testes_memoria PRIVATE cbd_motor GTest::gtest_main)
+else()
+  add_executable(testes_memoria ${CBD_MEM_TEST_SRC} tests/mini_main.cpp)
+  target_link_libraries(testes_memoria PRIVATE cbd_motor)
+endif()
+target_include_directories(testes_memoria PRIVATE tests)
+add_test(NAME testes_memoria COMMAND testes_memoria)

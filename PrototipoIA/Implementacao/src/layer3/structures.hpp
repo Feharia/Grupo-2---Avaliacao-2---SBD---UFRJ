@@ -127,7 +127,8 @@ public:
     virtual void add(const Key&, RID) = 0;
     virtual void remove(const Key&, RID) = 0;
     virtual void move(const Key&, RID from, RID to) = 0;
-    virtual std::unique_ptr<RidState> probe(const Predicate&, Intent) = 0;
+    // numa operação medida, as páginas do índice vêm da reserva da operação (172)
+    virtual std::unique_ptr<RidState> probe(const Predicate&, Intent, ReservationId) = 0;
     virtual StructureStats measure() = 0;
     virtual Occupancy occupancy() = 0;
     virtual std::vector<FileId> files() const = 0;
@@ -141,7 +142,7 @@ public:
     void add(const Key&, RID) override;
     void remove(const Key&, RID) override;
     void move(const Key&, RID from, RID to) override;
-    std::unique_ptr<RidState> probe(const Predicate&, Intent) override;
+    std::unique_ptr<RidState> probe(const Predicate&, Intent, ReservationId) override;
     StructureStats measure() override;
     Occupancy occupancy() override;
     std::vector<FileId> files() const override { return {file_}; }
@@ -165,7 +166,7 @@ public:
     void add(const Key&, RID) override;
     void remove(const Key&, RID) override;
     void move(const Key&, RID from, RID to) override;
-    std::unique_ptr<RidState> probe(const Predicate&, Intent) override;
+    std::unique_ptr<RidState> probe(const Predicate&, Intent, ReservationId) override;
     StructureStats measure() override;
     Occupancy occupancy() override;
     std::vector<FileId> files() const override { return {file_}; }
@@ -176,18 +177,21 @@ public:
     // iteração das entradas em ordem de chave (usada pelo RidCursor e pelo clustering)
     class EntryIter {
     public:
-        EntryIter(const BPlusIndex*, KeyRange, Intent);
-        // devolve (chave, bytes da entrada); válidos até a próxima chamada
+        EntryIter(const BPlusIndex*, KeyRange, Intent, ReservationId res = kNoReservation);
+        // devolve (chave, bytes da entrada); válidos até a próxima chamada ou até release()
         std::optional<std::pair<Key, std::span<const std::byte>>> next();
+        // solta a folha corrente, que volta a ser lida no próximo next() (172: cabe em M = 2)
+        void release() { leaf_.reset(); }
     private:
         const BPlusIndex* idx_;
         KeyRange range_;
         Intent intent_;
+        ReservationId res_;
         std::optional<PageGuard> leaf_;
         std::vector<std::pair<Key, std::uint16_t>> order_;
         std::size_t pos_ = 0;
-        std::uint32_t next_leaf_ = 0;
-        bool started_ = false, done_ = false;
+        std::uint32_t next_leaf_ = 0, cur_leaf_ = 0;
+        bool started_ = false, done_ = false, mid_page_ = false;
     };
     // posting list de uma entrada: inline e depois a cadeia de overflow
     std::uint32_t entry_count(std::span<const std::byte> e) const;

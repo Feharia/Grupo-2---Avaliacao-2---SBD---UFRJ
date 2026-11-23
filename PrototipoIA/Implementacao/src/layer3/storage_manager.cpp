@@ -3,6 +3,7 @@
 #include "layer3/catalog.hpp"
 #include "layer3/structures.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 namespace cbd {
@@ -61,13 +62,20 @@ public:
     explicit CountingStream(RecordStream& in) : in_(in) {}
     std::optional<std::span<const std::byte>> next() override {
         auto r = in_.next();
-        if (r) ++n_;
+        if (r) {
+            ++n_;
+            bytes_ += r->size();
+            max_record_bytes_ = std::max(max_record_bytes_, static_cast<std::uint32_t>(r->size()));
+        }
         return r;
     }
     std::uint64_t count() const { return n_; }
+    std::uint64_t bytes() const { return bytes_; }
+    std::uint32_t max_record_bytes() const { return max_record_bytes_; }
 private:
     RecordStream& in_;
-    std::uint64_t n_ = 0;
+    std::uint64_t n_ = 0, bytes_ = 0;
+    std::uint32_t max_record_bytes_ = 0;
 };
 
 }  // namespace
@@ -279,11 +287,11 @@ SearchCursor StorageManager::find(const AccessPath& p, const Predicate& pred, In
     }
 }
 
-RidCursor StorageManager::probe(const AccessPath& p, const Predicate& pred, Intent i) {
+RidCursor StorageManager::probe(const AccessPath& p, const Predicate& pred, Intent i, const Reservation& r) {
     if (predicate_field(pred) != p.field) throw std::logic_error("probe: predicado em campo diferente do caminho");
     if (p.kind != PathKind::SecondaryHash && p.kind != PathKind::SecondaryBTreeNonClustering)
         throw std::logic_error("probe só em índice secundário não clustering");
-    return RidCursor(indexes_.at(p.id).idx->probe(pred, i));
+    return RidCursor(indexes_.at(p.id).idx->probe(pred, i, r.id()));
 }
 
 PinnedRecord StorageManager::fetch(TableId t, RID rid, Intent i, const Reservation& r) {
@@ -296,8 +304,13 @@ PinnedRecord StorageManager::fetch(TableId t, RID rid, Intent i, const Reservati
 
 // ----------------------------------------------------------------------- memória de trabalho
 TempFile StorageManager::create_temp(const Schema& s, const Reservation& r) {
+    return create_temp(std::make_shared<const Schema>(s), r);   // cópia do esquema (165)
+}
+
+TempFile StorageManager::create_temp(std::shared_ptr<const Schema> s, const Reservation& r) {
+    if (!s) throw std::invalid_argument("create_temp sem esquema");
     const FileId f = pool_.create(next_name("tmp", "tmp"), FileKind::Temp);
-    return TempFile(&pool_, f, std::make_shared<const Schema>(s), r.id());   // cópia do esquema (165)
+    return TempFile(&pool_, f, std::move(s), r.id());
 }
 
 ScratchSpace StorageManager::create_scratch(const Schema& s, const Reservation& r, std::size_t pages) {
@@ -306,6 +319,13 @@ ScratchSpace StorageManager::create_scratch(const Schema& s, const Reservation& 
     pg.reserve(pages);
     for (std::size_t i = 0; i < pages; ++i) pg.push_back(pool_.scratch(r.id()));
     return ScratchSpace(std::move(pg), std::make_shared<const Schema>(s), pool_.block_size());
+}
+
+std::vector<PageGuard> StorageManager::hold_frames(const Reservation& r, std::size_t n) {
+    std::vector<PageGuard> held;
+    held.reserve(n);
+    for (std::size_t i = 0; i < n; ++i) held.push_back(pool_.scratch(r.id()));
+    return held;
 }
 
 ScratchSpace StorageManager::create_rid_scratch(const Reservation& r, std::size_t pages) {
@@ -326,7 +346,10 @@ void StorageManager::refresh_stats(TableId t) {
     TableStats s;
     s.n = e.n;
     s.r = e.schema->record_size;
+    s.max_record_bytes = e.max_record_bytes;
     s.bfr = sp_capacity(pool_.block_size(), s.r);
+    // blocagem pelo tamanho médio real: com VarChar, o máximo R superestima os blocos densos (P08)
+    s.bfr_medio = e.n ? sp_capacity(pool_.block_size(), static_cast<std::uint32_t>((e.bytes + e.n - 1) / e.n)) : s.bfr;
     s.b = pf.data_blocks();
     StructureStats ps = pf.measure();
     ps.id = e.primary_id;
@@ -369,6 +392,8 @@ void StorageManager::bulk_load(TableId t, RecordStream& sorted) {
     CountingStream cs(sorted);
     tables_.at(t).primary->bulk_load(cs);
     catalog_->table(t).n += cs.count();
+    catalog_->table(t).bytes += cs.bytes();
+    catalog_->table(t).max_record_bytes = std::max(catalog_->table(t).max_record_bytes, cs.max_record_bytes());
     build_indexes(t);   // índices construídos depois da organização
     refresh_stats(t);
     catalog_->persist();
@@ -380,7 +405,7 @@ RID StorageManager::insert(TableId t, std::span<const std::byte> rec) {
     for (StructureId id : e.indexes) {   // unicidade verificada pela estrutura que indexa o campo (157)
         const IndexRt& ix = indexes_.at(id);
         if (!e.schema->field(ix.spec.key).unique || ix.spec.clustering || v.is_null(ix.spec.key)) continue;
-        auto st = ix.idx->probe(Point{ix.spec.key, v.key(ix.spec.key)}, kRandomReuse);
+        auto st = ix.idx->probe(Point{ix.spec.key, v.key(ix.spec.key)}, kRandomReuse, kNoReservation);
         if (st->next()) throw DuplicateKey("duplicata em " + e.schema->field(ix.spec.key).name);
     }
     PrimaryFile& pf = *tables_.at(t).primary;
@@ -393,6 +418,9 @@ RID StorageManager::insert(TableId t, std::span<const std::byte> rec) {
         else ix.idx->add(k, rid);
     }
     ++catalog_->table(t).n;
+    catalog_->table(t).bytes += rec.size();
+    catalog_->table(t).max_record_bytes =
+        std::max(catalog_->table(t).max_record_bytes, static_cast<std::uint32_t>(rec.size()));
     invalidate_stats(t);
     return rid;
 }
@@ -421,6 +449,7 @@ void StorageManager::erase(TableId t, RID rid) {
         }
     }
     --catalog_->table(t).n;
+    catalog_->table(t).bytes -= copy.size();
     invalidate_stats(t);
 }
 
@@ -433,7 +462,7 @@ std::size_t StorageManager::erase_key(TableId t, FieldId f, const Key& k) {
         for (StructureId id : e.indexes) {
             const IndexRt& ix = indexes_.at(id);
             if (ix.spec.key != f || ix.spec.clustering) continue;
-            auto st = ix.idx->probe(Point{f, k}, kRandomReuse);
+            auto st = ix.idx->probe(Point{f, k}, kRandomReuse, kNoReservation);
             return st->next();
         }
         BlockScan scan(&pool_, pf.scan_plan(), e.schema, kSeqOnce, kNoReservation);
@@ -465,22 +494,29 @@ void StorageManager::reorganize(TableId t) {
     std::unique_ptr<PrimaryFile> old = std::move(tables_.at(t).primary);
     tables_.at(t).primary = make_primary(t);
     PrimaryFile& fresh = *tables_.at(t).primary;
-    std::uint64_t n = 0;
+    std::uint64_t n = 0, bytes = 0;
+    std::uint32_t max_record_bytes = 0;
     if (old->kind() == StructureKind::BTree) {
         const auto* bt = static_cast<const BPlusTreeFile*>(old.get());
         SortedLeafStream s(pool_, bt->data_file(), bt->engine().meta().first_leaf, bt->engine().key_of());
         CountingStream cs(s);
         fresh.bulk_load(cs);
         n = cs.count();
+        bytes = cs.bytes();
+        max_record_bytes = cs.max_record_bytes();
     } else {
         ScanStream s(BlockScan(&pool_, old->scan_plan(), e.schema, kSeqOnce, kNoReservation));
         CountingStream cs(s);
         fresh.bulk_load(cs);
         n = cs.count();
+        bytes = cs.bytes();
+        max_record_bytes = cs.max_record_bytes();
     }
     for (FileId f : old->files()) pool_.remove_file(f);
     old.reset();
     e.n = n;
+    e.bytes = bytes;
+    e.max_record_bytes = max_record_bytes;
     build_indexes(t);   // RIDs mudaram: índices reconstruídos (141)
     refresh_stats(t);
     catalog_->persist();

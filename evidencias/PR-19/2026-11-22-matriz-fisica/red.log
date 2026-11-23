@@ -1,0 +1,80 @@
+test_config_b_com_secundario_na_outra_tabela_reprova (test_verificar_matriz.VerificadorTest.test_config_b_com_secundario_na_outra_tabela_reprova) ... FAIL
+test_config_c_sem_primarias_reprova (test_verificar_matriz.VerificadorTest.test_config_c_sem_primarias_reprova) ... FAIL
+test_indice_em_outro_campo_nao_muda_config_a (test_verificar_matriz.VerificadorTest.test_indice_em_outro_campo_nao_muda_config_a) ... ok
+test_inventario (test_verificar_matriz.VerificadorTest.test_inventario) ... ok
+test_inviavel_aparece_mas_nao_reprova (test_verificar_matriz.VerificadorTest.test_inviavel_aparece_mas_nao_reprova) ... ok
+test_juncao_obrigatoria_nao_aplicavel_reprova (test_verificar_matriz.VerificadorTest.test_juncao_obrigatoria_nao_aplicavel_reprova) ... ok
+test_matriz_completa_aprova (test_verificar_matriz.VerificadorTest.test_matriz_completa_aprova) ... ok
+test_omitir_uma_celula_reprova (test_verificar_matriz.VerificadorTest.test_omitir_uma_celula_reprova) ... ok
+test_politica_ausente_reprova (test_verificar_matriz.VerificadorTest.test_politica_ausente_reprova) ... ok
+test_porte_falso_reprova (test_verificar_matriz.VerificadorTest.test_porte_falso_reprova) ... ok
+test_repeticao_unica_reprova_ainda_com_manifesto_tres (test_verificar_matriz.VerificadorTest.test_repeticao_unica_reprova_ainda_com_manifesto_tres) ... FAIL
+test_rodada_reduzida_nao_prova_a_matriz (test_verificar_matriz.VerificadorTest.test_rodada_reduzida_nao_prova_a_matriz) ... ok
+test_scan_em_tabela_indexada_nao_prova_config_a (test_verificar_matriz.VerificadorTest.test_scan_em_tabela_indexada_nao_prova_config_a) ... FAIL
+test_selecao_a_indexada_reprova (test_verificar_matriz.VerificadorTest.test_selecao_a_indexada_reprova) ... FAIL
+test_selecao_nao_aplicavel_fora_do_caso_3_reprova (test_verificar_matriz.VerificadorTest.test_selecao_nao_aplicavel_fora_do_caso_3_reprova) ... ok
+test_sem_metadados_fisicos_reprova (test_verificar_matriz.VerificadorTest.test_sem_metadados_fisicos_reprova) ... FAIL
+test_tudo_inviavel_sem_motivo_reprova (test_verificar_matriz.VerificadorTest.test_tudo_inviavel_sem_motivo_reprova) ... FAIL
+test_variante_nao_aplicavel_com_outra_executada_aprova (test_verificar_matriz.VerificadorTest.test_variante_nao_aplicavel_com_outra_executada_aprova) ... ok
+
+======================================================================
+FAIL: test_config_b_com_secundario_na_outra_tabela_reprova (test_verificar_matriz.VerificadorTest.test_config_b_com_secundario_na_outra_tabela_reprova)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/cbd-pr19-matriz-LJ9gXd/before/PrototipoIA/Implementacao/tests/python/test_verificar_matriz.py", line 178, in test_config_b_com_secundario_na_outra_tabela_reprova
+    self.assertTrue(any("configuração física" in f for f in self.roda()[0]))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_config_c_sem_primarias_reprova (test_verificar_matriz.VerificadorTest.test_config_c_sem_primarias_reprova)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/cbd-pr19-matriz-LJ9gXd/before/PrototipoIA/Implementacao/tests/python/test_verificar_matriz.py", line 182, in test_config_c_sem_primarias_reprova
+    self.assertTrue(any("configuração física" in f for f in self.roda()[0]))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_repeticao_unica_reprova_ainda_com_manifesto_tres (test_verificar_matriz.VerificadorTest.test_repeticao_unica_reprova_ainda_com_manifesto_tres)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/cbd-pr19-matriz-LJ9gXd/before/PrototipoIA/Implementacao/tests/python/test_verificar_matriz.py", line 194, in test_repeticao_unica_reprova_ainda_com_manifesto_tres
+    self.assertTrue(any("repetições executadas" in f for f in self.roda()[0]))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_scan_em_tabela_indexada_nao_prova_config_a (test_verificar_matriz.VerificadorTest.test_scan_em_tabela_indexada_nao_prova_config_a)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/cbd-pr19-matriz-LJ9gXd/before/PrototipoIA/Implementacao/tests/python/test_verificar_matriz.py", line 170, in test_scan_em_tabela_indexada_nao_prova_config_a
+    self.assertTrue(any("configuração física" in f for f in self.roda()[0]))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_selecao_a_indexada_reprova (test_verificar_matriz.VerificadorTest.test_selecao_a_indexada_reprova)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/cbd-pr19-matriz-LJ9gXd/before/PrototipoIA/Implementacao/tests/python/test_verificar_matriz.py", line 186, in test_selecao_a_indexada_reprova
+    self.assertTrue(any("configuração física" in f for f in self.roda()[0]))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_sem_metadados_fisicos_reprova (test_verificar_matriz.VerificadorTest.test_sem_metadados_fisicos_reprova)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/cbd-pr19-matriz-LJ9gXd/before/PrototipoIA/Implementacao/tests/python/test_verificar_matriz.py", line 190, in test_sem_metadados_fisicos_reprova
+    self.assertTrue(any("metadados" in f for f in self.roda()[0]))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_tudo_inviavel_sem_motivo_reprova (test_verificar_matriz.VerificadorTest.test_tudo_inviavel_sem_motivo_reprova)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/cbd-pr19-matriz-LJ9gXd/before/PrototipoIA/Implementacao/tests/python/test_verificar_matriz.py", line 200, in test_tudo_inviavel_sem_motivo_reprova
+    self.assertTrue(self.roda()[0])
+AssertionError: [] is not true
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.202s
+
+FAILED (failures=7)
+exit_code=1

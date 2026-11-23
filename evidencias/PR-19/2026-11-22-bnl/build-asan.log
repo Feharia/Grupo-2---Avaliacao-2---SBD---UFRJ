@@ -1,0 +1,16 @@
+[  6%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer2/monitor.cpp.o
+[  6%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer2/algorithms.cpp.o
+[ 10%] Linking CXX static library libcbd_motor.a
+[ 51%] Built target cbd_motor
+[ 55%] Linking CXX executable bancada
+[ 58%] Building CXX object CMakeFiles/testes_memoria.dir/tests/memoria/test_bnl.cpp.o
+[ 62%] Building CXX object CMakeFiles/testes.dir/tests/test_layer2.cpp.o
+[ 65%] Built target bancada
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp: In member function ‘virtual void Monitor_SelecaoComIndicesDentroDeM_Test::TestBody()’:
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:371:8: warning: suggest explicit braces to avoid ambiguous ‘else’ [-Wdangling-else]
+  371 |     if (*st.height > 1)   // cada descida pede a raiz pela reserva (pode ser acerto, se ela ainda estiver lá)
+      |        ^
+[ 68%] Linking CXX executable testes_memoria
+[ 79%] Built target testes_memoria
+[ 82%] Linking CXX executable testes
+[100%] Built target testes

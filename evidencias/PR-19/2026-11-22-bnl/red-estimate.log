@@ -1,0 +1,40 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = Estimativas.Bnl:Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia
+[==========] Running 2 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from Estimativas
+[ RUN      ] Estimativas.Bnl
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_estimativas.cpp:44: Failure
+Value of: perto(limited.transfers, 900)
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_estimativas.cpp:45: Failure
+Value of: perto(limited.seeks, 40)
+  Actual: false
+Expected: true
+[  FAILED  ] Estimativas.Bnl (0 ms)
+[----------] 1 test from Estimativas (0 ms total)
+
+[----------] 1 test from Monitor
+[ RUN      ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia
+  [bnl] externa=169 pares=169 requisicoes=3 leituras=3 gravacoes=0
+  [bnl] externa=170 pares=170 requisicoes=3 leituras=3 gravacoes=0
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_layer2.cpp:224: Failure
+Expected equality of these values:
+  result.estimate.transfers
+    Which is: 3
+  count <= 170 ? 3.0 : 5.0
+    Which is: 5
+  [bnl] externa=171 pares=171 requisicoes=5 leituras=5 gravacoes=0
+[  FAILED  ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia (3 ms)
+[----------] 1 test from Monitor (3 ms total)
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 2 test suites ran. (3 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] Estimativas.Bnl
+[  FAILED  ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia
+
+ 2 FAILED TESTS
+exit_code=1

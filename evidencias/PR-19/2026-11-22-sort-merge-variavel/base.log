@@ -1,0 +1,9 @@
+max_varchar=24 encoded_bytes=7 schema_record_size=30 b=3
+M=5 run_pages=3 runs=3/3 rows=1000 checksum=6419884852493350448 reads=12 writes=6
+M=16 run_pages=14 runs=1/1 rows=1000 checksum=6419884852493350448 reads=12 writes=6
+max_varchar=1000 encoded_bytes=7 schema_record_size=1006 b=3
+M=5 run_pages=3 runs=84/84 rows=1000 checksum=6419884852493350448 reads=12 writes=6
+M=16 run_pages=14 runs=18/18 rows=1000 checksum=6419884852493350448 reads=12 writes=6
+max_varchar=4050 encoded_bytes=7 schema_record_size=4056 b=3
+M=5 run_pages=3 runs=334/334 rows=1000 checksum=6419884852493350448 reads=12 writes=6
+M=16 run_pages=14 runs=72/72 rows=1000 checksum=6419884852493350448 reads=12 writes=6

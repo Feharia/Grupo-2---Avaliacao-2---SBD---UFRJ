@@ -35,8 +35,7 @@ public:
 private:
     struct OpenFile {
         UniqueFd              fd;
-        std::filesystem::path path;
-        std::string           name;
+        std::string           name;                // o caminho é dir_ / name (CBD-005: não guarda cópia)
         FileKind              kind = FileKind::Data;
         std::uint32_t         blocks = 0;          // inclui o cabeçalho
         std::vector<bool>     free_map;            // espelho do bitmap do bloco 0 (true = livre)
@@ -58,6 +57,7 @@ private:
     std::uint32_t extent_blocks_;
     std::filesystem::path dir_;
     std::vector<OpenFile> files_;        // índice = FileId; 0 é reservado
+    std::vector<FileId>   free_temp_ids_;  // entradas de temporários apagados, reaproveitadas (CBD-005)
     struct { FileId file = 0; std::uint32_t block = 0; bool valid = false; } last_;
     Counters io_;
 };

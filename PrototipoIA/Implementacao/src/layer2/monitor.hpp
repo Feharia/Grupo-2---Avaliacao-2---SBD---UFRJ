@@ -45,14 +45,18 @@ struct JoinPlan {
     bool          inner_unique = false;                 // (157)
     // BNL
     std::size_t   chunk = 0;
+    std::size_t   dir_frames = 0;                       // diretório do chunk: ⌈registros × 24 B / bloco⌉ molduras retidas (173)
+    std::size_t   dir_entries = 0;                      // RecordViews que cabem nessas molduras
     // sort-merge
     bool          sort_outer = true, sort_inner = true;
     std::size_t   run_pages = 0;                        // m − 2
     std::size_t   fan_in = 0;                           // m − 1
     std::size_t   group_pages = 0;                      // 0 se o campo da interna for unique (157)
     std::size_t   final_fan_in = 0;                     // m − group_pages
-    std::size_t   runs_outer = 0, runs_inner = 0;
+    std::size_t   runs_outer = 0, runs_inner = 0;           // runs geradas (limite do vetor de cada lado)
     std::size_t   merge_passes_outer = 0, merge_passes_inner = 0;
+    std::size_t   desc_frames = 0;                      // lista de runs cobrada em M (CBD-005)
+    std::size_t   ordered_extra_frames = 0;             // índice retido além da página de dados nas fontes clustering/hash
     // hash join (externa = build)
     bool          prepartitioned_outer = false, prepartitioned_inner = false;
     std::size_t   partitions = 0;                       // ≤ m − 1

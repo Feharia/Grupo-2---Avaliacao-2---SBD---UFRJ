@@ -137,6 +137,7 @@ IoCounts& IoCounts::operator+=(const IoCounts& o) {
     writes_seq += o.writes_seq; writes_rand += o.writes_rand;
     dirty_evictions += o.dirty_evictions; forced_writes += o.forced_writes;
     data_area_requests += o.data_area_requests;
+    index_area_requests += o.index_area_requests;
     return *this;
 }
 IoCounts& IoCounts::operator-=(const IoCounts& o) {
@@ -145,6 +146,7 @@ IoCounts& IoCounts::operator-=(const IoCounts& o) {
     writes_seq -= o.writes_seq; writes_rand -= o.writes_rand;
     dirty_evictions -= o.dirty_evictions; forced_writes -= o.forced_writes;
     data_area_requests -= o.data_area_requests;
+    index_area_requests -= o.index_area_requests;
     return *this;
 }
 Counters operator-(Counters a, const Counters& b) {
