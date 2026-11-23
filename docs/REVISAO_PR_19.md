@@ -5,10 +5,11 @@ PR examinado no SHA `f8177711ac3f6816f321948dff8bef798018b934`, base
 o PDF e as duas exportações de chat de wpp-msgs. Seus relatos serviram como
 guia para conferir fontes, requisitos e testes.
 
-As correções locais estão em `fix/pr19-slot-prefetch`, no worktree
-`pr19-slot-prefetch`. A main permanece em `4091762` e o remoto não foi
-alterado nesta revisão. As numerações CBD variam entre pacotes de contexto;
-os números de issue abaixo são os do GitHub.
+As correções foram desenvolvidas em `fix/pr19-slot-prefetch`, no worktree
+`pr19-slot-prefetch`, e publicadas na origem do PR em `a6b3d48`. O usuário
+forneceu a confirmação de três execuções Actions aprovadas para esse HEAD.
+A main permanece em `4091762`. As numerações CBD variam entre pacotes de
+contexto; os números de issue abaixo são os do GitHub.
 
 ## Resultado da revisão e ajustes
 
@@ -40,10 +41,12 @@ corrigidos na continuação da revisão, com as evidências descritas abaixo.
 
 ## Limites e recomendação
 
-O SHA original do PR precisa incorporar os ajustes funcionais e de
-validação antes do merge. O CI hospedado da branch local ainda precisa
-ser executado após seu envio autorizado. Este parecer não declara todas
-as issues encerradas por um único resultado positivo da suíte.
+O PR incorporou os ajustes funcionais e de validação em `a6b3d48`, com
+sucesso no CI informado pelo usuário. Os registros dessa publicação e
+da comparação de I/O contra a main estão em
+`evidencias/PR-19/2026-11-22-io-main/`. A consolidação posterior dos registros
+ainda precisa ser enviada e conferida no CI. Este parecer não declara
+todas as issues encerradas por um único resultado positivo da suíte.
 
 O contrato de memória usa as exclusões documentadas na decisão 173. Os
 testes de alocações cobrem seus casos declarados; não medem todo o RSS do
@@ -55,6 +58,12 @@ O material do WhatsApp deixava a #18 fora do fechamento. O commit
 continuam pendentes do escopo relatado pelo colega. A rodada corrigida
 preserva CSVs e tabelas, e essa pendência deve permanecer visível no
 acompanhamento da issue.
+
+A preparação posterior da integração está em `docs/INTEGRACAO_PR_19.md`.
+A instrução de fechamento está em uma mensagem histórica de commit;
+preservando esse histórico, o merge previsto deve ser por squash com
+mensagem final revisada para manter a #18 pendente. Editar apenas o texto
+do PR não neutraliza a mensagem do commit histórico.
 
 Os resultados de exemplo de 17/11 foram preservados como histórico. As
 evidências atualizadas, fontes, patches e comandos estão nas pastas

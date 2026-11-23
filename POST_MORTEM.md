@@ -1324,3 +1324,57 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   git ls-remote falhou com `Could not resolve hostname github.com`.
   O commit local pode ser consolidado. Envio, Actions e atualização da
   branch remota do PR continuam pendentes de uma conexão funcional.
+
+### Publicação confirmada pelo usuário e aumentos de I/O contra a main
+
+- O usuário executou o script de publicação. A saída informa as branches
+  `fix/pr19-slot-prefetch` e `fix/auditoria-p01-p15` em `a6b3d48`, PR #19
+  aberto contra main e três execuções Actions aprovadas: 45084486986,
+  45085068095 e 45085073054. São informações fornecidas pelo usuário;
+  não houve nova confirmação pela API neste ambiente. Main não foi alterada.
+- Diante da dúvida sobre os aumentos do relatório, repetida localmente a
+  comparação main `4091762` → `a6b3d48`, com driver comum io-rapido-v2:
+  168 cenários, 29 alertas (12 sort-merge, 2 hash, 8 BNL, 7 seleções), quatro
+  reduções. Ambos os motores conferidos com tuplas SQLite, sem ausências
+  ou divergências. Maior aumento de escritas: dois blocos por cenário.
+- Os maiores aumentos são de leituras de seleções: CPF/hash secundário
+  116→195 LRU e 119→195 MRU; DRE/B+ primária 102→202 MRU. Neste último,
+  leituras de índice 1→98 e demais 101→104. O orçamento de M=2 passou a
+  incluir índice e dados (172), perdendo o cache adicional de índices da
+  main. O aumento é real no modelo de transferências; não é mera mudança
+  de apresentação de contadores. Custos de auxiliares em M explicam os
+  grupos menores, já documentados em docs/IO.md (173).
+- O controle anterior sem mudanças de I/O partia de `b1c0de5`, não da main;
+  por isso não contradiz este resultado. Actions verde não exige ausência
+  de aumentos: esses são alertas para investigação, conforme o protocolo.
+- Evidências novas em `evidencias/PR-19/2026-11-22-io-main/`, incluindo
+  decomposição por leituras de índice e registros da publicação informada.
+  O merge temporário `85069ed` do relatório não está disponível localmente;
+  a reprodução usa o HEAD do PR. Não houve alteração de implementação,
+  commit, push ou merge nesta investigação.
+
+### Consolidação dos registros e preparação da integração
+
+- O usuário autorizou consolidar as evidências de I/O, ajustar o fechamento
+  da #18, enviar a atualização e acompanhar o CI, sem merge na main.
+- A referência de fechamento da #18 está na mensagem histórica de
+  `dc1b1ea`, não apenas em um arquivo ou descrição editável. Novo commit
+  não apaga esse efeito. A documentação oficial do GitHub confirma o
+  fechamento ao integrar o commit na branch padrão.
+- Preservado o histórico publicado. Registrada em
+  `docs/INTEGRACAO_PR_19.md` a integração futura por squash com mensagem
+  explícita revisada, sem instrução de fechamento da #18 e sem copiar a
+  mensagem automática dos commits. O merge continua sem autorização.
+- A consulta remota falhou por conectividade com api.github.com. Preparado
+  script para publicar os registros, revisar a descrição existente sem
+  fechamento da #18, explicitar o squash e acompanhar o Actions. A edição
+  remota e o CI da atualização dependem de conexão funcional; não são
+  declarados concluídos pela preparação local.
+- Na retomada em 23/11, a revisão do helper apontou dois defeitos: risco
+  de sobrescrever descrição editada durante a espera do CI e tratamento
+  incompleto de múltiplas issues na mesma instrução. Corrigidos no script;
+  sete casos de referências e seis fluxos simulados aprovados, incluindo
+  edição concorrente, falha do CI e divergência. Sintaxe Bash aprovada.
+  As assinaturas dos CSVs de resultados foram conferidas contra os
+  metadados. Esta etapa altera documentação/evidências; não exigiu nova
+  execução do motor C++ já validado no HEAD funcional publicado.

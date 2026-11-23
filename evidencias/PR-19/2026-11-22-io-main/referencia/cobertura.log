@@ -1,0 +1,2 @@
+/home/carlos/.pyenv/versions/3.11.14/bin/python3 -I /home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tools/validar_smoke_ci.py /tmp/cbd-pr19-io-main-i094l1u3/referencia/smoke
+Smoke: cobertura mínima completa; 168 execuções com dumps presentes

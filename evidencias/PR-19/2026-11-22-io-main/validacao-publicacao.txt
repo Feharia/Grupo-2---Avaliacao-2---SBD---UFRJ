@@ -1,0 +1,12 @@
+Retomada em 23/11/2026.
+Sintaxe: bash -n /tmp/atualizar-registros-pr19.sh: aprovada.
+Referências: 7 casos aprovados (listas ambíguas nas duas ordens recusadas; instruções separadas preservadas; referência qualificada; #180 intacta; URL; reexecução idempotente).
+Simulações: success, ci_failure, diverged, closed_issue, ambiguous, concurrent: aprovadas.
+Em concorrência detectada: duas branches enviadas no mock, nenhum PATCH.
+Em falha do CI: um push no mock, nenhum PATCH.
+Em divergência, issue fechada e descrição ambígua: nenhum push nem PATCH.
+Mocks não executaram operações de rede.
+Fontes do motor candidato correspondem às assinaturas da medição a6b3d48.
+CSV de ambos os motores corresponde ao SHA256 do respectivo medicao.json.
+168 cenários, 29 alertas conferidos.
+API: nova tentativa falhou com error connecting to api.github.com.
