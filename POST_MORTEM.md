@@ -1491,3 +1491,30 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   Make/shim: build, suítes e teste CLI aprovados. ASan/UBSan, comparação de
   I/O e rodada integral do SHA final ainda serão executados em cópia limpa.
 - Evidências em `evidencias/CONGELAMENTO/2026-11-23-correcoes/`.
+
+### Aceitação do candidato em cópia limpa — 23/11
+
+- Commit de implementação `8569e0e9f1894b6c647bf72888b4e5c0e9c1de9c`,
+  em `fix/congelamento-programa`, com as correções de ocupação e manutenção.
+  Criado worktree separado, limpo antes/depois da aceitação, com builds
+  Release e ASan/UBSan do zero, GoogleTest real obrigatório.
+- 114 casos C++ aprovados em cada build; 69 Python aprovados. ASan/UBSan:
+  54,10 s, `detect_leaks=0` (LSan segue fora da validação).
+- Comparação contra a base integrada a59f333: 168 cenários v2 pareados,
+  zero alterações de leituras, escritas e flush. Os dois lados passaram
+  cobertura e comparação de multiconjuntos com SQLite na escala reduzida.
+- Integral: escala 1, LRU/MRU, M=32/2, lote 1000, 3..10 repetições,
+  seed 20261122. Foram 691 linhas medidas em 168 combinações, sem ausências
+  ou divergências de contagem/checksum com SQLite; matriz aprovada com
+  108 células executadas, 12 não aplicáveis e nenhuma inviável/ausente,
+  portes conferidos em 476 execuções de junção. Duração: 82,45 s.
+- E/S convergiu em todos os grupos. Onze atingiram o teto apenas por
+  variação temporal, corretamente declarada no CSV. Sem flush final não
+  zero, erro de manutenção ou nova falha de tuplas.
+- Resultados em `evidencias/CONGELAMENTO/2026-11-23-aceitacao/`, com logs,
+  CSVs, metadados, ambiente, fontes e hashes dos binários. A integral não
+  gerou dumps de tuplas completos; estes foram comparados na reduzida.
+- O programa desse commit satisfaz os critérios locais do plano para um
+  candidato congelável. Os registros de aceitação serão consolidados sem
+  mudar a árvore da implementação. A publicação/integração remota dessas
+  correções e seu CI ainda não foram executados neste ambiente sem rede.

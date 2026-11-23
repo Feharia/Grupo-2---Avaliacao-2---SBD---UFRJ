@@ -1,0 +1,3 @@
+["/home/carlos/.pyenv/versions/3.11.14/bin/python3", "-I", "/tmp/cbd-freeze-validacao-10reharx/candidate/PrototipoIA/Implementacao/tools/verificar_matriz.py", "/tmp/cbd-freeze-validacao-10reharx/full"]
+matriz obrigatória: 60 células por política, LRU, MRU; 108 executadas, 12 não aplicáveis, 0 inviáveis, 0 ausentes; porte conferido em 476 execuções de junção
+matriz: aprovada (0 falhas)

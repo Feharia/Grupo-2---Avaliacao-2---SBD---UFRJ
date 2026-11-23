@@ -64,7 +64,7 @@ Todos os caminhos acima são relativos a `PrototipoIA/Implementacao/`.
 - [x] Executar os casos contra a base para mostrar a ausência/subcontagem da métrica exigida.
 - [x] Expor e exportar os valores distintos, preservando os componentes de dados/overflow/índice. Consultar metadados já mantidos pelo gerenciador, sem varredura de dados dentro das operações medidas.
 - [x] Preservar `TableStats.b`, os custos dos operadores e os contadores de leituras/escritas. O número de blocos que um operador percorre não deve virar o comprimento reservado do arquivo.
-- [ ] Reexecutar a suíte e o comparador de I/O contra o pai. A expectativa para os contadores de consultas é nenhuma mudança; investigar qualquer diferença.
+- [x] Reexecutar a suíte e o comparador de I/O contra o pai. A expectativa para os contadores de consultas é nenhuma mudança; investigar qualquer diferença.
 
 **Aceite:** no caso reproduzido de Curso há 8 usados + 1 livre reservado = 9 totais; em Disciplina, 13 + 4 = 17. A API/CSV distinguem essas quantidades também nas demais organizações.
 
@@ -85,14 +85,14 @@ Todos os caminhos acima são relativos a `PrototipoIA/Implementacao/`.
 
 **Arquivos:** testes/CLI/scripts existentes; nenhuma implementação nova se a aceitação passar.
 
-- [ ] Criar checkout limpo do SHA final autorizado e compilar pelo CMake oficial com GoogleTest obrigatório, em Linux/WSL2.
-- [ ] Executar CTest Release, ASan/UBSan, testes Python com o binário habilitado e os casos dirigidos das tarefas 2/3. A suíte cresce a partir dos 107 C++ e 63 Python atuais.
-- [ ] Executar smoke com tuplas completas e SQLite, cobertura do smoke e testes negativos existentes.
-- [ ] Executar bancada integral em saída nova: escala 1, LRU/MRU, M=32/2, seed conhecida, pelo menos três repetições. Rodar `reference.py`, `compare.py` e `verificar_matriz.py`; conferir seleções em torno de 1%/50%, presença das 168 combinações e portes reais.
-- [ ] Exigir ausência de divergência/combinação obrigatória ausente, de inviabilidade obrigatória não resolvida e de falha de manutenção. O verificador atual pode emitir aviso para inviabilidade; aviso não equivale a aprovação do congelamento.
-- [ ] Avaliar estabilidade de leituras/escritas. Casos encerrados pelo teto só por ruído de tempo não justificam alteração arbitrária do motor; a contagem e o motivo precisam estar corretos.
-- [ ] Conferir comparação de I/O válida e explicar cada novo aumento. Preservar os aumentos já aceitos da mudança do contrato de M, sem ajustar fórmulas artificialmente.
-- [ ] Se a aceitação passar, fixar o SHA de entrega e restringir mudanças posteriores a correções reproduzidas, com revalidação proporcional. Tag/release e alterações remotas somente se autorizadas.
+- [x] Criar checkout limpo do SHA final autorizado e compilar pelo CMake oficial com GoogleTest obrigatório, em Linux/WSL2.
+- [x] Executar CTest Release, ASan/UBSan, testes Python com o binário habilitado e os casos dirigidos das tarefas 2/3. A suíte cresce a partir dos 107 C++ e 63 Python atuais.
+- [x] Executar smoke com tuplas completas e SQLite, cobertura do smoke e testes negativos existentes.
+- [x] Executar bancada integral em saída nova: escala 1, LRU/MRU, M=32/2, seed conhecida, pelo menos três repetições. Rodar `reference.py`, `compare.py` e `verificar_matriz.py`; conferir seleções em torno de 1%/50%, presença das 168 combinações e portes reais.
+- [x] Exigir ausência de divergência/combinação obrigatória ausente, de inviabilidade obrigatória não resolvida e de falha de manutenção. O verificador atual pode emitir aviso para inviabilidade; aviso não equivale a aprovação do congelamento.
+- [x] Avaliar estabilidade de leituras/escritas. Casos encerrados pelo teto só por ruído de tempo não justificam alteração arbitrária do motor; a contagem e o motivo precisam estar corretos.
+- [x] Conferir comparação de I/O válida e explicar cada novo aumento. Preservar os aumentos já aceitos da mudança do contrato de M, sem ajustar fórmulas artificialmente.
+- [x] Se a aceitação passar, fixar o SHA de entrega e restringir mudanças posteriores a correções reproduzidas, com revalidação proporcional. Tag/release e alterações remotas somente se autorizadas.
 
 **Aceite:** a versão identificada compila do zero, executa o obrigatório, produz resultados corretos e indicadores coerentes e não oculta falhas como sucesso.
 
@@ -112,3 +112,13 @@ Recomendação: integrar a base revisada, começar pela tarefa 2 e, em seguida,
 fechar a tarefa 3. As duas são independentes de relatório/documentação.
 A tarefa 4 é o critério de término: se passar, congelar, sem abrir uma
 sequência indefinida de melhorias.
+
+## Execução local concluída — 23/11/2026
+
+Implementação aceita em `8569e0e`: 114 C++ Release/ASan e 69 Python,
+168 cenários sem deltas de I/O, 691 execuções integrais sem divergências,
+matriz com zero ausências/inviabilidades. Onze tetos só por tempo.
+Evidências em `evidencias/CONGELAMENTO/2026-11-23-aceitacao/`.
+A publicação e integração remota do candidato ainda dependem do terminal
+com acesso ao GitHub; não houve tag/release. O código pode ser congelado
+nessa versão; os registros seguintes não mudam a implementação aceita.
