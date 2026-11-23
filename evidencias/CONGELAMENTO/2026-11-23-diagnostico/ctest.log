@@ -1,0 +1,10 @@
+Internal ctest changing into directory: /tmp/cbd-pr19-slot-prefetch-release
+Test project /tmp/cbd-pr19-slot-prefetch-release
+    Start 1: testes
+1/2 Test #1: testes ...........................   Passed    1.79 sec
+    Start 2: testes_memoria
+2/2 Test #2: testes_memoria ...................   Passed    1.22 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   3.01 sec

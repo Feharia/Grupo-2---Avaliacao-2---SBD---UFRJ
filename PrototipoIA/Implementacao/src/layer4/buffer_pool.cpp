@@ -119,6 +119,7 @@ FileId BufferPool::create(const std::string& name, FileKind k) { return files_.c
 FileId BufferPool::open(const std::string& name, FileKind k) { return files_.open(name, k); }
 std::uint32_t BufferPool::header_blocks(FileId f) const { return files_.header_blocks(f); }
 std::uint32_t BufferPool::file_blocks(FileId f) const { return files_.blocks(f); }
+std::uint32_t BufferPool::file_free_blocks(FileId f) const { return files_.free_blocks(f); }
 FileKind BufferPool::file_kind(FileId f) const { return files_.kind(f); }
 
 FrameId BufferPool::obtain_frame(Region& r) {

@@ -1,0 +1,27 @@
+{
+  "fonte": "Arquivos reais preservados pelo helper executado pelo usuário.",
+  "candidate_enviado": "4339845c74815bf51a29fe85425d68af30095c42",
+  "registros": [
+    {
+      "arquivo": "pull-before.json",
+      "state": "open",
+      "head_sha": "a6b3d48dd913e12f6aa1623954edd34ed13031ae",
+      "head_ref": "fix/auditoria-p01-p15",
+      "base_ref": "main",
+      "updated_at": "2026-11-22T23:46:48Z",
+      "body_sha256": "3b86ff73447454e03935cc0516c962a175341220f5273a0e568279b748a4d3e2",
+      "title_sha256": "63e5330613c06ed847f293e5e7a8fe890e6dcfa2b22f5ce21bdaa957447055e2"
+    },
+    {
+      "arquivo": "pull-before-patch.json",
+      "state": "open",
+      "head_sha": "a6b3d48dd913e12f6aa1623954edd34ed13031ae",
+      "head_ref": "fix/auditoria-p01-p15",
+      "base_ref": "main",
+      "updated_at": "2026-11-22T23:46:48Z",
+      "body_sha256": "3b86ff73447454e03935cc0516c962a175341220f5273a0e568279b748a4d3e2",
+      "title_sha256": "63e5330613c06ed847f293e5e7a8fe890e6dcfa2b22f5ce21bdaa957447055e2"
+    }
+  ],
+  "limitacao": "O motivo da resposta antiga da API não foi confirmado por consulta remota independente; a continuação trata apenas o SHA anterior conhecido com espera limitada."
+}

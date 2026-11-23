@@ -1,0 +1,19 @@
+Integra as correções revisadas de armazenamento, orçamento de memória, operadores e validação da bancada.
+
+Inclui regressões de SlottedPage/prefetch, planejamento de sort-merge e BNL, matriz física e conferência com SQLite. Testes e evidências antes/depois estão preservados no repositório e nas branches da revisão.
+
+A issue #18 permanece pendente de gráficos e metadados do manifesto. As correções remanescentes para congelamento do programa serão tratadas separadamente, conforme o plano aprovado.
+
+Refs #18
+
+Closes #1
+Closes #3
+Closes #4
+Closes #5
+Closes #6
+Closes #7
+Closes #9
+Closes #14
+Closes #15
+Closes #16
+Closes #17

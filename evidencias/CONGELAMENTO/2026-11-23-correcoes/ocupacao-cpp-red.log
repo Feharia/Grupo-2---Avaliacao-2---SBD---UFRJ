@@ -1,0 +1,79 @@
+Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+Note: Google Test filter = Occupancy.*
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from Occupancy
+[ RUN      ] Occupancy.HeapDistingueArquivoVazioEPrimeiroExtent
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.HeapDistingueArquivoVazioEPrimeiroExtent (0 ms)
+[ RUN      ] Occupancy.HeapCresceSemConfundirBlocosLidosComReservados
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.HeapCresceSemConfundirBlocosLidosComReservados (0 ms)
+[ RUN      ] Occupancy.HashReconciliaOverflowLiberadoEReutilizado
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.HashReconciliaOverflowLiberadoEReutilizado (0 ms)
+[ RUN      ] Occupancy.BPlusSomaDoisArquivosIncluindoCabecalhos
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.BPlusSomaDoisArquivosIncluindoCabecalhos (0 ms)
+[ RUN      ] Occupancy.HashSecundarioIncluiAFolgaDoArquivo
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.HashSecundarioIncluiAFolgaDoArquivo (0 ms)
+[ RUN      ] Occupancy.BPlusSecundariaContaPostingELiberacao
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/test_occupancy.cpp:14: Failure
+Value of: reports_extents
+  Actual: false
+Expected: true
+[  FAILED  ] Occupancy.BPlusSecundariaContaPostingELiberacao (0 ms)
+[----------] 6 tests from Occupancy (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 6 tests, listed below:
+[  FAILED  ] Occupancy.HeapDistingueArquivoVazioEPrimeiroExtent
+[  FAILED  ] Occupancy.HeapCresceSemConfundirBlocosLidosComReservados
+[  FAILED  ] Occupancy.HashReconciliaOverflowLiberadoEReutilizado
+[  FAILED  ] Occupancy.BPlusSomaDoisArquivosIncluindoCabecalhos
+[  FAILED  ] Occupancy.HashSecundarioIncluiAFolgaDoArquivo
+[  FAILED  ] Occupancy.BPlusSecundariaContaPostingELiberacao
+
+ 6 FAILED TESTS

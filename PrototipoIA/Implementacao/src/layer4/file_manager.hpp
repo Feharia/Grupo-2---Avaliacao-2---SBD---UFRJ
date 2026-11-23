@@ -26,6 +26,7 @@ public:
     std::uint64_t flush_headers();                             // grava cabeçalhos sujos
     std::uint32_t header_blocks(FileId) const;
     std::uint32_t blocks(FileId) const;                        // inclui o cabeçalho
+    std::uint32_t free_blocks(FileId) const;                   // metadados em memória; não faz E/S
     bool          is_free(FileId, std::uint32_t) const;
     FileKind      kind(FileId) const;
     const std::string& name(FileId) const;

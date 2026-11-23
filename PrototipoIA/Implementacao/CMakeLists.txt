@@ -31,6 +31,10 @@ add_executable(bancada src/layer1/bench.cpp)
 target_link_libraries(bancada PRIVATE cbd_motor)
 target_compile_definitions(bancada PRIVATE CBD_FLAGS="${CMAKE_CXX_FLAGS} ${CMAKE_BUILD_TYPE}")
 
+# Fronteira de falha exercitada apenas pelos testes Python da CLI, sem flag de produção.
+add_executable(bancada_verify_failure tests/support/bench_verify_failure.cpp)
+target_link_libraries(bancada_verify_failure PRIVATE cbd_motor)
+
 # Testes: GoogleTest se estiver instalado; senão, o shim tests/mini_test.hpp (mesma sintaxe).
 file(GLOB CBD_TEST_SRC CONFIGURE_DEPENDS tests/test_*.cpp)
 find_package(GTest QUIET)

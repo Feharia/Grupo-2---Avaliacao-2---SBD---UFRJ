@@ -1,0 +1,9 @@
+[ 45%] Built target cbd_motor
+[ 51%] Building CXX object CMakeFiles/bancada_verify_failure.dir/tests/support/bench_verify_failure.cpp.o
+[ 51%] Building CXX object CMakeFiles/bancada.dir/src/layer1/bench.cpp.o
+[ 54%] Linking CXX executable bancada_verify_failure
+[ 54%] Built target bancada_verify_failure
+[ 57%] Linking CXX executable bancada
+[ 84%] Built target testes
+[100%] Built target testes_memoria
+[100%] Built target bancada

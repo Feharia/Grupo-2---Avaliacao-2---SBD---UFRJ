@@ -658,16 +658,24 @@ std::string executed_access(const AccessPath& p) {   // seleção: o caminho ped
     return "?";
 }
 
-void write_occupancy(Monitor& mon, const Built& b, Csv& out, const std::string& pol, const std::string& when) {
+template<class MonitorType>
+void write_occupancy(MonitorType& mon, const Built& b, Csv& out, const std::string& pol, const std::string& when) {
     for (const auto& [name, t] : b.tables) {
         for (StructureId sid : mon.structures(t)) {
-            const Occupancy o = mon.occupancy(sid);
+            const auto o = mon.occupancy(sid);
             std::string levels;
             for (auto l : o.index_levels) levels += (levels.empty() ? "" : "|") + std::to_string(l);
-            std::uint32_t total = o.data + o.overflow + o.header + o.directory;
+            std::uint64_t total = static_cast<std::uint64_t>(o.data) + o.overflow + o.header + o.directory;
             for (auto l : o.index_levels) total += l;
-            out.row({pol, when, name, mon.structure_name(sid), std::to_string(o.data), std::to_string(o.overflow),
-                     std::to_string(o.header), std::to_string(o.directory), levels, std::to_string(total)});
+            std::vector<std::string> row{pol, when, name, mon.structure_name(sid), std::to_string(o.data),
+                std::to_string(o.overflow), std::to_string(o.header), std::to_string(o.directory), levels, std::to_string(total)};
+            if constexpr (requires { o.file_total; o.reserved_free; }) {
+                row.insert(row.end(), {std::to_string(o.file_total - o.reserved_free),
+                                       std::to_string(o.reserved_free), std::to_string(o.file_total)});
+            } else {
+                row.resize(row.size() + 3);   // biblioteca histórica do CI: métricas indisponíveis, não zero
+            }
+            out.row(row);
         }
     }
 }
@@ -814,7 +822,8 @@ int main(int argc, char** argv) {
     Csv results(out_dir / "resultados.csv");
     results.row(result_header());
     Csv occ(out_dir / "ocupacao.csv");
-    occ.row({"politica", "momento", "tabela", "estrutura", "dados", "overflow", "cabecalho", "diretorio", "niveis_indice", "total"});
+    occ.row({"politica", "momento", "tabela", "estrutura", "dados", "overflow", "cabecalho", "diretorio", "niveis_indice", "total",
+             "usados", "livres_reservados", "total_arquivo"});
     Csv stats(out_dir / "estatisticas.csv");
     stats.row({"politica", "tabela", "estrutura", "n", "r", "bfr", "b", "blocos", "altura", "blocos_internos", "folhas",
                "distintos", "buckets", "overflow", "fator_carga", "cadeia_media", "cadeia_max"});
@@ -1011,7 +1020,10 @@ int main(int argc, char** argv) {
                 mon.insert(t, mon.encode(t, row));
             }
             for (const auto& v : victims) mon.erase_key(t, 0, to_key(v, FieldType::Int32));
-            if (const auto err = mon.verify(t); !err.empty()) std::cerr << "verificação falhou em " << name << ": " << err << "\n";
+            if (const auto err = mon.verify(t); !err.empty()) {
+                std::cerr << "verificação falhou em " << name << ": " << err << "\n";
+                return 1;
+            }
         }
         mon.flush_all();
         write_occupancy(mon, built, occ, pname, "depois");

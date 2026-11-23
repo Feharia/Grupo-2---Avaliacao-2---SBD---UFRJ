@@ -1,0 +1,211 @@
+[ RODA ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+[  OK  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros (0.634335 ms)
+[ RODA ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+[  OK  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros (9.10365 ms)
+[ RODA ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+[  OK  ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada (0.259615 ms)
+[ RODA ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes
+[  OK  ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes (0.264541 ms)
+[ RODA ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo
+[  OK  ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo (0.576889 ms)
+[ RODA ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros
+[  OK  ] BPlusBulkLoadIntegration.DuasFolhasValidasPreservamOsRegistros (0.236777 ms)
+[ RODA ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes
+[  OK  ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoNosLimitesAdjacentes (1.42568 ms)
+[ RODA ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes
+[  OK  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoNosLimitesAdjacentes (12.6891 ms)
+[ RODA ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada
+[  OK  ] BPlusBulkLoadIntegration.InternosRespeitamMinimoSemCaudaSubocupada (5.57964 ms)
+[ RODA ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis
+[  OK  ] BPlusBulkLoadIntegration.InternosNaoRaizRespeitamMinimoEmTresNiveis (12.5301 ms)
+[ RODA ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo
+[  OK  ] BPlusBulkLoadIntegration.PreenchimentosExtremosRespeitamMinimo (1.45047 ms)
+[ RODA ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes
+[  OK  ] BPlusBulkLoadIntegration.RegistrosVariaveisRespeitamMinimoEmBytes (0.91019 ms)
+[ RODA ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario
+[  OK  ] BPlusBulkLoadIntegration.CargaEReorganizacaoPreservamIndiceSecundario (0.421282 ms)
+[ RODA ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas
+[  OK  ] BPlusBulkLoadIntegration.VariaveisDesiguaisRepartemMaisDeDuasFolhas (0.260988 ms)
+[ RODA ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada
+[  OK  ] BPlusBulkLoadIntegration.VariaveisNaoDeixamFolhaIntermediariaSubocupada (0.224228 ms)
+[ RODA ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados
+[  OK  ] BPlusBulkLoadIntegration.VariaveisSemParticaoValidaSaoRejeitados (0.448645 ms)
+[ RODA ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas
+[  OK  ] StorageBPlusContract.CargaPreservaLinhasEBuscasUnicas (232.958 ms)
+[ RODA ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites
+[  OK  ] StorageBPlusContract.BuscaPorFaixaRespeitaLimites (0.241059 ms)
+[ RODA ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas
+[  OK  ] StorageBPlusContract.OrganizacaoNaoUnicaPreservaDuplicatas (0.406371 ms)
+[ RODA ] Convergencia.SerieEstavelConvergeNoMinimo
+[  OK  ] Convergencia.SerieEstavelConvergeNoMinimo (0.008542 ms)
+[ RODA ] Convergencia.TempoOscilanteParaNoTeto
+[  OK  ] Convergencia.TempoOscilanteParaNoTeto (0.001757 ms)
+[ RODA ] Convergencia.EsVariavelTambemParaNoTeto
+[  OK  ] Convergencia.EsVariavelTambemParaNoTeto (0.001482 ms)
+[ RODA ] Convergencia.ConvergeDepoisDoAquecimento
+[  OK  ] Convergencia.ConvergeDepoisDoAquecimento (0.001561 ms)
+[ RODA ] Convergencia.FalhaNaPrimeiraNaoExecuta
+[  OK  ] Convergencia.FalhaNaPrimeiraNaoExecuta (0.001026 ms)
+[ RODA ] Convergencia.TetoIgualAoMinimoNaoConvergeSemCriterio
+[  OK  ] Convergencia.TetoIgualAoMinimoNaoConvergeSemCriterio (0.001453 ms)
+[ RODA ] Estimativas.BlocosDensosUsamABlocagemMedia
+[  OK  ] Estimativas.BlocosDensosUsamABlocagemMedia (0.001021 ms)
+[ RODA ] Estimativas.Bnl
+[  OK  ] Estimativas.Bnl (0.00356 ms)
+[ RODA ] Estimativas.SortMergeComUmPasseEEntradaOrdenada
+[  OK  ] Estimativas.SortMergeComUmPasseEEntradaOrdenada (0.00119 ms)
+[ RODA ] Estimativas.HashSemPartesComUmEComDoisNiveis
+[  OK  ] Estimativas.HashSemPartesComUmEComDoisNiveis (0.013514 ms)
+[ RODA ] Estimativas.SelecaoPelaBPrimaria
+[  OK  ] Estimativas.SelecaoPelaBPrimaria (0.001565 ms)
+[ RODA ] Estimativas.ClusteringSobreHash
+[  OK  ] Estimativas.ClusteringSobreHash (0.001245 ms)
+[ RODA ] Estimativas.HashesEBMaisSecundaria
+[  OK  ] Estimativas.HashesEBMaisSecundaria (0.001165 ms)
+[ RODA ] Estimativas.Varredura
+[  OK  ] Estimativas.Varredura (0.001091 ms)
+[ RODA ] Monitor.TresAlgoritmosConcordamEmTodasAsOrganizacoes
+[  OK  ] Monitor.TresAlgoritmosConcordamEmTodasAsOrganizacoes (60.5016 ms)
+[ RODA ] Monitor.PapeisTrocadosNaoMudamOChecksum
+[  OK  ] Monitor.PapeisTrocadosNaoMudamOChecksum (18.1049 ms)
+[ RODA ] Monitor.DiretorioDoBnlCabeEmM
+[  OK  ] Monitor.DiretorioDoBnlCabeEmM (532.519 ms)
+[ RODA ] Monitor.BnlRetemAsMoldurasDoDiretorio
+[  OK  ] Monitor.BnlRetemAsMoldurasDoDiretorio (0.922332 ms)
+[ RODA ] Monitor.BnlDividePaginaDensaComTresMolduras
+[  OK  ] Monitor.BnlDividePaginaDensaComTresMolduras (2.15535 ms)
+[ RODA ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia
+  [bnl] externa=169 pares=169 requisicoes=3 leituras=3 gravacoes=0
+  [bnl] externa=170 pares=170 requisicoes=3 leituras=3 gravacoes=0
+  [bnl] externa=171 pares=171 requisicoes=5 leituras=5 gravacoes=0
+[  OK  ] Monitor.BnlDiretorioExatamenteCheioNaoRevarreInternaVazia (2.68513 ms)
+[ RODA ] Monitor.EsDosTemporariosFicaDentroDaMedicao
+[  OK  ] Monitor.EsDosTemporariosFicaDentroDaMedicao (15.8926 ms)
+[ RODA ] Monitor.SequenciaManualDeEs
+[  OK  ] Monitor.SequenciaManualDeEs (0.648803 ms)
+[ RODA ] Monitor.PreparoFlushEOperacaoSeparados
+[  OK  ] Monitor.PreparoFlushEOperacaoSeparados (0.30702 ms)
+[ RODA ] Monitor.SelecaoComIndicesDentroDeM
+[  OK  ] Monitor.SelecaoComIndicesDentroDeM (11.9315 ms)
+[ RODA ] Monitor.MruLeMenosQueLruNoBnlComVariasPassadas
+[  OK  ] Monitor.MruLeMenosQueLruNoBnlComVariasPassadas (27.9071 ms)
+[ RODA ] Monitor.SemCacheOcultoEntreAreasDeTrabalho
+[  OK  ] Monitor.SemCacheOcultoEntreAreasDeTrabalho (25.9764 ms)
+[ RODA ] Monitor.InaplicaveisDevolvemMotivo
+[  OK  ] Monitor.InaplicaveisDevolvemMotivo (11.724 ms)
+[ RODA ] Monitor.HashJoinRecursivoComMPequeno
+[  OK  ] Monitor.HashJoinRecursivoComMPequeno (16.1911 ms)
+[ RODA ] Monitor.HashJoinBailoutEmGrupoIndivisivel
+[  OK  ] Monitor.HashJoinBailoutEmGrupoIndivisivel (278.781 ms)
+[ RODA ] Monitor.SelecoesConcordamEntreCaminhos
+[  OK  ] Monitor.SelecoesConcordamEntreCaminhos (13.1293 ms)
+[ RODA ] Monitor.GrupoDeDuplicatasQueNaoCabeViraInaplicavel
+[  OK  ] Monitor.GrupoDeDuplicatasQueNaoCabeViraInaplicavel (13.8061 ms)
+[ RODA ] Monitor.SortMergeComVarCharCurtoIndependeDoMaximoDeclarado
+[  OK  ] Monitor.SortMergeComVarCharCurtoIndependeDoMaximoDeclarado (18.4608 ms)
+[ RODA ] Monitor.SortMergeVarCharAposManutencao
+[  OK  ] Monitor.SortMergeVarCharAposManutencao (13.4017 ms)
+[ RODA ] Monitor.SortMergeCapacidadeZeroViraInviavelNoPlano
+[  OK  ] Monitor.SortMergeCapacidadeZeroViraInviavelNoPlano (0.241937 ms)
+[ RODA ] Monitor.SortMergeRejeitaUniqueViolado
+[  OK  ] Monitor.SortMergeRejeitaUniqueViolado (0.680514 ms)
+[ RODA ] Monitor.HashPreParticionadoIncompativelUsaSoOMaior
+[  OK  ] Monitor.HashPreParticionadoIncompativelUsaSoOMaior (20.2172 ms)
+[ RODA ] Monitor.SortMergeAproveitaEntradaOrdenada
+[  OK  ] Monitor.SortMergeAproveitaEntradaOrdenada (22.1488 ms)
+[ RODA ] Monitor.SortMergeClusteringHashContaIndiceEDados
+[  OK  ] Monitor.SortMergeClusteringHashContaIndiceEDados (0.571389 ms)
+[ RODA ] Monitor.SortMergeDistingueClusteringHashDeClusteringBPlus
+[  OK  ] Monitor.SortMergeDistingueClusteringHashDeClusteringBPlus (4.39114 ms)
+[ RODA ] Monitor.TabelaMenorCabeNumaPassada
+[  OK  ] Monitor.TabelaMenorCabeNumaPassada (14.4504 ms)
+[ RODA ] SlottedPage.SlotsNaoSaoRenumerados
+[  OK  ] SlottedPage.SlotsNaoSaoRenumerados (0.010378 ms)
+[ RODA ] SlottedPage.RejeitaSlotNaRegiaoLivre
+[  OK  ] SlottedPage.RejeitaSlotNaRegiaoLivre (0.033689 ms)
+[ RODA ] SlottedPage.PaginaMalformadaFalhaSemAcessoInvalido
+[  OK  ] SlottedPage.PaginaMalformadaFalhaSemAcessoInvalido (0.17223 ms)
+[ RODA ] SlottedPage.CasosLimiteContinuamValidos
+[  OK  ] SlottedPage.CasosLimiteContinuamValidos (0.056458 ms)
+[ RODA ] Record.NuloVarCharEVerificacaoSempreLigada
+[  OK  ] Record.NuloVarCharEVerificacaoSempreLigada (0.019331 ms)
+[ RODA ] StorageManager.BPlusUnicaContraOraculo
+[  OK  ] StorageManager.BPlusUnicaContraOraculo (34.6465 ms)
+[ RODA ] StorageManager.BPlusNaoUnicaComDuplicatas
+[  OK  ] StorageManager.BPlusNaoUnicaComDuplicatas (19.4607 ms)
+[ RODA ] StorageManager.HashRejeitaDuplicataSoNoUnique
+[  OK  ] StorageManager.HashRejeitaDuplicataSoNoUnique (0.303973 ms)
+[ RODA ] StorageManager.OverflowDoHashESeguidoELiberado
+[  OK  ] StorageManager.OverflowDoHashESeguidoELiberado (0.808213 ms)
+[ RODA ] StorageManager.RidsEstaveisComDivisoesEReorganize
+[  OK  ] StorageManager.RidsEstaveisComDivisoesEReorganize (57.3518 ms)
+[ RODA ] StorageManager.HeapNaoLiberaBlocosForaDoReorganize
+[  OK  ] StorageManager.HeapNaoLiberaBlocosForaDoReorganize (0.383352 ms)
+[ RODA ] StorageManager.EstatisticasSemEntradaESaida
+[  OK  ] StorageManager.EstatisticasSemEntradaESaida (0.354573 ms)
+[ RODA ] StorageManager.ValidaCriacaoDeIndices
+[  OK  ] StorageManager.ValidaCriacaoDeIndices (0.252363 ms)
+[ RODA ] TempFile.SealGravaKBlocosEReleituraLeK
+[  OK  ] TempFile.SealGravaKBlocosEReleituraLeK (0.221787 ms)
+[ RODA ] ScratchSpace.OrdenaEMontaHash
+[  OK  ] ScratchSpace.OrdenaEMontaHash (0.195554 ms)
+[ RODA ] ScratchSpace.DiretorioCabeNasPaginasDaReserva
+[  OK  ] ScratchSpace.DiretorioCabeNasPaginasDaReserva (0.279127 ms)
+[ RODA ] ScratchSpace.OrdenarRidsNaoAlocaFora
+[  OK  ] ScratchSpace.OrdenarRidsNaoAlocaFora (0.119688 ms)
+[ RODA ] StorageManager.IndicesDentroDaReserva
+[  OK  ] StorageManager.IndicesDentroDaReserva (24.6059 ms)
+[ RODA ] StorageManager.ClusteringSobreHashComColisoesContraOraculo
+[  OK  ] StorageManager.ClusteringSobreHashComColisoesContraOraculo (12.9262 ms)
+[ RODA ] StorageManager.ClusteringSobreHashEBPlus
+[  OK  ] StorageManager.ClusteringSobreHashEBPlus (9.44567 ms)
+[ RODA ] FileManager.CriaAbreEConfereCabecalho
+[  OK  ] FileManager.CriaAbreEConfereCabecalho (0.184095 ms)
+[ RODA ] FileManager.BlockSizeDiferenteNaAberturaLanca
+[  OK  ] FileManager.BlockSizeDiferenteNaAberturaLanca (0.102342 ms)
+[ RODA ] FileManager.CabecalhoTruncadoLancaEmVezDeTravar
+[  OK  ] FileManager.CabecalhoTruncadoLancaEmVezDeTravar (0.111922 ms)
+[ RODA ] FileManager.ClassificaSequencialEAleatorio
+[  OK  ] FileManager.ClassificaSequencialEAleatorio (0.09557 ms)
+[ RODA ] BufferPool.AcertosFaltasEAlocacoes
+[  OK  ] BufferPool.AcertosFaltasEAlocacoes (0.121657 ms)
+[ RODA ] BufferPool.SubpoolNaoPassaDeM
+[  OK  ] BufferPool.SubpoolNaoPassaDeM (0.1184 ms)
+[ RODA ] BufferPool.LruEMruEscolhemVitimasDiferentes
+[  OK  ] BufferPool.LruEMruEscolhemVitimasDiferentes (0.227941 ms)
+[ RODA ] BufferPool.TossImmediateViraProximaVitima
+[  OK  ] BufferPool.TossImmediateViraProximaVitima (0.11419 ms)
+[ RODA ] BufferPool.FreeBlockDePaginaFixadaLanca
+[  OK  ] BufferPool.FreeBlockDePaginaFixadaLanca (0.104451 ms)
+[ RODA ] BufferPool.FetchDeBlocoLivreLanca
+[  OK  ] BufferPool.FetchDeBlocoLivreLanca (0.158202 ms)
+[ RODA ] BufferPool.FlushAllContaEDepoisZera
+[  OK  ] BufferPool.FlushAllContaEDepoisZera (0.096562 ms)
+[ RODA ] BufferPool.InvalidateAllComCatalogoFixado
+[  OK  ] BufferPool.InvalidateAllComCatalogoFixado (0.138779 ms)
+[ RODA ] BufferPool.ReservaLiberadaLancaLogicError
+[  OK  ] BufferPool.ReservaLiberadaLancaLogicError (0.10117 ms)
+[ RODA ] BufferPool.PedidoSemReservaEmDadosEContado
+[  OK  ] BufferPool.PedidoSemReservaEmDadosEContado (0.152586 ms)
+[ RODA ] BufferPool.MigracaoParaOSubpoolContaComoAcerto
+[  OK  ] BufferPool.MigracaoParaOSubpoolContaComoAcerto (0.100665 ms)
+[ RODA ] BufferPool.PrefetchIgnoraBlocosLivres
+[  OK  ] BufferPool.PrefetchIgnoraBlocosLivres (0.156845 ms)
+[ RODA ] BufferPool.PrefetchLeAteOFimDoExtent
+[  OK  ] BufferPool.PrefetchLeAteOFimDoExtent (0.13189 ms)
+[ RODA ] StorageManager.ManutencaoVariavelPreservaConteudoNosCaminhos
+[  OK  ] StorageManager.ManutencaoVariavelPreservaConteudoNosCaminhos (18.891 ms)
+[ RODA ] Occupancy.HeapDistingueArquivoVazioEPrimeiroExtent
+[  OK  ] Occupancy.HeapDistingueArquivoVazioEPrimeiroExtent (0.082715 ms)
+[ RODA ] Occupancy.HeapCresceSemConfundirBlocosLidosComReservados
+[  OK  ] Occupancy.HeapCresceSemConfundirBlocosLidosComReservados (0.096376 ms)
+[ RODA ] Occupancy.HashReconciliaOverflowLiberadoEReutilizado
+[  OK  ] Occupancy.HashReconciliaOverflowLiberadoEReutilizado (0.080527 ms)
+[ RODA ] Occupancy.BPlusSomaDoisArquivosIncluindoCabecalhos
+[  OK  ] Occupancy.BPlusSomaDoisArquivosIncluindoCabecalhos (0.138111 ms)
+[ RODA ] Occupancy.HashSecundarioIncluiAFolgaDoArquivo
+[  OK  ] Occupancy.HashSecundarioIncluiAFolgaDoArquivo (0.070581 ms)
+[ RODA ] Occupancy.BPlusSecundariaContaPostingELiberacao
+[  OK  ] Occupancy.BPlusSecundariaContaPostingELiberacao (0.187165 ms)
+
+103 testes, 0 com falha

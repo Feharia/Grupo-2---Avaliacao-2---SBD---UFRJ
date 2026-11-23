@@ -1,0 +1,30 @@
+{
+  "command": [
+    "/tmp/cbd-pr19-slot-prefetch-release/bancada",
+    "--rapido",
+    "--so",
+    "j_pequenas",
+    "--saida",
+    "/tmp/cbd-congelamento-assessment-zsw2x2t6/smoke"
+  ],
+  "results": [
+    {
+      "tabela": "curso_heap_sem_indices",
+      "csv_total": 8,
+      "cabecalho_total": 9,
+      "usados_bitmap": 8,
+      "livres_reservados": 1,
+      "bytes_logicos": 36864,
+      "arquivo": "/tmp/cbd-congelamento-assessment-zsw2x2t6/smoke/motor_LRU/curso_heap_sem_indices_1.heap"
+    },
+    {
+      "tabela": "disciplina_heap_sem_indices",
+      "csv_total": 13,
+      "cabecalho_total": 17,
+      "usados_bitmap": 13,
+      "livres_reservados": 4,
+      "bytes_logicos": 69632,
+      "arquivo": "/tmp/cbd-congelamento-assessment-zsw2x2t6/smoke/motor_LRU/disciplina_heap_sem_indices_2.heap"
+    }
+  ]
+}

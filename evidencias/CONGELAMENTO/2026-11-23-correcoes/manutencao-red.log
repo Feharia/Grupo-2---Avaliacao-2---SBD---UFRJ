@@ -1,0 +1,25 @@
+test_falha_de_verificacao_reprova_a_bancada (test_maintenance.MaintenanceFailureTest.test_falha_de_verificacao_reprova_a_bancada) ... FAIL
+
+======================================================================
+FAIL: test_falha_de_verificacao_reprova_a_bancada (test_maintenance.MaintenanceFailureTest.test_falha_de_verificacao_reprova_a_bancada)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_maintenance.py", line 21, in test_falha_de_verificacao_reprova_a_bancada
+    self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+AssertionError: 0 == 0 : gerando a base (escala 0.1)...
+[LRU] construindo as tabelas...
+[LRU] j_pequenas
+[LRU] carga de manutenção...
+pronto em 0.2 s. Resultados em "/tmp/tmpa4e7hd9c/saida"
+verificação falhou em aluno_bt_curso: falha_injetada_no_verificador
+verificação falhou em aluno_bt_dre: falha_injetada_no_verificador
+verificação falhou em aluno_h_curso: falha_injetada_no_verificador
+verificação falhou em aluno_h_dre: falha_injetada_no_verificador
+verificação falhou em aluno_heap: falha_injetada_no_verificador
+verificação falhou em aluno_heap_sem_indices: falha_injetada_no_verificador
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.248s
+
+FAILED (failures=1)

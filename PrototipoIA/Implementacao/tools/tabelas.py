@@ -628,8 +628,8 @@ def t_ocupacao(b):
         d = depois.get(e)
         if not d:
             continue
-        ta, td = int(a["total"]), int(d["total"])
-        if ta == td:
+        ta, td = int(a.get("total_arquivo") or a["total"]), int(d.get("total_arquivo") or d["total"])
+        if ta == td and a["total"] == d["total"]:
             iguais += 1
             continue
         linhas.append([e, fmt_int(int(a["dados"])), fmt_int(int(d["dados"])), fmt_int(int(a["overflow"])),
@@ -637,8 +637,8 @@ def t_ocupacao(b):
         brutas.append([e, a["dados"], d["dados"], a["overflow"], d["overflow"], ta, td, erro_pct(td, ta)])
     return Tabela(
         "12_ocupacao", "Ocupação antes e depois da carga de manutenção",
-        f"Blocos por estrutura. Só as estruturas que mudaram; as outras {iguais} ficaram iguais (tabelas fora da "
-        "carga de manutenção).",
+        f"Blocos por estrutura. Total do arquivo inclui a folga reservada quando disponível; saídas históricas "
+        f"usam o total de blocos usados. Só estruturas que mudaram; as outras {iguais} ficaram iguais.",
         ["Estrutura", "Dados antes", "Dados depois", "Overflow antes", "Overflow depois", "Total antes",
          "Total depois", "Δ"], linhas, brutas,
         ["estrutura", "dados_antes", "dados_depois", "overflow_antes", "overflow_depois", "total_antes",

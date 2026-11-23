@@ -1,0 +1,616 @@
+test_csv_reconcilia_arquivo_heap_com_bitmap (test_occupancy.OccupancyCliTest.test_csv_reconcilia_arquivo_heap_com_bitmap) ... 
+  test_csv_reconcilia_arquivo_heap_com_bitmap (test_occupancy.OccupancyCliTest.test_csv_reconcilia_arquivo_heap_com_bitmap) (table='curso_heap_sem_indices') ... FAIL
+  test_csv_reconcilia_arquivo_heap_com_bitmap (test_occupancy.OccupancyCliTest.test_csv_reconcilia_arquivo_heap_com_bitmap) (table='disciplina_heap_sem_indices') ... FAIL
+test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) ... 
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_curso:btree', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_curso:sec_btree_clustering(curso)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_dre:btree', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_curso:hash', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_curso:sec_btree_clustering(curso)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_dre:hash', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_hash(cpf)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(professor_orientador)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(cr)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_hash(dre)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(curso)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap_sem_indices:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_bt_codigo:btree', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_h_codigo:hash', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap:sec_hash(codigo)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap_sem_indices:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='detalhes_heap:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_bt_curso:btree', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_h_curso:hash', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap:sec_btree(curso)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap_sem_indices:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_bt_dre:btree', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_h_dre:hash', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap:sec_btree(dre)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap_sem_indices:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='turma_heap:heap', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='turma_heap:sec_btree(professor)', phase='antes') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_curso:btree', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_curso:sec_btree_clustering(curso)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_dre:btree', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_curso:hash', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_curso:sec_btree_clustering(curso)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_dre:hash', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_hash(cpf)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(professor_orientador)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(cr)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_hash(dre)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(curso)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap_sem_indices:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_bt_codigo:btree', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_h_codigo:hash', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap:sec_hash(codigo)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap_sem_indices:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='detalhes_heap:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_bt_curso:btree', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_h_curso:hash', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap:sec_btree(curso)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap_sem_indices:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_bt_dre:btree', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_h_dre:hash', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap:sec_btree(dre)', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap_sem_indices:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='turma_heap:heap', phase='depois') ... FAIL
+  test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='turma_heap:sec_btree(professor)', phase='depois') ... FAIL
+test_csv_historico_continua_legivel (test_occupancy.OccupancyTableTest.test_csv_historico_continua_legivel) ... ok
+test_ocupacao_muda_dentro_do_mesmo_extent (test_occupancy.OccupancyTableTest.test_ocupacao_muda_dentro_do_mesmo_extent) ... FAIL
+test_total_novo_inclui_folga_do_extent (test_occupancy.OccupancyTableTest.test_total_novo_inclui_folga_do_extent) ... FAIL
+
+======================================================================
+FAIL: test_csv_reconcilia_arquivo_heap_com_bitmap (test_occupancy.OccupancyCliTest.test_csv_reconcilia_arquivo_heap_com_bitmap) (table='curso_heap_sem_indices')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 38, in test_csv_reconcilia_arquivo_heap_com_bitmap
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_csv_reconcilia_arquivo_heap_com_bitmap (test_occupancy.OccupancyCliTest.test_csv_reconcilia_arquivo_heap_com_bitmap) (table='disciplina_heap_sem_indices')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 38, in test_csv_reconcilia_arquivo_heap_com_bitmap
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_curso:btree', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_curso:sec_btree_clustering(curso)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_dre:btree', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_curso:hash', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_curso:sec_btree_clustering(curso)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_dre:hash', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_hash(cpf)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(professor_orientador)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(cr)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_hash(dre)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(curso)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap_sem_indices:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_bt_codigo:btree', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_h_codigo:hash', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap:sec_hash(codigo)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap_sem_indices:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='detalhes_heap:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_bt_curso:btree', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_h_curso:hash', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap:sec_btree(curso)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap_sem_indices:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_bt_dre:btree', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_h_dre:hash', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap:sec_btree(dre)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap_sem_indices:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='turma_heap:heap', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='turma_heap:sec_btree(professor)', phase='antes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_curso:btree', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_curso:sec_btree_clustering(curso)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_bt_dre:btree', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_curso:hash', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_curso:sec_btree_clustering(curso)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_h_dre:hash', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_hash(cpf)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(professor_orientador)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(cr)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_hash(dre)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap:sec_btree(curso)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='aluno_heap_sem_indices:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_bt_codigo:btree', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_h_codigo:hash', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap:sec_hash(codigo)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='curso_heap_sem_indices:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='detalhes_heap:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_bt_curso:btree', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_h_curso:hash', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap:sec_btree(curso)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='disciplina_heap_sem_indices:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_bt_dre:btree', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_h_dre:hash', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap:sec_btree(dre)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='inscricao_heap_sem_indices:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='turma_heap:heap', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_todas_as_estruturas_exportam_as_tres_quantidades (test_occupancy.OccupancyCliTest.test_todas_as_estruturas_exportam_as_tres_quantidades) (structure='turma_heap:sec_btree(professor)', phase='depois')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 56, in test_todas_as_estruturas_exportam_as_tres_quantidades
+    self.assertTrue({"usados", "livres_reservados", "total_arquivo"} <= row.keys())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_ocupacao_muda_dentro_do_mesmo_extent (test_occupancy.OccupancyTableTest.test_ocupacao_muda_dentro_do_mesmo_extent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 79, in test_ocupacao_muda_dentro_do_mesmo_extent
+    self.assertEqual(t.brutas[0][5:7], [9, 9])
+AssertionError: Lists differ: [2, 3] != [9, 9]
+
+First differing element 0:
+2
+9
+
+- [2, 3]
++ [9, 9]
+
+======================================================================
+FAIL: test_total_novo_inclui_folga_do_extent (test_occupancy.OccupancyTableTest.test_total_novo_inclui_folga_do_extent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/PrototipoIA/Implementacao/tests/python/test_occupancy.py", line 73, in test_total_novo_inclui_folga_do_extent
+    self.assertEqual(t.brutas[0][5:7], [9, 17])
+AssertionError: Lists differ: [2, 10] != [9, 17]
+
+First differing element 0:
+2
+9
+
+- [2, 10]
++ [9, 17]
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.282s
+
+FAILED (failures=66)
