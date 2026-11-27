@@ -6,7 +6,7 @@ corrigida e suas limitações estão nas [evidências](../../evidencias/PR-19/20
 Os números de `resultados_exemplo/` e da análise de 17/11 abaixo
 representam o snapshot anterior à correção da matriz física.
 
-Este é um protótipo funcional da arquitetura descrita em `../HANDOFF_ARQUITETURA_2026-11-08.md` (decisões 1 a 45 e 100 a 175, com as emendas de 08/11 e da auditoria de 10/11) e no diagrama `../diagrama_camadas_v5.png`. É **código bruto gerado por IA**, ainda sem revisão do grupo. O `PROMPTS.md` traz o log de prompts e as correções que a própria IA fez durante a geração.
+Este é um protótipo funcional da arquitetura descrita em `../HANDOFF_ARQUITETURA_2026-11-08.md` (decisões 1 a 45 e 100 a 175, com as emendas de 08/11 e da auditoria de 10/11) e no diagrama `../diagrama_camadas_v6.png`. É **código bruto gerado por IA**, ainda sem revisão do grupo. O `PROMPTS.md` traz o log de prompts e as correções que a própria IA fez durante a geração.
 
 Estado em 17/11/2026 (commit `49be2d4`, rodada definitiva em `resultados_exemplo/`):
 - **compila sem avisos** com `make` no Apple clang 21 (`-Wall -Wextra -Wpedantic -Wshadow`); o CI compila com GCC 13;
@@ -73,7 +73,7 @@ cmake -S . -B build-cmake && cmake --build build-cmake && ctest --test-dir build
 | 3 | `src/layer3/bplus.*` | motor B+: bulk load, divisão, redistribuição, fusão, verificação de invariantes |
 | 3 | `src/layer3/structures.*` | HeapFile, HashFile, BPlusTreeFile, HashIndex, BPlusIndex (posting lists com overflow, clustering), estados de busca |
 | 3 | `src/layer3/handles.*` | BlockScan, BlockCursor, SearchCursor, RidCursor, PinnedRecord, TempFile, ScratchSpace |
-| 3 | `src/layer3/catalog.*`, `storage_manager.*` | Catalog (página fixada), StorageManager (fachada, MoveListener → índices, reorganize) |
+| 3 | `src/layer3/catalog.*`, `storage_manager.*` | Catalog (página fixada), StorageManager (fachada, callback on_moved → índices, reorganize) |
 | 2 | `src/layer2/monitor.*` | Monitor, JoinPlan/SelectPlan com orçamento, ResultSink (checksum canônico), PhaseRecorder |
 | 2 | `src/layer2/algorithms.*` | BNL, sort-merge (runs, passes, grupo de duplicatas), partition-hash (com entrada pré-particionada, particionamento recursivo e bailout, decisão 171), seleções, estimativas |
 | 1 | `src/layer1/bench.cpp` | gerador da base, especificação padrão, constantes por quantis, lotes, repetições, CSVs, manifesto |
@@ -93,7 +93,7 @@ cmake -S . -B build-cmake && cmake --build build-cmake && ctest --test-dir build
 | `convergencia.csv` | uma linha por grupo de repetições: nº de repetições, dispersão de E/S e de tempo, se cada critério convergiu e se a parada foi por convergência ou pelo teto (P07) |
 | `caminhos.csv` | acesso realmente executado em cada entrada, por algoritmo, tirado do plano (P09) |
 | `operacoes.csv`, `constantes.csv`, `lotes/` | SQL equivalente, constantes de cada faixa (com a seletividade pedida e a efetiva) e lotes de chaves |
-| `dados/`, `esquema.csv`, `manifesto.txt` | a base gerada, o esquema e o manifesto da execução |
+| `dados/`, `esquema.csv`, `manifesto.txt` | a base gerada, o esquema e o manifesto da execução (commit, compilador, parâmetros, tamanho do bloco e configuração do buffer) |
 
 A rodada definitiva, feita com o código do commit `49be2d4` e reproduzida num clone limpo, está em `resultados_exemplo/` (sem os dados e os arquivos do motor), com as tabelas do `tabelas.py` em `resultados_exemplo/tabelas.md` e `resultados_exemplo/tabelas/`.
 

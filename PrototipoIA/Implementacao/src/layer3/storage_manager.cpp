@@ -440,7 +440,7 @@ void StorageManager::erase(TableId t, RID rid) {
         IndexRt& ix = indexes_.at(id);
         if (!ix.spec.clustering && !v.is_null(ix.spec.key)) ix.idx->remove(v.key(ix.spec.key), rid);
     }
-    pf.erase(rid);   // movimentações avisadas ao MoveListener (141)
+    pf.erase(rid);   // movimentações avisadas pelo on_moved (141)
     for (StructureId id : e.indexes) {
         IndexRt& ix = indexes_.at(id);
         if (ix.spec.clustering && !v.is_null(ix.spec.key)) {

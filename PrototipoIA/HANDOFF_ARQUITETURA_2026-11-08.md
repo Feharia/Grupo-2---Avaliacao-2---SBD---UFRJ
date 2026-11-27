@@ -58,7 +58,7 @@ Regras para quem continuar:
 - **HANDOFF_ARQUITETURA_2026-11-08.md** — este documento.
 - **revisao_interfaces_claude_cbd_2026-11-06.md** — revisão de um colega, feita sobre uma versão anterior das interfaces (provavelmente a V2). O que ainda era válido virou as decisões 157 a 169; o resto já estava resolvido aqui.
 - **ARQUITETURA_V3.md** e **ARQUITETURA_V2.md** — versões anteriores deste conteúdo, mantidas como histórico.
-- **diagrama_camadas_v5.png** e **.svg** — diagrama de entidades por camada vigente, com as decisões até a 171 e as emendas de 08/11. Versões anteriores: diagrama_camadas.png (v1), diagrama_camadas_v2.png, diagrama_camadas_v3.png e diagrama_camadas_v4.png (decisões até a 169).
+- **diagrama_camadas_v6.png** e **.svg** — diagrama de entidades por camada vigente, com as decisões até a 175, conferido com o código em 27/11/2026. Versões anteriores: diagrama_camadas.png (v1), diagrama_camadas_v2.png, diagrama_camadas_v3.png, diagrama_camadas_v4.png (decisões até a 169) e diagrama_camadas_v5.png (decisões até a 171).
 - **PrototipoIA/** — protótipo gerado por IA em 08/11 a partir deste documento (decisões até a 170): código bruto ainda não revisado, com 37 testes e conferência com o SQLite. Os desvios em relação a este documento estão no README dele, e o log de prompts está em PROMPTS.md.
 - **diagrama_camada4_posix.png** e **.svg** — a camada 4 antes e depois da troca de std::fstream por pread/pwrite.
 
@@ -177,7 +177,7 @@ Texto final, já com todas as revisões. A camada ou fronteira está entre colch
 - **130. Gerador e constantes** [1] — Um CSV por tabela, com semente; CR em int32 × 100 e textos sem preenchimento. As constantes de faixa e as linhas esperadas saem dos quantis dos CSVs e são gravadas em constantes.csv.
 - **131. Carga de manutenção** [1] — Proporção de inserções e remoções, distribuição das chaves, volume e semente.
 - **132. Repetições** [1] — A semente da amostra muda a cada repetição; o pool começa vazio; pelo menos 3 repetições, tolerância de 5%, no máximo 10. A tolerância vale para as leituras e gravações e para o tempo de relógio: fora dos lotes, as contagens são determinísticas, e o que varia é o tempo (emendada em 08/11).
-- **133. Saída** [1] — CSV longo de resultados (uma linha por experimento, configuração, operação e repetição), CSV de ocupação por estrutura antes e depois da manutenção, e manifesto da execução (commit, compilador, flags, hash da especificação).
+- **133. Saída** [1] — CSV longo de resultados (uma linha por experimento, configuração, operação e repetição), CSV de ocupação por estrutura antes e depois da manutenção, e manifesto da execução (commit, compilador, flags, escala, semente, repetições, M, lote, hash da especificação e, desde a #18, os parâmetros físicos da Config: tamanho do bloco, extent, molduras por área, prefetch e toss-immediate).
 - **134. Repasses** [transversal] — A camada 3 repassa à 2 as chamadas de controle da 4 (reserve, snapshot, flush_all, invalidate_all); a camada 2 repassa à 1 as de definição, carga, manutenção e consulta. Repasses não têm lógica.
 - **135. Tipos que atravessam camadas** [transversal] — Da camada 4 até a 2 chegam só o PageGuard (dentro de cursores e do PinnedRecord) e a Reservation, opaca (só id, capacidade e molduras fixadas). Valores sem comportamento ficam em common/.
 - **136. Subpool** [4] — A reserva separa n molduras da área de trabalho, com uma instância própria da política. Toda página pedida pela reserva vive ali.
@@ -185,7 +185,7 @@ Texto final, já com todas as revisões. A camada ou fronteira está entre colch
 - **138. Contagem de allocate** [4] — allocate soma em allocations e não em requisições; requisições = acertos + faltas.
 - **139. Selagem de temporários** [3] — seal() grava as páginas sujas do temporário, contadas como gravações comuns do tipo temp, e as retira do pool; a releitura é sempre física.
 - **140. Memória de trabalho** [3] — ScratchSpace em molduras anônimas da reserva, que nunca vão ao disco nem são contadas. Guarda registros ou RIDs (estes como chave Int64 = bloco << 16 | slot), ordena, monta hash e responde sondagens. Os diretórios internos são limitados pela capacidade.
-- **141. RID estável** [3] — Toda movimentação de registro (divisão, fusão, redistribuição, absorção de overflow) é avisada a um MoveListener, que atualiza os índices. O reorganize reconstrói os índices.
+- **141. RID estável** [3] — Toda movimentação de registro (divisão, fusão, redistribuição, absorção de overflow) é avisada ao StorageManager pelo callback on_moved, que cada PrimaryFile recebe por set_on_move, e o on_moved atualiza os índices da tabela. O reorganize reconstrói os índices. (A proposta original era uma interface MoveListener com um IndexMaintainer; o código usa o callback, e essas classes não existem.)
 - **142. Checksum canônico** [2, 1] — Campos na ordem dos operandos da consulta, cada um precedido de um byte de marca (0 = NULL, 1 = valor; decisão 158); inteiros como int64 little-endian; textos em UTF-8 sem preenchimento, com prefixo de tamanho; FNV-1a de 64 bits por tupla; soma módulo 2⁶⁴.
 - **143. Plano resolvido** [2] — JoinPlan e SelectPlan são calculados uma vez e usados igualmente pela execução e pela estimativa. O tamanho de runs e partições usa os blocos densos d = ⌈n/bfr⌉, porque elas são gravadas cheias. As estimativas usam b para ler a estrutura e d para gravar e reler runs e partições; com b em tudo, a B+ com fill 0,7 e o hash com α = 0,8 ficavam superestimados (emendada em 08/11).
 - **144. Catálogo fixado** [3, 4] — O catálogo fixa suas páginas na abertura e só as solta no fim; invalidate_all não toca na área de catálogo.
@@ -218,7 +218,7 @@ Acrescentadas depois de conferir a revisão de um colega (revisao_interfaces_cla
 - **166. Diagnóstico do checksum** [2, 1] — ResultShape ganha dump, um caminho opcional. Com ele, o ResultSink grava cada tupla codificada em hexadecimal, uma por linha, por std::ofstream, fora do buffer pool e sem afetar a contagem; reference.py e compare.py ganham a opção --tuplas, que grava as tuplas do SQLite do mesmo jeito e faz um diff ordenado. Usado só nos testes com base pequena, nunca nas medições, porque altera o tempo de relógio. Motivo: o checksum detecta a divergência mas não diz qual tupla diverge (revisão, P1-4).
 - **167. RID inválido e ordem dos bytes** [common] — kInvalidRid = {0, 0}: o bloco 0 é sempre cabeçalho, então nunca é um RID real. static_assert(std::endian::native == std::endian::little). Os formatos em disco (RID, cabeçalhos de bloco, slots e nós) são a representação do host, lidos só pelo mesmo binário; não são formato de troca. Motivo: deixar escrito o que o layout fixo supõe (revisão, P1-3).
 - **168. Liberar página fixada** [4] — free_block com o bloco fixado, ou com o bloco 0, lança logic_error. Diferente de remove_file e release (155), free_block não é chamado em destrutor e pode lançar. Motivo: o texto dizia "exige o bloco sem pin" sem dizer o que acontecia (revisão, P0-4).
-- **169. Sentido de "RID estável"** [3] — Corrige a redação da 111. O RID é estável enquanto o registro fica na mesma página, porque os slots não são renumerados (27). Quando o registro muda de página (divisão, fusão, redistribuição, absorção de overflow ou reorganize), o RID muda, e o MoveListener ou a reconstrução atualizam os índices (141). Motivo: o texto anterior dizia "estável sob qualquer movimentação", o que levaria a supor que um RID nunca muda (revisão, P0-5).
+- **169. Sentido de "RID estável"** [3] — Corrige a redação da 111. O RID é estável enquanto o registro fica na mesma página, porque os slots não são renumerados (27). Quando o registro muda de página (divisão, fusão, redistribuição, absorção de overflow ou reorganize), o RID muda, e o callback on_moved ou a reconstrução atualizam os índices (141). Motivo: o texto anterior dizia "estável sob qualquer movimentação", o que levaria a supor que um RID nunca muda (revisão, P0-5).
 
 ### Decisão 170 (08/11/2026, releitura do enunciado)
 
@@ -302,24 +302,24 @@ Origem: `PROBLEMAS_IDENTIFICADOS_CBD_2026-11-10.md` (P01 a P15), conferido contr
 
 ## 6. Camadas e interfaces
 
-O diagrama vigente é o diagrama_camadas_v5.png, com as decisões até a 171 e as emendas de 08/11. As decisões 173 a 175 não mudam as entidades; a 173 acrescenta ao ScratchSpace os métodos capacity_for, record_bytes e aux_bytes, ainda não desenhados. Em relação ao v4, ele acrescenta: os repasses encode, suggest_buckets, erase_key e access_paths; o NotApplicable, que distingue não aplicável de inviável (170); e o BPlusEngine. Em texto:
+O diagrama vigente é o diagrama_camadas_v6.png, com as decisões até a 175, conferido com o código em 27/11/2026. As decisões 173 a 175 não mudam as entidades; a 173 acrescenta ao ScratchSpace os métodos capacity_for, record_bytes e aux_bytes, que o diagrama não detalha. Em relação ao v5, o v6 corrige o que divergia do código: a manutenção dos índices é o callback on_moved do StorageManager, e não as classes MoveListener e IndexMaintainer, que não existem; a camada 3 não chama open nem header_blocks, internos à camada 4, e chama block_size, file_blocks e file_free_blocks para a ocupação; a camada 2 chama também hold_frames, stats e block_size e recebe PageGuard; a camada 1 chama também plan_join, verify, schema, structures e structure_name. O v6 mostra ainda as funções de seleção, os scripts verificar_matriz.py e tabelas.py, o ftruncate_to e a Config padrão, que o manifesto grava (#18). O v5 tinha acrescentado ao v4: os repasses encode, suggest_buckets, erase_key e access_paths; o NotApplicable, que distingue não aplicável de inviável (170); e o BPlusEngine. Em texto:
 
-**Camada 1 — Bancada de teste.** Funções do roteiro (main, geração de dados, constantes, lotes, manifesto, execução) e os scripts tools/reference.py e tools/compare.py.
-- Chama a camada 2: as primitivas medidas (join, select_points, select_range), que devolvem OpResult ou NotApplicable, e os repasses (definição, carga, manutenção, stats, occupancy, access_paths, encode, suggest_buckets, erase_key, flush_all, invalidate_all).
+**Camada 1 — Bancada de teste.** Funções do roteiro em src/layer1/bench.cpp (main, geração de dados, constantes, lotes, manifesto, execução) e os scripts tools/reference.py (referência no SQLite), tools/compare.py, tools/verificar_matriz.py e tools/tabelas.py.
+- Chama a camada 2: as primitivas medidas (join, select_points, select_range), que devolvem OpResult ou NotApplicable; plan_join, que só planeja, sem E/S; e os repasses sem medição (create_table, create_index, bulk_load, insert, erase_key, verify, schema, stats, structures, structure_name, access_paths, occupancy, encode, suggest_buckets, flush_all, invalidate_all).
 - Tipos da interface 1 → 2, no cabeçalho público da camada 2: JoinInput, ResultShape, JoinParams e SelectParams.
 
 **Camada 2 — Mini monitor de execução.** Monitor (serviço), JoinPlan e SelectPlan (planos), ResultSink, PhaseRecorder, funções dos algoritmos e das estimativas.
-- Chama a camada 3 para acesso (scan_blocks, scan_buckets, bucket_of, find, probe, fetch, schema, create_temp, create_scratch, create_rid_scratch, hold_frames) e para controle, por repasse da camada 4 (reserve, snapshot, flush_all, invalidate_all).
-- Recebe BlockScan, SearchCursor, RidCursor, PinnedRecord, TempFile, ScratchSpace e a Reservation, opaca.
+- Chama a camada 3 para acesso (scan_blocks, scan_buckets, bucket_of, find, probe, fetch, schema, stats, create_temp, create_scratch, create_rid_scratch, hold_frames), repassa a ela a definição, a carga e a manutenção pedidas pela camada 1 e, para controle, chama os repasses da camada 4 (reserve, snapshot, block_size, flush_all, invalidate_all).
+- Recebe BlockScan, SearchCursor, RidCursor, PinnedRecord, TempFile, ScratchSpace, os PageGuard do hold_frames e a Reservation, opaca.
 
-**Camada 3 — Gerente de armazenamento.** StorageManager (fachada), cursores (BlockScan, BlockCursor, SearchCursor, RidCursor), RecordView, PinnedRecord, TempFile, ScratchSpace e, por dentro, Catalog, PrimaryFile (HeapFile, BPlusTreeFile, HashFile), SecondaryIndex, MoveListener (IndexMaintainer) e BPlusEngine, o motor B+ comum à B+ primária e aos índices B+ secundários.
-- Chama a camada 4 para acesso (create, open, fetch, allocate, scratch, free_block, flush_file, remove_file, header_blocks) e controle (reserve, snapshot, flush_all, invalidate_all).
+**Camada 3 — Gerente de armazenamento.** StorageManager (fachada), cursores (BlockScan, BlockCursor, SearchCursor, RidCursor), RecordView, PinnedRecord, TempFile, ScratchSpace e, por dentro, Catalog, PrimaryFile (HeapFile, BPlusTreeFile, HashFile), SecondaryIndex e BPlusEngine, o motor B+ comum à B+ primária e aos índices B+ secundários. Cada PrimaryFile avisa, pelo callback registrado com set_on_move, o registro que muda de RID; o StorageManager::on_moved atualiza a entrada em cada índice da tabela (141).
+- Chama a camada 4 para acesso (create, fetch, allocate, scratch, free_block, flush_file, remove_file), para a ocupação, sem E/S (block_size, file_blocks, file_free_blocks), e para controle (reserve, snapshot, flush_all, invalidate_all). O open e o header_blocks ficam dentro da camada 4.
 - Recebe PageGuard e Reservation.
 
 **Camada 4 — Gerente de arquivos e buffer pool.** BufferPool, Reservation, PageGuard, ReplacementPolicy (Lru, Mru), FileManager e UniqueFd.
-- O FileManager chama pread, pwrite e ftruncate e é o único ponto que conta leituras e gravações físicas.
+- O FileManager chama pread, pwrite e ftruncate, pelas funções pread_full, pwrite_full, ftruncate_to, create_excl e open_existing, e é o único ponto que conta leituras e gravações físicas.
 
-**common/.** BlockId, RID, Counters, Config, Stats, AccessPath, OpResult, NotApplicable, Intent, Occupancy e Schema/FieldDef, usados por todas as camadas.
+**common/.** BlockId, RID, Counters, Config, TableStats, AccessPath, OpResult, NotApplicable, Intent, Occupancy, Schema/FieldDef e Point/KeyRange, usados por todas as camadas. A Config padrão tem bloco de 4.096 B, extent de 8 blocos, molduras 32, 16, 4 e 32 (dados, índices, catálogo, trabalho) e prefetch e toss-immediate desligados.
 
 ---
 
@@ -783,7 +783,7 @@ Estatística e ocupação
 
 Carga e manutenção
 - **bulk_load(tabela, fluxo)** — Constrói a organização a partir de um fluxo ordenado e depois os índices.
-- **insert(tabela, registro)** — Insere na organização primária e nos índices. Registros movidos são avisados ao MoveListener. Se o campo for unique e alguma estrutura o indexar, uma duplicata lança DuplicateKey (157).
+- **insert(tabela, registro)** — Insere na organização primária e nos índices. Registros movidos são avisados pelo callback on_moved, que atualiza os índices. Se o campo for unique e alguma estrutura o indexar, uma duplicata lança DuplicateKey (157).
 - **erase(tabela, RID)** — Remove e atualiza os índices. Na B+ e no hash, libera blocos esvaziados com free_block; no heap, só marca o slot e atualiza o mapa de espaço livre (162).
 - **reorganize(tabela)** — Compacta, reconstrói ou refaz o hash, recalcula campos derivados e reconstrói os índices. No heap, reescreve o arquivo sem blocos vazios (162). Mede de novo as estatísticas (160).
 
@@ -801,10 +801,8 @@ class SecondaryIndex;   // HashIndex, BPlusIndex (clustering ou não)
 
 struct DuplicateKey : std::runtime_error { using std::runtime_error::runtime_error; };   // (157)
 
-struct MoveListener {
-    virtual ~MoveListener() = default;
-    virtual void moved(TableId, RID from, RID to, const RecordView& rec) = 0;
-};
+// manutenção dos índices (141): cada PrimaryFile recebe o callback por set_on_move(MoveFn)
+using MoveFn = std::function<void(RID from, RID to, std::span<const std::byte> rec)>;
 
 struct SearchState {                       // implementado por cada organização e pelo clustering
     virtual ~SearchState() = default;
@@ -818,7 +816,7 @@ struct RidState {
 };
 ```
 
-- **MoveListener::moved(tabela, de, para, registro)** — Chamado a cada registro movido. O IndexMaintainer atualiza a entrada em cada índice da tabela.
+- **StorageManager::on_moved(tabela, de, para, registro)** — Registrado em cada PrimaryFile por set_on_move e chamado a cada registro movido. Atualiza a entrada em cada índice da tabela; um índice cuja chave seja NULL no registro não tem entrada e fica de fora.
 - **SearchState::make_view(bytes, esquema)** — Cria um RecordView para as subclasses, que não herdam a amizade.
 
 #### BlockScan
@@ -1752,4 +1750,4 @@ Linhas de raciocínio já percorridas e encerradas:
 - **Memória de trabalho em molduras (ScratchSpace),** e não estruturas da linguagem.
 - **Conferência com o SQLite fora do motor,** com lotes e constantes em arquivo.
 - **Índices fora de M** (145): a revisão de 06/11 propôs uma cota única por operador, que incluísse as páginas de índice. Na época ficou como estava, e o que a revisão tinha de válido virou a 159. Depois da auditoria de 10/11, o grupo adotou a cota única (172).
-- **Itens da revisão de 06/11 já resolvidos:** liberação de página (free_block), manutenção de RIDs (MoveListener), sequência de medição (149), ciclo de vida do TempFile (118, 139, 155) e catálogo fixado × invalidate_all (144).
+- **Itens da revisão de 06/11 já resolvidos:** liberação de página (free_block), manutenção de RIDs (callback on_moved), sequência de medição (149), ciclo de vida do TempFile (118, 139, 155) e catálogo fixado × invalidate_all (144).

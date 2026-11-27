@@ -842,9 +842,11 @@ int main(int argc, char** argv) {
     Csv configurations(out_dir / "configuracoes.csv");
     configurations.row({"politica", "operacao", "variante", "algoritmo",
                         "externa", "campo_externa", "interna", "campo_interna"});
+    // Configuração física comum a todas as políticas: o manifesto grava exatamente esta base (#18)
+    const Config base;
     for (Policy pol : spec.policies) {
         const std::string pname = to_string(pol);
-        Config cfg;
+        Config cfg = base;
         cfg.policy = pol;
         cfg.data_dir = out_dir / ("motor_" + pname);
         fs::remove_all(cfg.data_dir);   // cada configuração começa num data_dir vazio (161)
@@ -1041,6 +1043,11 @@ int main(int argc, char** argv) {
     man << "escala: " << spec.scale << "\nsemente: " << spec.seed << "\nreps: " << spec.min_reps << ".." << spec.max_reps
         << "\ntolerancia: " << spec.tolerance << "\nm_juncao: " << spec.m_join << "\nm_selecao: " << spec.m_select
         << "\nlote: " << spec.batch << "\n";
+    // parâmetros físicos da medição (#18): todas as contagens estão em blocos deste tamanho
+    man << "bloco: " << base.block_size << "\nextent: " << base.extent_blocks << "\nmolduras: dados="
+        << base.area_frames[0] << " indices=" << base.area_frames[1] << " catalogo=" << base.area_frames[2]
+        << " trabalho=" << base.area_frames[3] << "\nprefetch: " << (base.prefetch ? "sim" : "nao")
+        << "\ntoss_immediate: " << (base.toss_immediate ? "sim" : "nao") << "\n";
     std::string desc;
     for (const auto& op : spec.ops) desc += op.id + ";" + op.sql + "\n";
     for (const auto& v : spec.variants) desc += v.name + ";" + to_string(v.kind) + ";" + v.key + "\n";

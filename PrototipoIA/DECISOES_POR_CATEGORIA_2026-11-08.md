@@ -106,7 +106,7 @@ Total: 75 decisões de arquitetura (12 críticas, 34 altas, 22 médias e 7 baixa
 | Alta | 159. Reserva sempre explícita | Um cursor que esquecesse a reserva furaria M sem erro | fetch e allocate sem valor padrão; o contador data_area_requests deve ficar em zero nas operações medidas |
 | Alta | 158. Formato do registro e leitura verificada | Acesso fora da faixa em campo variável é um erro do §7.1 | [null bitmap][campos fixos][fins dos VarChar][VarChar]; leitura verificada sempre, também em release |
 | Alta | 162. Heap não libera blocos | Liberar um bloco no meio do heap faria a varredura devolver registros apagados | O erase só marca o slot; blocos vazios saem no reorganize |
-| Alta | 141. Manutenção dos índices quando o RID muda | Índices desatualizados devolveriam registros errados | Toda movimentação é avisada a um MoveListener; o reorganize reconstrói os índices |
+| Alta | 141. Manutenção dos índices quando o RID muda | Índices desatualizados devolveriam registros errados | Toda movimentação é avisada pelo callback on_moved do StorageManager, que atualiza os índices; o reorganize reconstrói os índices |
 | Alta | 142. Checksum canônico | Permite conferir o resultado com o SQLite | Campos na ordem dos operandos, com marca de NULL; FNV-1a de 64 bits por tupla; soma módulo 2⁶⁴ |
 | Alta | 27. Registros removidos | Manter o RID estável na página evita atualizar índices a cada remoção | Marcados no slot; slots nunca são renumerados |
 | Alta | 37. Ocupação mínima da B+ | Não manter a ocupação mínima é um dos erros listados no §7.1 | ⌈n/2⌉ registros por folha (a divisão considera o registro novo) |

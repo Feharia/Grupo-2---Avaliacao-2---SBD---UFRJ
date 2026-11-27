@@ -32,7 +32,7 @@ O enunciado ([PDF, versão de 04/11/2026](PrototipoIA/Avaliacao_2_v2_Indexacao_e
 | 3. Gerente de armazenamento | Organizações primárias (heap, B+, hash estático), índices secundários (hash, B+ e B+ clustering) e um mini catálogo | `src/layer3/` |
 | 4. Gerente de arquivos e buffer pool | Blocos de 4 KB lidos e gravados com `pread`/`pwrite`. Buffer pool com áreas separadas e políticas LRU e MRU. Conta cada leitura e gravação, separando as sequenciais das aleatórias | `src/layer4/` |
 
-![Diagrama das camadas](PrototipoIA/diagrama_camadas_v5.png)
+![Diagrama das camadas](PrototipoIA/diagrama_camadas_v6.png)
 
 A métrica central é o **número de blocos transferidos** entre os arquivos do motor e o buffer pool, contado em cada `pread` e `pwrite` do gerente de arquivos. Não é E/S física do SSD: o cache de páginas do sistema operacional pode atender a leitura, e os seeks são classificados (sequencial × aleatório), não observados. Por isso o tempo de relógio é registrado só como informação complementar. Cada medida tem ao lado o custo estimado pelas fórmulas dos livros-texto (Silberschatz e afins), calculado com os parâmetros medidos pela própria bancada. Cada resultado é conferido contra o SQLite, em número de linhas e checksum.
 
@@ -158,7 +158,7 @@ As opções da bancada estão no [README do protótipo](PrototipoIA/Implementaca
 | `referencia.csv`, `conferencia.txt` | Resultado do SQLite e da conferência (combinações conferidas, ausentes e divergentes) |
 | `verificacao_matriz.txt` | Saída do `verificar_matriz.py` na rodada de exemplo |
 | `tabelas.md`, `tabelas/*.csv` | As 16 tabelas de análise do `tabelas.py` |
-| `manifesto.txt` | Commit (da variável `CBD_COMMIT`), compilador, flags, escala, semente, parâmetros e duração |
+| `manifesto.txt` | Commit (da variável `CBD_COMMIT`), compilador, flags, escala, semente, parâmetros, duração e a configuração física da medição: tamanho do bloco (4.096 B), extent, molduras por área do buffer, prefetch e toss-immediate |
 
 ### Reproduzir a rodada definitiva
 
@@ -380,6 +380,6 @@ Os detalhes estão na §9 do [handoff](PrototipoIA/HANDOFF_ARQUITETURA_2026-11-0
 | [`PrototipoIA/DECISOES_DO_ENUNCIADO_2026-11-08.md`](PrototipoIA/DECISOES_DO_ENUNCIADO_2026-11-08.md) | As 45 decisões que o enunciado pede, com o que foi decidido |
 | [`PrototipoIA/DECISOES_POR_CATEGORIA_2026-11-08.md`](PrototipoIA/DECISOES_POR_CATEGORIA_2026-11-08.md) | As decisões separadas em arquitetura e implementação, por importância |
 | [`PrototipoIA/METODOS_DE_INTERFACE_2026-11-08.md`](PrototipoIA/METODOS_DE_INTERFACE_2026-11-08.md) | Os métodos de cada interface entre camadas |
-| [`PrototipoIA/diagrama_camadas_v5.png`](PrototipoIA/diagrama_camadas_v5.png) | Diagrama das camadas (há também o `.svg` e a versão anterior, v4) |
+| [`PrototipoIA/diagrama_camadas_v6.png`](PrototipoIA/diagrama_camadas_v6.png) | Diagrama das camadas, conferido com o código (há também o `.svg` e as versões anteriores, v4 e v5) |
 | [`PrototipoIA/revisao_interfaces_claude_cbd_2026-11-06.md`](PrototipoIA/revisao_interfaces_claude_cbd_2026-11-06.md) | Revisão das interfaces feita por um colega |
 | [`PrototipoIA/Avaliacao_2_v2_Indexacao_e_Processamento_de_Consultas.pdf`](PrototipoIA/Avaliacao_2_v2_Indexacao_e_Processamento_de_Consultas.pdf) | Enunciado, versão de 04/11/2026 (a de 02/11 está em `Avaliacao_2_v1_...pdf`) |
