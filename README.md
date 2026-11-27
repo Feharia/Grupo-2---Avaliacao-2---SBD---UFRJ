@@ -158,7 +158,7 @@ As opções da bancada estão no [README do protótipo](PrototipoIA/Implementaca
 | `referencia.csv`, `conferencia.txt` | Resultado do SQLite e da conferência (combinações conferidas, ausentes e divergentes) |
 | `verificacao_matriz.txt` | Saída do `verificar_matriz.py` na rodada de exemplo |
 | `tabelas.md`, `tabelas/*.csv` | As 16 tabelas de análise do `tabelas.py` |
-| `manifesto.txt` | Commit (da variável `CBD_COMMIT`), compilador, flags, escala, semente, parâmetros e duração |
+| `manifesto.txt` | Commit (da variável `CBD_COMMIT`), compilador, flags, escala, semente, parâmetros, duração e a configuração física da medição: tamanho do bloco (4.096 B), extent, molduras por área do buffer, prefetch e toss-immediate |
 
 ### Reproduzir a rodada definitiva
 

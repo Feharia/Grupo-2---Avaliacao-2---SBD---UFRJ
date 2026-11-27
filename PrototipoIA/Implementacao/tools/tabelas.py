@@ -280,6 +280,7 @@ def t_resumo(b):
                  if r["politica"] == b.politica)
     linhas = [
         ["Escala", m.get("escala", "?")],
+        ["Bloco", f"{m['bloco']} B (extent de {m.get('extent', '?')} blocos)" if "bloco" in m else "não registrado"],
         ["Políticas comparadas", ", ".join(b.politicas)],
         ["Repetições por combinação", f"{m.get('reps', '?')} (tolerância {m.get('tolerancia', '?')})"],
         ["M das junções / das seleções", f"{m.get('m_juncao', '?')} / {m.get('m_selecao', '?')} molduras"],

@@ -93,7 +93,7 @@ cmake -S . -B build-cmake && cmake --build build-cmake && ctest --test-dir build
 | `convergencia.csv` | uma linha por grupo de repetições: nº de repetições, dispersão de E/S e de tempo, se cada critério convergiu e se a parada foi por convergência ou pelo teto (P07) |
 | `caminhos.csv` | acesso realmente executado em cada entrada, por algoritmo, tirado do plano (P09) |
 | `operacoes.csv`, `constantes.csv`, `lotes/` | SQL equivalente, constantes de cada faixa (com a seletividade pedida e a efetiva) e lotes de chaves |
-| `dados/`, `esquema.csv`, `manifesto.txt` | a base gerada, o esquema e o manifesto da execução |
+| `dados/`, `esquema.csv`, `manifesto.txt` | a base gerada, o esquema e o manifesto da execução (commit, compilador, parâmetros, tamanho do bloco e configuração do buffer) |
 
 A rodada definitiva, feita com o código do commit `49be2d4` e reproduzida num clone limpo, está em `resultados_exemplo/` (sem os dados e os arquivos do motor), com as tabelas do `tabelas.py` em `resultados_exemplo/tabelas.md` e `resultados_exemplo/tabelas/`.
 
