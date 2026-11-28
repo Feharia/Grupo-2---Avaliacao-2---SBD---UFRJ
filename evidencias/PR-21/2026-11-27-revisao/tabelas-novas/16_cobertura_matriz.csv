@@ -1,0 +1,157 @@
+grupo,obrigatoriedade,tipo,tamanho,config,seletividade,algoritmo,estado
+natural join (obrigatória),obrigatória,natural_join,menor_menor,a,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,a,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,a,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,b,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,b,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,b,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,c,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,c,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,c,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,d,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,d,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,d,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,e,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,e,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_menor,e,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,a,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,a,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,a,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,b,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,b,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,b,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,c,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,c,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,c,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,d,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,d,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,d,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,e,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,e,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,menor_maior,e,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,a,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,a,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,a,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,b,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,b,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,b,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,c,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,c,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,c,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,d,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,d,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,d,,hash,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,e,,bnl,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,e,,sort_merge,ok
+natural join (obrigatória),obrigatória,natural_join,maior_maior,e,,hash,ok
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,a,,bnl,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,a,,sort_merge,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,a,,hash,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,b,,bnl,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,b,,sort_merge,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,b,,hash,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,c,,bnl,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,c,,sort_merge,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,c,,hash,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,d,,bnl,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,d,,sort_merge,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,d,,hash,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,e,,bnl,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,e,,sort_merge,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_menor,e,,hash,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,a,,bnl,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,a,,sort_merge,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,a,,hash,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,b,,bnl,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,b,,sort_merge,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,b,,hash,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,c,,bnl,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,c,,sort_merge,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,c,,hash,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,d,,bnl,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,d,,sort_merge,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,d,,hash,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,e,,bnl,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,e,,sort_merge,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,menor_maior,e,,hash,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,a,,bnl,ok
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,a,,sort_merge,ok
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,a,,hash,ok
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,b,,bnl,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,b,,sort_merge,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,b,,hash,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,c,,bnl,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,c,,sort_merge,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,c,,hash,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,d,,bnl,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,d,,sort_merge,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,d,,hash,nao_aplicavel
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,e,,bnl,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,e,,sort_merge,nao_implementado
+equijoin UNIQUE (opcional),opcional,equijoin_unique,maior_maior,e,,hash,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,a,,bnl,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,a,,sort_merge,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,a,,hash,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,b,,bnl,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,b,,sort_merge,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,b,,hash,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,c,,bnl,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,c,,sort_merge,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,c,,hash,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,d,,bnl,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,d,,sort_merge,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,d,,hash,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,e,,bnl,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,e,,sort_merge,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_menor,e,,hash,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,a,,bnl,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,a,,sort_merge,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,a,,hash,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,b,,bnl,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,b,,sort_merge,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,b,,hash,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,c,,bnl,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,c,,sort_merge,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,c,,hash,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,d,,bnl,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,d,,sort_merge,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,d,,hash,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,e,,bnl,ok
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,e,,sort_merge,ok
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,menor_maior,e,,hash,ok
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,a,,bnl,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,a,,sort_merge,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,a,,hash,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,b,,bnl,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,b,,sort_merge,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,b,,hash,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,c,,bnl,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,c,,sort_merge,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,c,,hash,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,d,,bnl,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,d,,sort_merge,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,d,,hash,nao_aplicavel
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,e,,bnl,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,e,,sort_merge,nao_implementado
+equijoin NOT UNIQUE (opcional),opcional,equijoin_not_unique,maior_maior,e,,hash,nao_implementado
+igualdade em UNIQUE (obrigatória),obrigatória,igualdade_unique,,a,pontual,,ok
+igualdade em UNIQUE (obrigatória),obrigatória,igualdade_unique,,a,1%,,nao_aplicavel
+igualdade em UNIQUE (obrigatória),obrigatória,igualdade_unique,,a,50%,,nao_aplicavel
+igualdade em UNIQUE (obrigatória),obrigatória,igualdade_unique,,b,pontual,,ok
+igualdade em UNIQUE (obrigatória),obrigatória,igualdade_unique,,b,1%,,nao_aplicavel
+igualdade em UNIQUE (obrigatória),obrigatória,igualdade_unique,,b,50%,,nao_aplicavel
+igualdade em UNIQUE (obrigatória),obrigatória,igualdade_unique,,c,pontual,,ok
+igualdade em UNIQUE (obrigatória),obrigatória,igualdade_unique,,c,1%,,nao_aplicavel
+igualdade em UNIQUE (obrigatória),obrigatória,igualdade_unique,,c,50%,,nao_aplicavel
+faixa em NOT UNIQUE (obrigatória),obrigatória,faixa_not_unique,,a,1%,,ok
+faixa em NOT UNIQUE (obrigatória),obrigatória,faixa_not_unique,,a,50%,,ok
+faixa em NOT UNIQUE (obrigatória),obrigatória,faixa_not_unique,,b,1%,,ok
+faixa em NOT UNIQUE (obrigatória),obrigatória,faixa_not_unique,,b,50%,,ok
+faixa em NOT UNIQUE (obrigatória),obrigatória,faixa_not_unique,,c,1%,,ok
+faixa em NOT UNIQUE (obrigatória),obrigatória,faixa_not_unique,,c,50%,,ok
+faixa em UNIQUE (opcional),opcional,faixa_unique,,a,1%,,ok
+faixa em UNIQUE (opcional),opcional,faixa_unique,,a,50%,,ok
+faixa em UNIQUE (opcional),opcional,faixa_unique,,b,1%,,ok
+faixa em UNIQUE (opcional),opcional,faixa_unique,,b,50%,,ok
+faixa em UNIQUE (opcional),opcional,faixa_unique,,c,1%,,nao_aplicavel
+faixa em UNIQUE (opcional),opcional,faixa_unique,,c,50%,,nao_aplicavel

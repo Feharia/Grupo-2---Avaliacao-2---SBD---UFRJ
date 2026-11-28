@@ -1,0 +1,21 @@
+operacao,tipo,tamanho,config,variante,bnl,sort_merge,hash,vencedor,vantagem
+j_mestre_detalhe,natural_join,maior_maior,a,aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan,885,709,709,sort_merge=hash,1.2482
+j_mestre_detalhe,natural_join,maior_maior,b,aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan,1115,608,739,sort_merge,1.2155
+j_mestre_detalhe,natural_join,maior_maior,c,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,1559,341,813,sort_merge,2.3842
+j_mestre_detalhe,natural_join,maior_maior,c,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,1691,830,488,hash,1.7008
+j_mestre_detalhe,natural_join,maior_maior,d,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,1115,608,739,sort_merge,1.2155
+j_mestre_detalhe,natural_join,maior_maior,e,aluno_heap:secondary_hash x inscricao_heap:secondary_btree,915,709,709,sort_merge=hash,1.2906
+j_pequenas,natural_join,menor_menor,a,curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan,19,57,19,bnl=hash,3.0
+j_pequenas,natural_join,menor_menor,b,curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan,21,46,21,bnl=hash,2.1905
+j_pequenas,natural_join,menor_menor,c,curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree,25,27,25,bnl=hash,1.08
+j_pequenas,natural_join,menor_menor,c,curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash,28,66,28,bnl=hash,2.3571
+j_pequenas,natural_join,menor_menor,d,curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree,21,46,21,bnl=hash,2.1905
+j_pequenas,natural_join,menor_menor,e,curso_heap:secondary_hash x disciplina_heap:secondary_btree,19,57,19,bnl=hash,3.0
+j_grande_pequena,natural_join,menor_maior,a,curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan,72,218,72,bnl=hash,3.0278
+j_grande_pequena,natural_join,menor_maior,b,curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree,102,117,102,bnl=hash,1.1471
+j_grande_pequena,natural_join,menor_maior,c,curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree,104,106,104,bnl=hash,1.0192
+j_grande_pequena,natural_join,menor_maior,c,curso_h_codigo:primary_hash x aluno_h_curso:primary_hash,123,269,123,bnl=hash,2.187
+j_grande_pequena,natural_join,menor_maior,d,curso_bt_codigo:primary_btree x aluno_heap:secondary_btree,74,207,74,bnl=hash,2.7973
+j_grande_pequena,natural_join,menor_maior,e,curso_heap:secondary_hash x aluno_heap:secondary_btree,72,218,72,bnl=hash,3.0278
+j_unique,equijoin_unique,maior_maior,a,aluno_heap_sem_indices:scan x detalhes_heap:scan,314,361,367,bnl,1.1497
+j_not_unique,equijoin_not_unique,menor_maior,e,aluno_heap:secondary_btree x turma_heap:secondary_btree,70,200,70,bnl=hash,2.8571

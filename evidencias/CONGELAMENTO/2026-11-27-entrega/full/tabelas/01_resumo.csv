@@ -1,0 +1,14 @@
+Item,Valor
+Escala,1
+Bloco,4096 B (extent de 8 blocos)
+Políticas comparadas,"LRU, MRU"
+Repetições por combinação,3..10 (tolerância 0.05)
+M das junções / das seleções,32 / 2 molduras
+Chaves por lote de seleção pontual,1000
+Combinações medidas (por política),84
+Linhas medidas no CSV (todas as repetições e políticas),697
+Células `nao_aplicavel` (caso 1) por política,54
+Células `nao_aplicavel` (caso 2) por política,2
+Células `nao_aplicavel` (caso 3) por política,6
+Células `nao_aplicavel` (caso 4) por política,4
+Duração da rodada,91.2 s

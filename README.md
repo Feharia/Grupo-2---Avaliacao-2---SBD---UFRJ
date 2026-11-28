@@ -1,5 +1,11 @@
 # Grupo-2---Avaliacao-2---SBD---UFRJ
 
+**Programa congelado:** tag `entrega-programa-2026-11-27`, commit
+`d95acc612b7885e6d35839f15c227c1cd527fca0`. A [versão de entrega](docs/ENTREGA_PROGRAMA.md)
+identifica o código aceito e a [rodada oficial de 27/11](evidencias/CONGELAMENTO/README.md),
+com 697 medições em 168 combinações, SQLite e matriz obrigatória aprovados.
+As análises de 17/11 e os resultados de exemplo abaixo são históricos.
+
 Revisão de 22/11/2026: a bancada separa heaps sem índices das variantes
 indexadas e verifica a configuração física pelos metadados. A rodada
 corrigida e suas limitações estão nas [evidências](evidencias/PR-19/2026-11-22-matriz-fisica/README.md).

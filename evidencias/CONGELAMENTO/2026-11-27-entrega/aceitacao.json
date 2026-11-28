@@ -1,0 +1,93 @@
+{
+  "commit": "d95acc612b7885e6d35839f15c227c1cd527fca0",
+  "clean_checkout": true,
+  "full_rows": 697,
+  "combinations": 168,
+  "required_executed": 108,
+  "required_not_applicable": 12,
+  "required_missing": 0,
+  "required_infeasible": 0,
+  "sqlite_missing": 0,
+  "sqlite_different": 0,
+  "io_not_converged": 0,
+  "time_not_converged": 7,
+  "final_flush_nonzero": 0,
+  "manifest_expected": {
+    "commit": "d95acc612b7885e6d35839f15c227c1cd527fca0",
+    "escala": "1",
+    "semente": "20261122",
+    "reps": "3..10",
+    "m_juncao": "32",
+    "m_selecao": "2",
+    "lote": "1000",
+    "bloco": "4096",
+    "extent": "8",
+    "molduras": "dados=32 indices=16 catalogo=4 trabalho=32",
+    "prefetch": "nao",
+    "toss_immediate": "nao"
+  },
+  "phases": [
+    {
+      "phase": "configure",
+      "completed": true
+    },
+    {
+      "phase": "build",
+      "completed": true
+    },
+    {
+      "phase": "bancada",
+      "completed": true
+    },
+    {
+      "phase": "sqlite",
+      "completed": true
+    },
+    {
+      "phase": "compare",
+      "completed": true
+    },
+    {
+      "phase": "matrix",
+      "completed": true
+    },
+    {
+      "phase": "tables",
+      "completed": true
+    }
+  ],
+  "binary_sha256": "625678e69c79683170443e8ab506c16e2587b0bf25c3bbc43bae7754333e8d5d",
+  "source_sha256": {
+    "src/common/common.cpp": "1e8f04797d7aed467fe142f2fa1b15f7fea441e1623be4276fcbf5b374112576",
+    "src/common/common.hpp": "c689b2468b7b89162486bd690d68db02fadee078fb30dea3ac34906e54951c0a",
+    "src/layer1/bench.cpp": "a3108d2750ed3e146f85fc8362678e614ad28bd88dd2d0d7f26274de356b681a",
+    "src/layer1/convergencia.hpp": "3b4cf3475acd3e21cdf3cfe88429787c41c85f422e792ef5dff040e94896077c",
+    "src/layer2/algorithms.cpp": "4dfcbcb0335f35b0cd251a0e3d1cb9fe7ed78cc0d573f3a96eef6c641cab878e",
+    "src/layer2/algorithms.hpp": "d9cf6bebc94a2e5a85fa3815d49c27991ab118202e0fbf8b1098a30ddab930eb",
+    "src/layer2/monitor.cpp": "8e7c788bf2ef7d81a940c5537847d25cb031a0bb3e2bd8a189435ec47924e177",
+    "src/layer2/monitor.hpp": "5d6d949c4fd63272c763aa7f73e4c2cddbe17f5a10fb386d07ca04c61e7539fd",
+    "src/layer3/bplus.cpp": "30a075c50289bde95e9ba300f9520ff035c97a5077496e15a5b2d24e641c2296",
+    "src/layer3/bplus.hpp": "7a7b5ae02bf96b23715442866b708f5ac13d2190a16cddba2f093acf9a125a33",
+    "src/layer3/catalog.cpp": "5c2b8bd64c03fa3b3d687caa05dc79cf2eb0915e61a1aa7312063f87dc49b301",
+    "src/layer3/catalog.hpp": "793450c2061de3c9bfca5efb7e18e8e634ef58c8fce153b8ffeeeca02c931cd5",
+    "src/layer3/handles.cpp": "c70e1f74fd97e480408f6ba1cf564fba2f5a6e321e05c86d216f80fa14ab257d",
+    "src/layer3/handles.hpp": "b7ecaa91693b3abe9df208495069a9093355b7d923e631188f4abb956c50957a",
+    "src/layer3/page.cpp": "e02196d58282458fd027256a8fbfa1533af8101d1566a61bff2680ce6fae8671",
+    "src/layer3/page.hpp": "67791ceb9514dc348de46192deb2ae97afcb4943e1e37effa2c383125f9789a0",
+    "src/layer3/record.cpp": "43394274eb46386d0e00cba6e03cc06f1c4610a3f316806faaf0f96b45b6b64a",
+    "src/layer3/record.hpp": "1b1700b17c2d171e37281f593596b369cc86a4567aa1e0fe01be99eb50cdc288",
+    "src/layer3/storage_manager.cpp": "a84f474c5ca9b4df0744c38d8e63eeaf7345fc7ec8c1a4b8ef7b12582c06b50e",
+    "src/layer3/storage_manager.hpp": "22a86dd89b0ef75e5d44c8c1772d112d764f4e7d6e414bbc246f4a7a5cfa3822",
+    "src/layer3/structures.cpp": "ea2a4f8d6923f828c02c7d4c144a131f34b923119938ecb6405ec252080592af",
+    "src/layer3/structures.hpp": "96ed342048e0da50c2fce508e2b5fc1ab4501aae66ef12954ee7ccd67830333e",
+    "src/layer4/buffer_pool.cpp": "a1132105171b8965c938d451b27106a8822cc44adcc53e5701aa8998e1ff9252",
+    "src/layer4/buffer_pool.hpp": "4e2c180a1d8aa5aca00cf8f7963b761517d0bac990c1b12883a7b5dda4e068f0",
+    "src/layer4/file_manager.cpp": "8416ffff2da508f7578a8da70d6a1543a10913ce12bdc8dc6a6e1de97f1357fa",
+    "src/layer4/file_manager.hpp": "0ccfe5fdb0b4549b1b23f8a776920d799470e0bb52e14a3f7020d2e93a33f5a5",
+    "src/layer4/posix_io.cpp": "8d1b6c1eacc9ae3ecbdadfe720d2dc96e7069cdefdc19eafa7081e5fbd0b1c0f",
+    "src/layer4/posix_io.hpp": "8d97fea6a586265b72dc4802539449460387e21de9542759278e3bccad37145d",
+    "src/layer4/replacement_policy.cpp": "6bd7b4b3129ea456b0e067751af8a54179eb66d1bd7482becbf6f32ffc12a772",
+    "src/layer4/replacement_policy.hpp": "f783be799ccab07d6125e07f18f1571edb95cc04e933c0987be0e21b1551ed5c"
+  },
+  "duration_s_from_manifest": 91.2
+}

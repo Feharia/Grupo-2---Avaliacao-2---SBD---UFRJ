@@ -1,5 +1,11 @@
 # Congelamento do programa — plano geral
 
+**Situação final em 27/11/2026:** programa congelado na tag
+`entrega-programa-2026-11-27`, SHA `d95acc612b7885e6d35839f15c227c1cd527fca0`.
+Ver [versão de entrega](../../ENTREGA_PROGRAMA.md) e
+[evidências finais](../../../evidencias/CONGELAMENTO/README.md).
+As avaliações e pendências datadas abaixo preservam o histórico do plano.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking. A execução depende de solicitação do usuário; este plano não autoriza merge, push ou novas funcionalidades.
 
 **Goal:** Fixar uma versão reproduzível do programa que cumpra o núcleo obrigatório e passe pelos critérios técnicos de entrega.
@@ -122,3 +128,29 @@ Evidências em `evidencias/CONGELAMENTO/2026-11-23-aceitacao/`.
 A publicação e integração remota do candidato ainda dependem do terminal
 com acesso ao GitHub; não houve tag/release. O código pode ser congelado
 nessa versão; os registros seguintes não mudam a implementação aceita.
+
+## Publicação concluída — 23/11/2026
+
+PR #20 integrado na main em `f3d12311bfece737fa2f2c3b6decedcccfa5696f`,
+com CI aprovado (45205153798) e #18 aberta. Conferida igualdade da árvore
+integrada com o candidato `2cd1696` e da implementação com `8569e0e`.
+Este é o SHA de congelamento do programa na main remota; não foi criada
+tag/release nem modificada novamente a implementação. Registros de
+publicação em `evidencias/CONGELAMENTO/2026-11-23-publicacao/`.
+
+## Congelamento final concluído — 27/11/2026
+
+- [x] Integrar o PR #21 por squash e confirmar o CI da main em d95acc6.
+- [x] Executar rodada oficial no SHA integrado e conferir o novo manifesto.
+- [x] Aprovar SQLite e matriz: 697 medições, 168 combinações, 108 células
+  executadas e 12 não aplicáveis, nenhuma ausência/inviabilidade.
+- [x] Registrar convergência: todos os grupos em E/S; sete tetos só por tempo.
+- [x] Publicar e conferir a tag anotada `entrega-programa-2026-11-27`.
+- [x] Preparar checkout separado e limpo da tag para a entrega.
+- [x] Consolidar registros em branch baseada na main integrada, preservando
+  fontes, tag, artefatos originais e alterações dos worktrees anteriores.
+
+A publicação remota desta consolidação documental usa uma branch própria;
+não condiciona a validade da versão do programa já publicada. Os checks da
+branch documental serão acompanhados na publicação. Nenhum novo defeito
+funcional foi identificado ou corrigido nesta consolidação.

@@ -1,0 +1,18 @@
+data: 2026-11-27 18:17:21
+compilador: 13.3.0
+flags:  Release
+commit: a502a5f573626623b6fd2b71195902aeceeadb24
+escala: 0.1
+semente: 20261122
+reps: 1..1
+tolerancia: 0.05
+m_juncao: 32
+m_selecao: 2
+lote: 100
+bloco: 4096
+extent: 8
+molduras: dados=32 indices=16 catalogo=4 trabalho=32
+prefetch: nao
+toss_immediate: nao
+hash_especificacao: 1828a859a9238dde
+duracao_s: 0.5

@@ -1,0 +1,19 @@
+Iniciando configure
+configure: aprovado
+Iniciando build
+build: aprovado
+Iniciando bancada
+bancada: aprovado
+Iniciando sqlite
+sqlite: aprovado
+Iniciando compare
+compare: aprovado
+Iniciando matrix
+matrix: aprovado
+Iniciando tables
+tables: aprovado
+Traceback (most recent call last):
+  File "/tmp/cbd-entrega-oficial-92f686kh/run_official.py", line 35, in <module>
+    assert len(convergence)==168
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError

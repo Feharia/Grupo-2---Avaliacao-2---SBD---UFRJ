@@ -1,0 +1,25 @@
+{
+  "simulated_only": true,
+  "results": [
+    {
+      "scenario": "before",
+      "exit_code": 2,
+      "expected_success": false
+    },
+    {
+      "scenario": "after",
+      "exit_code": 0,
+      "expected_success": true
+    },
+    {
+      "scenario": "failed-check",
+      "exit_code": 1,
+      "expected_success": false
+    },
+    {
+      "scenario": "wrong-sha",
+      "exit_code": 1,
+      "expected_success": false
+    }
+  ]
+}

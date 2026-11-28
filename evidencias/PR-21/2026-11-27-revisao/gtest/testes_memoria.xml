@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="11" failures="0" disabled="0" errors="0" time="1.098" timestamp="2026-11-27T18:16:50.226" name="AllTests">
+  <testsuite name="MemoriaAuxiliar" tests="11" failures="0" disabled="0" skipped="0" errors="0" time="1.098" timestamp="2026-11-27T18:16:50.226">
+    <testcase name="BnlDiretorioDentroDasMolduras" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_bnl.cpp" line="49" status="run" result="completed" time="0.053" timestamp="2026-11-27T18:16:50.226" classname="MemoriaAuxiliar" />
+    <testcase name="BnlControleNaoCresceComOsDados" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_bnl.cpp" line="93" status="run" result="completed" time="0.083" timestamp="2026-11-27T18:16:50.279" classname="MemoriaAuxiliar" />
+    <testcase name="BnlPaginasDesiguaisNaoPassamDoDiretorio" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_bnl.cpp" line="112" status="run" result="completed" time="0.015" timestamp="2026-11-27T18:16:50.363" classname="MemoriaAuxiliar" />
+    <testcase name="SortMergeListaDeRunsDentroDeM" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_juncoes.cpp" line="75" status="run" result="completed" time="0.357" timestamp="2026-11-27T18:16:50.379" classname="MemoriaAuxiliar" />
+    <testcase name="HashDescritoresDePartesLimitadosPorM" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_juncoes.cpp" line="105" status="run" result="completed" time="0.251" timestamp="2026-11-27T18:16:50.736" classname="MemoriaAuxiliar" />
+    <testcase name="SortMergeGrupoGrandeFicaInviavel" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_juncoes.cpp" line="131" status="run" result="completed" time="0.008" timestamp="2026-11-27T18:16:50.987" classname="MemoriaAuxiliar" />
+    <testcase name="HashInscricaoComoBuildEmM32" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_juncoes.cpp" line="148" status="run" result="completed" time="0.297" timestamp="2026-11-27T18:16:50.996" classname="MemoriaAuxiliar" />
+    <testcase name="TabelaDeArquivosReaproveitaTemporariosApagados" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_juncoes.cpp" line="171" status="run" result="completed" time="0.017" timestamp="2026-11-27T18:16:51.294" classname="MemoriaAuxiliar" />
+    <testcase name="ScratchSpaceDentroDasPaginas" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_scratch.cpp" line="75" status="run" result="completed" time="0.012" timestamp="2026-11-27T18:16:51.312" classname="MemoriaAuxiliar" />
+    <testcase name="OrdenarRidsDentroDaPagina" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_scratch.cpp" line="99" status="run" result="completed" time="0" timestamp="2026-11-27T18:16:51.324" classname="MemoriaAuxiliar" />
+    <testcase name="ContadorSoContaOEscopo" file="/tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tests/memoria/test_scratch.cpp" line="121" status="run" result="completed" time="0" timestamp="2026-11-27T18:16:51.325" classname="MemoriaAuxiliar" />
+  </testsuite>
+</testsuites>

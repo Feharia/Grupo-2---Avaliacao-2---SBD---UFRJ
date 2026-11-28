@@ -1,0 +1,12 @@
+politica,operacao,variante,algoritmo,n_repeticoes,dispersao_io,dispersao_tempo,convergiu_io,convergiu_tempo
+LRU,sel_rg_curso_alta,aluno_h_curso:clustering_btree,,10,0.0000,0.1740,sim,nao
+LRU,j_pequenas,curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree,sort_merge,10,0.0000,0.2920,sim,nao
+LRU,j_grande_pequena,curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan,bnl,10,0.0000,0.0645,sim,nao
+LRU,j_grande_pequena,curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree,bnl,10,0.0000,0.0865,sim,nao
+LRU,j_grande_pequena,curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree,hash,10,0.0000,0.0799,sim,nao
+LRU,j_grande_pequena,curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree,bnl,10,0.0000,0.0734,sim,nao
+LRU,j_grande_pequena,curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree,sort_merge,10,0.0000,0.0706,sim,nao
+LRU,j_grande_pequena,curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree,hash,10,0.0000,0.0737,sim,nao
+LRU,j_grande_pequena,curso_h_codigo:primary_hash x aluno_h_curso:primary_hash,bnl,10,0.0000,0.0699,sim,nao
+LRU,j_grande_pequena,curso_h_codigo:primary_hash x aluno_h_curso:primary_hash,hash,10,0.0000,0.0734,sim,nao
+LRU,j_grande_pequena,curso_bt_codigo:primary_btree x aluno_heap:secondary_btree,hash,10,0.0000,0.0760,sim,nao

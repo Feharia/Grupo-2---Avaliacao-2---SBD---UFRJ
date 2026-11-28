@@ -1,0 +1,25 @@
+{
+  "simulated_only": true,
+  "results": [
+    {
+      "scenario": "open-success",
+      "exit_code": 0,
+      "merge_called": true
+    },
+    {
+      "scenario": "resume-success",
+      "exit_code": 0,
+      "merge_called": false
+    },
+    {
+      "scenario": "wrong-sha",
+      "exit_code": 1,
+      "merge_called": false
+    },
+    {
+      "scenario": "ci-failure",
+      "exit_code": 1,
+      "merge_called": false
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+politica,operacao,variante,algoritmo,n_repeticoes,dispersao_io,dispersao_tempo,convergiu_io,convergiu_tempo
+LRU,sel_pt_dre,aluno_bt_dre:primary_btree,,10,0.0030,0.0849,sim,nao
+LRU,j_pequenas,curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan,hash,10,0.0000,0.5432,sim,nao
+MRU,sel_pt_dre,aluno_bt_dre:primary_btree,,10,0.0036,0.1349,sim,nao
+MRU,sel_rg_dre_alta,aluno_heap_sem_indices:scan,,10,0.0000,0.3065,sim,nao
+MRU,sel_rg_curso_alta,aluno_bt_curso:clustering_btree,,10,0.0000,0.1236,sim,nao
+MRU,sel_rg_curso_alta,aluno_h_curso:clustering_btree,,10,0.0000,0.1067,sim,nao
+MRU,j_pequenas,curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan,sort_merge,10,0.0000,0.3071,sim,nao

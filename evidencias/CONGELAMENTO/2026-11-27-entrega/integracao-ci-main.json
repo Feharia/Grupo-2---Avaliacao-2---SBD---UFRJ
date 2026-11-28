@@ -1,0 +1,13 @@
+{
+  "pr": 21,
+  "sourceHead": "a502a5f573626623b6fd2b71195902aeceeadb24",
+  "mergeSha": "d95acc612b7885e6d35839f15c227c1cd527fca0",
+  "ciMain": {
+    "conclusion": "success",
+    "headSha": "d95acc612b7885e6d35839f15c227c1cd527fca0",
+    "status": "completed",
+    "url": "https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ/actions/runs/46085054328"
+  },
+  "issue18": "open",
+  "evidenceDir": "/tmp/pr21-integracao-HKufWo"
+}

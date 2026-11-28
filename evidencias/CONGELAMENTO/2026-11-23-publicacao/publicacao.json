@@ -1,0 +1,17 @@
+{
+  "candidate": "2cd1696f1bb42d5f3fbed453ef7827d125140266",
+  "implementation": "8569e0e9f1894b6c647bf72888b4e5c0e9c1de9c",
+  "main": "f3d12311bfece737fa2f2c3b6decedcccfa5696f",
+  "pr": 20,
+  "evidenceDir": "/tmp/cbd-congelamento-publicacao-UbmAMV",
+  "ciMain": {
+    "conclusion": "success",
+    "headSha": "f3d12311bfece737fa2f2c3b6decedcccfa5696f",
+    "url": "https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ/actions/runs/45205153798"
+  },
+  "issue18": "open",
+  "estado": "congelamento integrado com CI aprovado",
+  "tree": "fc8f7f0ccbc689d0ea23ac98ae33840397772d8c",
+  "implementationTree": "6592ddbf73aeb73adacab23f678359c3e290e790",
+  "fonte": "Arquivos reais do script executado pelo usuário e objetos Git locais recebidos pelo fetch; sem nova consulta remota pelo agente."
+}

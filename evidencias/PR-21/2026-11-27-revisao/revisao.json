@@ -1,0 +1,17 @@
+{
+  "base": "f3d12311bfece737fa2f2c3b6decedcccfa5696f",
+  "head": "a502a5f573626623b6fd2b71195902aeceeadb24",
+  "base_build_source_commit": "8569e0e9f1894b6c647bf72888b4e5c0e9c1de9c",
+  "base_implementation_tree": "6592ddbf73aeb73adacab23f678359c3e290e790",
+  "source_checkout_clean": true,
+  "cpp_tests": 114,
+  "python_tests": 69,
+  "skipped_tests": 0,
+  "io_scenarios": 168,
+  "io_rows_with_deltas": 0,
+  "sqlite_missing": 0,
+  "sqlite_different": 0,
+  "new_remote_ci": "not accessible (network)",
+  "sanitizers": "not rerun in this review",
+  "full_run": "not rerun in this review"
+}

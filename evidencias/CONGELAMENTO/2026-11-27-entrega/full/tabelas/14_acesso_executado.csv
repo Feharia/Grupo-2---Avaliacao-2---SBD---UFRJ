@@ -1,0 +1,61 @@
+operacao,config,variante,algoritmo,acesso_externa,acesso_interna
+j_mestre_detalhe,a,aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan,bnl,varredura do heap,varredura do heap
+j_mestre_detalhe,a,aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan,sort_merge,varredura do heap + ordenação em runs,varredura do heap + ordenação em runs
+j_mestre_detalhe,a,aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan,hash,varredura do heap + particionamento,varredura do heap + particionamento
+j_mestre_detalhe,b,aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan,bnl,folhas da B+,varredura do heap
+j_mestre_detalhe,b,aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan,sort_merge,varredura do heap + ordenação em runs,folhas da B+ lidas em ordem (sem ordenar)
+j_mestre_detalhe,b,aluno_bt_dre:primary_btree x inscricao_heap_sem_indices:scan,hash,folhas da B+ + particionamento,varredura do heap + particionamento
+j_mestre_detalhe,c,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,bnl,folhas da B+,folhas da B+
+j_mestre_detalhe,c,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,sort_merge,folhas da B+ lidas em ordem (sem ordenar),folhas da B+ lidas em ordem (sem ordenar)
+j_mestre_detalhe,c,aluno_bt_dre:primary_btree x inscricao_bt_dre:primary_btree,hash,folhas da B+ + particionamento,folhas da B+ + particionamento
+j_mestre_detalhe,c,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,bnl,buckets do hash,buckets do hash
+j_mestre_detalhe,c,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,sort_merge,buckets do hash + ordenação em runs,buckets do hash + ordenação em runs
+j_mestre_detalhe,c,aluno_h_dre:primary_hash x inscricao_h_dre:primary_hash,hash,buckets do hash + particionamento,buckets do hash usados como partições (sem particionar)
+j_mestre_detalhe,d,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,bnl,folhas da B+,varredura do heap (índice secundário não usado)
+j_mestre_detalhe,d,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,sort_merge,varredura do heap (índice secundário não usado) + ordenação em runs,folhas da B+ lidas em ordem (sem ordenar)
+j_mestre_detalhe,d,aluno_bt_dre:primary_btree x inscricao_heap:secondary_btree,hash,folhas da B+ + particionamento,varredura do heap (índice secundário não usado) + particionamento
+j_mestre_detalhe,e,aluno_heap:secondary_hash x inscricao_heap:secondary_btree,bnl,varredura do heap (índice secundário não usado),varredura do heap (índice secundário não usado)
+j_mestre_detalhe,e,aluno_heap:secondary_hash x inscricao_heap:secondary_btree,sort_merge,varredura do heap (índice secundário não usado) + ordenação em runs,varredura do heap (índice secundário não usado) + ordenação em runs
+j_mestre_detalhe,e,aluno_heap:secondary_hash x inscricao_heap:secondary_btree,hash,varredura do heap (índice secundário não usado) + particionamento,varredura do heap (índice secundário não usado) + particionamento
+j_pequenas,a,curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan,bnl,varredura do heap,varredura do heap
+j_pequenas,a,curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan,sort_merge,varredura do heap + ordenação em runs,varredura do heap + ordenação em runs
+j_pequenas,a,curso_heap_sem_indices:scan x disciplina_heap_sem_indices:scan,hash,"varredura do heap, sem particionar (cabe em memória)","varredura do heap, sem particionar (cabe em memória)"
+j_pequenas,b,curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan,bnl,folhas da B+,varredura do heap
+j_pequenas,b,curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan,sort_merge,varredura do heap + ordenação em runs,folhas da B+ lidas em ordem (sem ordenar)
+j_pequenas,b,curso_bt_codigo:primary_btree x disciplina_heap_sem_indices:scan,hash,"folhas da B+, sem particionar (cabe em memória)","varredura do heap, sem particionar (cabe em memória)"
+j_pequenas,c,curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree,bnl,folhas da B+,folhas da B+
+j_pequenas,c,curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree,sort_merge,folhas da B+ lidas em ordem (sem ordenar),folhas da B+ lidas em ordem (sem ordenar)
+j_pequenas,c,curso_bt_codigo:primary_btree x disciplina_bt_curso:primary_btree,hash,"folhas da B+, sem particionar (cabe em memória)","folhas da B+, sem particionar (cabe em memória)"
+j_pequenas,c,curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash,bnl,buckets do hash,buckets do hash
+j_pequenas,c,curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash,sort_merge,buckets do hash + ordenação em runs,buckets do hash + ordenação em runs
+j_pequenas,c,curso_h_codigo:primary_hash x disciplina_h_curso:primary_hash,hash,"buckets do hash, sem particionar (cabe em memória)","buckets do hash, sem particionar (cabe em memória)"
+j_pequenas,d,curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree,bnl,folhas da B+,varredura do heap (índice secundário não usado)
+j_pequenas,d,curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree,sort_merge,varredura do heap (índice secundário não usado) + ordenação em runs,folhas da B+ lidas em ordem (sem ordenar)
+j_pequenas,d,curso_bt_codigo:primary_btree x disciplina_heap:secondary_btree,hash,"folhas da B+, sem particionar (cabe em memória)","varredura do heap (índice secundário não usado), sem particionar (cabe em memória)"
+j_pequenas,e,curso_heap:secondary_hash x disciplina_heap:secondary_btree,bnl,varredura do heap (índice secundário não usado),varredura do heap (índice secundário não usado)
+j_pequenas,e,curso_heap:secondary_hash x disciplina_heap:secondary_btree,sort_merge,varredura do heap (índice secundário não usado) + ordenação em runs,varredura do heap (índice secundário não usado) + ordenação em runs
+j_pequenas,e,curso_heap:secondary_hash x disciplina_heap:secondary_btree,hash,"varredura do heap (índice secundário não usado), sem particionar (cabe em memória)","varredura do heap (índice secundário não usado), sem particionar (cabe em memória)"
+j_grande_pequena,a,curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan,bnl,varredura do heap,varredura do heap
+j_grande_pequena,a,curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan,sort_merge,varredura do heap + ordenação em runs,varredura do heap + ordenação em runs
+j_grande_pequena,a,curso_heap_sem_indices:scan x aluno_heap_sem_indices:scan,hash,"varredura do heap, sem particionar (cabe em memória)","varredura do heap, sem particionar (cabe em memória)"
+j_grande_pequena,b,curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree,bnl,varredura do heap,folhas da B+
+j_grande_pequena,b,curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree,sort_merge,folhas da B+ lidas em ordem (sem ordenar),varredura do heap + ordenação em runs
+j_grande_pequena,b,curso_heap_sem_indices:scan x aluno_bt_curso:primary_btree,hash,"varredura do heap, sem particionar (cabe em memória)","folhas da B+, sem particionar (cabe em memória)"
+j_grande_pequena,c,curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree,bnl,folhas da B+,folhas da B+
+j_grande_pequena,c,curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree,sort_merge,folhas da B+ lidas em ordem (sem ordenar),folhas da B+ lidas em ordem (sem ordenar)
+j_grande_pequena,c,curso_bt_codigo:primary_btree x aluno_bt_curso:primary_btree,hash,"folhas da B+, sem particionar (cabe em memória)","folhas da B+, sem particionar (cabe em memória)"
+j_grande_pequena,c,curso_h_codigo:primary_hash x aluno_h_curso:primary_hash,bnl,buckets do hash,buckets do hash
+j_grande_pequena,c,curso_h_codigo:primary_hash x aluno_h_curso:primary_hash,sort_merge,buckets do hash + ordenação em runs,buckets do hash + ordenação em runs
+j_grande_pequena,c,curso_h_codigo:primary_hash x aluno_h_curso:primary_hash,hash,"buckets do hash, sem particionar (cabe em memória)","buckets do hash, sem particionar (cabe em memória)"
+j_grande_pequena,d,curso_bt_codigo:primary_btree x aluno_heap:secondary_btree,bnl,folhas da B+,varredura do heap (índice secundário não usado)
+j_grande_pequena,d,curso_bt_codigo:primary_btree x aluno_heap:secondary_btree,sort_merge,varredura do heap (índice secundário não usado) + ordenação em runs,folhas da B+ lidas em ordem (sem ordenar)
+j_grande_pequena,d,curso_bt_codigo:primary_btree x aluno_heap:secondary_btree,hash,"folhas da B+, sem particionar (cabe em memória)","varredura do heap (índice secundário não usado), sem particionar (cabe em memória)"
+j_grande_pequena,e,curso_heap:secondary_hash x aluno_heap:secondary_btree,bnl,varredura do heap (índice secundário não usado),varredura do heap (índice secundário não usado)
+j_grande_pequena,e,curso_heap:secondary_hash x aluno_heap:secondary_btree,sort_merge,varredura do heap (índice secundário não usado) + ordenação em runs,varredura do heap (índice secundário não usado) + ordenação em runs
+j_grande_pequena,e,curso_heap:secondary_hash x aluno_heap:secondary_btree,hash,"varredura do heap (índice secundário não usado), sem particionar (cabe em memória)","varredura do heap (índice secundário não usado), sem particionar (cabe em memória)"
+j_unique,a,aluno_heap_sem_indices:scan x detalhes_heap:scan,bnl,varredura do heap,varredura do heap
+j_unique,a,aluno_heap_sem_indices:scan x detalhes_heap:scan,sort_merge,varredura do heap + ordenação em runs,varredura do heap + ordenação em runs
+j_unique,a,aluno_heap_sem_indices:scan x detalhes_heap:scan,hash,varredura do heap + particionamento,varredura do heap + particionamento
+j_not_unique,e,aluno_heap:secondary_btree x turma_heap:secondary_btree,bnl,varredura do heap (índice secundário não usado),varredura do heap (índice secundário não usado)
+j_not_unique,e,aluno_heap:secondary_btree x turma_heap:secondary_btree,sort_merge,varredura do heap (índice secundário não usado) + ordenação em runs,varredura do heap (índice secundário não usado) + ordenação em runs
+j_not_unique,e,aluno_heap:secondary_btree x turma_heap:secondary_btree,hash,varredura do heap (índice secundário não usado) + particionamento,varredura do heap (índice secundário não usado) + particionamento

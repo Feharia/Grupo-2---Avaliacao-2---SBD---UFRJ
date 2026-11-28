@@ -1,0 +1,17 @@
+operacao,seletividade,seletividade_efetiva_pct,config,variante,linhas,leituras,pct_seq,estimado_transf,erro_pct,tempo_ms,vezes_melhor
+sel_rg_dre_baixa,1%,1.0,a,aluno_heap_sem_indices:scan,20,65,98.4615,65.0,0.0,0.32,21.6667
+sel_rg_dre_baixa,1%,1.0,b,aluno_bt_dre:primary_btree,20,3,33.3333,2.0,-33.3333,0.116,1.0
+sel_rg_dre_alta,50%,50.0,a,aluno_heap_sem_indices:scan,1000,65,98.4615,65.0,0.0,4.928,1.3
+sel_rg_dre_alta,50%,50.0,b,aluno_bt_dre:primary_btree,1000,50,96.0,49.0,-2.0,4.846,1.0
+sel_rg_cr_baixa,1%,1.0,a,aluno_heap_sem_indices:scan,20,65,98.4615,65.0,0.0,0.227,2.9545
+sel_rg_cr_baixa,1%,1.0,c,aluno_heap:secondary_btree,20,22,4.5455,22.0,0.0,0.136,1.0
+sel_rg_cr_alta,50%,50.2,a,aluno_heap_sem_indices:scan,1004,65,98.4615,65.0,0.0,5.482,1.0
+sel_rg_cr_alta,50%,50.2,c,aluno_heap:secondary_btree,1004,964,9.751,1006.0,4.3568,5.959,14.8308
+sel_rg_curso_baixa,1%,0.75,a,aluno_heap_sem_indices:scan,15,65,98.4615,65.0,0.0,0.214,21.6667
+sel_rg_curso_baixa,1%,0.75,b,aluno_bt_curso:primary_btree,15,3,33.3333,2.0,-33.3333,0.091,1.0
+sel_rg_curso_baixa,1%,0.75,c,aluno_bt_curso:clustering_btree,15,4,25.0,2.0,-50.0,0.093,1.3333
+sel_rg_curso_baixa,1%,0.75,c,aluno_h_curso:clustering_btree,15,4,25.0,3.7,-7.5,0.1,1.3333
+sel_rg_curso_alta,50%,49.8,a,aluno_heap_sem_indices:scan,996,65,98.4615,65.0,0.0,4.843,1.3265
+sel_rg_curso_alta,50%,49.8,b,aluno_bt_curso:primary_btree,996,49,95.9184,49.0,0.0,5.672,1.0
+sel_rg_curso_alta,50%,49.8,c,aluno_bt_curso:clustering_btree,996,50,94.0,49.0,-2.0,5.195,1.0204
+sel_rg_curso_alta,50%,49.8,c,aluno_h_curso:clustering_btree,996,158,0.6329,135.9,-13.9873,4.953,3.2245

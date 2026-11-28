@@ -1,5 +1,10 @@
 # Post-mortem — Avaliação 2 de Construção de Banco de Dados
 
+**Versão de entrega:** tag `entrega-programa-2026-11-27`, SHA
+`d95acc612b7885e6d35839f15c227c1cd527fca0`.
+[Estado final e evidências](docs/ENTREGA_PROGRAMA.md).
+As entradas seguintes são cronológicas e descrevem o estado de cada etapa.
+
 ## 2026-11-12 — Diagnóstico inicial com auxílio do Codex
 
 - Baseline examinada: `b61b87b4c3363e84eb199a21afaaee063a74e775`.
@@ -1518,3 +1523,133 @@ contadores apresentou 3 requests, 2 hits, 1 miss, 1 leitura e 1 escrita no flush
   candidato congelável. Os registros de aceitação serão consolidados sem
   mudar a árvore da implementação. A publicação/integração remota dessas
   correções e seu CI ainda não foram executados neste ambiente sem rede.
+
+### Congelamento integrado na main — 23/11
+
+- O usuário executou `/tmp/publicar-congelamento.sh`: branch publicada,
+  PR #20 criado e aprovado no CI, squash na main em
+  `f3d12311bfece737fa2f2c3b6decedcccfa5696f`. Checks aprovados nas execuções
+  45203445306 (branch), 45204276937 (PR) e 45205153798 (main).
+- Conferidos os arquivos reais preservados pelo script e os objetos Git
+  recebidos pelo fetch do usuário: árvore completa de f3d1231 idêntica à
+  de 2cd1696; árvore `PrototipoIA/Implementacao` idêntica à de 8569e0e,
+  validada em cópia limpa. A #18 continuou aberta após a integração.
+- O SHA de congelamento do programa na main remota é f3d1231. A aceitação
+  local e o CI da versão integrada estão aprovados; não há pendência
+  funcional restante identificada no plano. As onze não convergências
+  temporais e o LSan desativado permanecem limites já registrados.
+- Publicação confirmada em
+  `evidencias/CONGELAMENTO/2026-11-23-publicacao/`. Esta confirmação só
+  acrescenta registros locais, sem novo commit, push, tag ou alteração da
+  implementação congelada. O worktree main com alterações anteriores do
+  usuário permanece preservado.
+
+### Revisão do PR #21 antes do congelamento — 27/11/2026
+
+- Revisado o head `a502a5f573626623b6fd2b71195902aeceeadb24` contra
+  `f3d12311bfece737fa2f2c3b6decedcccfa5696f` em checkout temporário limpo.
+  Mudanças: parâmetros físicos no manifesto, tamanho do bloco nas tabelas,
+  diagrama v6 e textos sobre o callback real `on_moved`. Sem bloqueador
+  funcional encontrado; nenhuma correção da implementação foi necessária.
+- Build Release com GoogleTest real; 114 casos C++ e 69 Python aprovados,
+  sem skips. Comparação io-rapido-v2: 168 cenários, zero deltas de leitura,
+  escrita ou flush; ambos os lados concordaram com SQLite/tuplas completas.
+- Manifesto nativo conferido contra cabeçalhos de 37 arquivos por política;
+  tabelas novas e legadas geradas. Diagrama conferido com interfaces reais,
+  incluindo revisão independente via skill requesting-code-review.
+- Sanitizers e integral não repetidos nesta revisão localizada; CI remoto
+  não consultável por falta de rede. A revisão não realiza merge/push/tag,
+  não fecha issues e não substitui a rodada oficial no SHA final escolhido.
+- Evidências: `evidencias/PR-21/2026-11-27-revisao/`. Alterações locais
+  anteriores foram preservadas; somente estes registros foram acrescentados.
+
+### Compatibilidade do script de CI com gh 2.45.0 — 27/11/2026
+
+- O script fornecido usava `gh pr checks --json`, indisponível na versão
+  instalada. O usuário informou os seis checks aprovados; a falha aconteceu
+  ao coletar os registros, depois do watch, sem merge ou alteração do código.
+- Reproduzido o erro da CLI; coleta substituída por `gh api --paginate`,
+  preservando a validação de conclusão e SHA. Não requer atualizar o gh.
+- Sintaxe Bash validada; respostas simuladas reproduziram a falha anterior,
+  aprovaram o caminho corrigido e rejeitaram check reprovado/SHA divergente.
+  A consulta real corrigida ainda precisa ser executada pelo usuário.
+- Evidências: `evidencias/PR-21/2026-11-27-compatibilidade-gh/`.
+
+### CI remoto confirmado para o PR #21 — a502a5f
+
+- O usuário executou `/tmp/verificar-ci-pr21.sh`. PR aberto, destino main,
+  HEAD e base iguais aos revisados; todos os checks aprovados.
+- Workflow Correção (pull_request): https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ/actions/runs/46021541767
+- Evidência: `evidencias/PR-21/pr21-ci-6eNkkE/`.
+- Esta etapa não faz merge, push, commit ou tag; código e alterações locais preservados.
+
+### Integração do PR #21 preparada — 27/11/2026
+
+- O usuário autorizou prosseguir com integração, CI, rodada oficial e tag.
+  A rede deste ambiente continua indisponível; preparado `/tmp/integrar-pr21.sh`
+  para executar o squash e verificar o CI da main no terminal do usuário.
+- Script confere SHA/base e CI antes do merge, preserva #18, branches e
+  alterações locais e verifica igualdade da árvore integrada. Retoma
+  verificações se o PR já estiver integrado, sem repetir o merge.
+- Sintaxe e quatro cenários simulados aprovados, incluindo recusa de SHA
+  diferente/CI reprovado. Esses testes não executaram operações remotas reais.
+- Evidências: `evidencias/PR-21/2026-11-27-integracao-preparada/`. Merge real,
+  CI da main, rodada oficial e tag continuam pendentes nesta preparação.
+
+### PR #21 integrado — d95acc612b7885e6d35839f15c227c1cd527fca0
+
+- Integração por squash do head revisado `a502a5f573626623b6fd2b71195902aeceeadb24`.
+- Árvore integrada idêntica à do candidato. CI da main aprovado: https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ/actions/runs/46085054328
+- Evidências: `evidencias/PR-21/pr21-integracao-HKufWo/`.
+- Branches, HEAD e alterações locais preservados. Rodada oficial no SHA integrado
+  e tag de entrega ainda pendentes; este script não cria tag.
+
+### Rodada oficial no SHA integrado para entrega — 27/11/2026
+
+- Build limpo e rodada integral em `d95acc612b7885e6d35839f15c227c1cd527fca0`,
+  após integração do PR #21 e CI da main aprovado. Configuração: escala 1,
+  LRU/MRU, M=32/2, lote 1000, seed 20261122, 3..10 repetições. Manifesto
+  registra o SHA correto e a configuração física do PR #21.
+- 697 linhas medidas, 168 combinações, zero ausências/divergências SQLite.
+  Matriz: 108 executadas, 12 não aplicáveis, zero ausentes/inviáveis; 421
+  execuções de junção com porte conferido. E/S convergiu em todos os grupos;
+  sete ficaram sem convergência temporal (métrica complementar). Flush final
+  sempre zero, manutenção sem erro; duração informativa 91,2 s.
+- Uma asserção do verificador auxiliar confundia as oito linhas de grupos
+  não executados com os 168 grupos medidos no CSV de convergência. Corrigida
+  somente a seleção do verificador; os produtos foram revalidados sem
+  repetir benchmark ou alterar o programa. Script anterior/traceback mantidos.
+- Evidências e entradas reais preservadas em
+  `evidencias/CONGELAMENTO/2026-11-27-entrega/`, com hashes. ASan/UBSan e
+  demais suítes foram aprovados no CI do merge; não repetidos localmente.
+- Preparada publicação da tag anotada `entrega-programa-2026-11-27` nesse
+  SHA. Script validado com remoto Git local e CI simulado; publicação real
+  ainda pendente no terminal do usuário. Nenhum commit de registros, push
+  de branches ou alteração de código foi realizado nesta etapa.
+
+### Programa marcado para entrega — entrega-programa-2026-11-27
+
+- Tag anotada `entrega-programa-2026-11-27` publicada no SHA `d95acc612b7885e6d35839f15c227c1cd527fca0`, após rodada oficial
+  aprovada e confirmação do CI da main. Alvo remoto conferido via ls-remote.
+- Evidências: `evidencias/CONGELAMENTO/2026-11-27-entrega/`.
+- O envio publica somente a tag; branches e alterações locais preservadas.
+
+### Consolidação dos registros finais — 27/11/2026
+
+- Criada `docs/registros-finais-entrega` a partir de d95acc6, sem mover os
+  HEADs dos worktrees anteriores nem incorporar suas pendências de CBD-002.
+  Copiados os acréscimos finais do post-mortem/plano e as evidências locais
+  das publicações de 23/11, revisão/integração do PR #21 e rodada/tag finais.
+- Criado índice de entrega e vínculo no README para os resultados oficiais.
+  Os registros datados e hashes dos artefatos originais foram preservados;
+  indicações antigas de pendência são identificadas como histórico.
+- Preparado worktree separado `entrega-programa-2026-11-27` ao lado dos
+  checkouts de desenvolvimento, detached no SHA da tag e limpo.
+- Validação da consolidação: igualdade da árvore da implementação com a tag,
+  hashes dos artefatos e preservação dos worktrees anteriores. Nenhuma fonte,
+  teste, build, interface ou workflow do programa foi modificado; por isso
+  não se repetiu a rodada integral já aceita. A publicação remota dos
+  registros depende do script no terminal com acesso ao GitHub.
+- Revisão independente via requesting-code-review: sem achados acionáveis;
+  contagens, links, tag, checkout e ausência de mudanças na implementação
+  conferidos. Linhas vazias finais dos artefatos brutos foram preservadas.

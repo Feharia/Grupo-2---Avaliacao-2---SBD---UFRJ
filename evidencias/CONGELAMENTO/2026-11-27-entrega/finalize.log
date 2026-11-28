@@ -1,0 +1,61 @@
+{
+  "commit": "d95acc612b7885e6d35839f15c227c1cd527fca0",
+  "clean_checkout": true,
+  "full_rows": 697,
+  "combinations": 168,
+  "required_executed": 108,
+  "required_not_applicable": 12,
+  "required_missing": 0,
+  "required_infeasible": 0,
+  "sqlite_missing": 0,
+  "sqlite_different": 0,
+  "io_not_converged": 0,
+  "time_not_converged": 7,
+  "final_flush_nonzero": 0,
+  "manifest_expected": {
+    "commit": "d95acc612b7885e6d35839f15c227c1cd527fca0",
+    "escala": "1",
+    "semente": "20261122",
+    "reps": "3..10",
+    "m_juncao": "32",
+    "m_selecao": "2",
+    "lote": "1000",
+    "bloco": "4096",
+    "extent": "8",
+    "molduras": "dados=32 indices=16 catalogo=4 trabalho=32",
+    "prefetch": "nao",
+    "toss_immediate": "nao"
+  },
+  "phases": [
+    {
+      "phase": "configure",
+      "completed": true
+    },
+    {
+      "phase": "build",
+      "completed": true
+    },
+    {
+      "phase": "bancada",
+      "completed": true
+    },
+    {
+      "phase": "sqlite",
+      "completed": true
+    },
+    {
+      "phase": "compare",
+      "completed": true
+    },
+    {
+      "phase": "matrix",
+      "completed": true
+    },
+    {
+      "phase": "tables",
+      "completed": true
+    }
+  ],
+  "binary_sha256": "625678e69c79683170443e8ab506c16e2587b0bf25c3bbc43bae7754333e8d5d",
+  "source_sha256": "preservados em aceitacao.json"
+}

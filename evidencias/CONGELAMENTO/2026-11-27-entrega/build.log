@@ -1,0 +1,20 @@
+["cmake", "--build", "/tmp/cbd-entrega-oficial-92f686kh/release", "--target", "bancada", "--parallel", "2"]
+[  5%] Building CXX object CMakeFiles/cbd_motor.dir/src/common/common.cpp.o
+[ 11%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer2/algorithms.cpp.o
+[ 17%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer2/monitor.cpp.o
+[ 23%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/bplus.cpp.o
+[ 29%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/catalog.cpp.o
+[ 35%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/handles.cpp.o
+[ 41%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/page.cpp.o
+[ 47%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/record.cpp.o
+[ 52%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/storage_manager.cpp.o
+[ 58%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer3/structures.cpp.o
+[ 64%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/buffer_pool.cpp.o
+[ 70%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/file_manager.cpp.o
+[ 76%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/posix_io.cpp.o
+[ 82%] Building CXX object CMakeFiles/cbd_motor.dir/src/layer4/replacement_policy.cpp.o
+[ 88%] Linking CXX static library libcbd_motor.a
+[ 88%] Built target cbd_motor
+[ 94%] Building CXX object CMakeFiles/bancada.dir/src/layer1/bench.cpp.o
+[100%] Linking CXX executable bancada
+[100%] Built target bancada

@@ -1,0 +1,4 @@
+operacao,config,variante,algoritmo,externa_padrao,total_padrao,externa_trocada,total_trocada,delta_pct
+j_mestre_detalhe,a,aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan,bnl,aluno_heap_sem_indices,915,inscricao_heap_sem_indices,885,-3.2787
+j_mestre_detalhe,a,aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan,sort_merge,inscricao_heap_sem_indices,709,aluno_heap_sem_indices,709,0.0
+j_mestre_detalhe,a,aluno_heap_sem_indices:scan x inscricao_heap_sem_indices:scan,hash,aluno_heap_sem_indices,709,inscricao_heap_sem_indices,723,1.9746
