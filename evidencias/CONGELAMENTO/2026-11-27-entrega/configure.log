@@ -1,0 +1,12 @@
+["cmake", "-S", "/tmp/cbd-entrega-oficial-92f686kh/source/PrototipoIA/Implementacao", "-B", "/tmp/cbd-entrega-oficial-92f686kh/release", "-DCMAKE_BUILD_TYPE=Release", "-DCBD_SANITIZE=OFF", "-DCMAKE_REQUIRE_FIND_PACKAGE_GTest=TRUE", "-DCMAKE_PREFIX_PATH=/home/carlos/.local/cbd-deps/googletest-03597a01ee50ed33e9dfd640b249b4be3799d395"]
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Looking for pread
+-- Looking for pread - found
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/cbd-entrega-oficial-92f686kh/release

@@ -1,0 +1,6 @@
+operacao,config,variante,linhas,leituras,leituras_por_chave,leituras_aleat,taxa_acerto,estimado_transf,erro_pct,tempo_ms,amplitude_reps_pct,vezes_melhor
+sel_pt_cpf,a,aluno_heap_sem_indices:scan,100,3037,30.37,94,0.0026,3250.0,7.0135,7.61,0.0,15.5744
+sel_pt_cpf,c,aluno_heap:secondary_hash,100,195,1.95,195,0.025,200.0,2.5641,0.875,0.0,1.0
+sel_pt_dre,a,aluno_heap_sem_indices:scan,100,3344,33.44,98,0.0006,3250.0,-2.811,7.159,0.0,33.7778
+sel_pt_dre,b,aluno_h_dre:primary_hash,100,99,0.99,98,0.01,107.2,8.2828,0.634,0.0,1.0
+sel_pt_dre,b,aluno_bt_dre:primary_btree,100,108,1.08,100,0.4732,200.0,85.1852,0.866,0.0,1.0909

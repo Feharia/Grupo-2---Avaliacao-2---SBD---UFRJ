@@ -1,0 +1,17 @@
+{
+  "commit": "a502a5f573626623b6fd2b71195902aeceeadb24",
+  "expected": {
+    "bloco": "4096",
+    "extent": "8",
+    "molduras": "dados=32 indices=16 catalogo=4 trabalho=32",
+    "prefetch": "nao",
+    "toss_immediate": "nao",
+    "commit": "a502a5f573626623b6fd2b71195902aeceeadb24"
+  },
+  "file_headers_verified": {
+    "LRU": 37,
+    "MRU": 37
+  },
+  "new_manifest_table": "passed",
+  "legacy_manifest_table": "passed"
+}

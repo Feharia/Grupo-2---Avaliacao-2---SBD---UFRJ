@@ -1,0 +1,18 @@
+data: 2026-11-27 18:16:15
+compilador: 13.3.0
+flags: io-rapido-v2 -O3 -DNDEBUG
+commit: f3d12311bfece737fa2f2c3b6decedcccfa5696f
+escala: 0.1
+semente: 20261122
+reps: 1..1
+tolerancia: 0.05
+m_juncao: 32
+m_selecao: 2
+lote: 100
+bloco: 4096
+extent: 8
+molduras: dados=32 indices=16 catalogo=4 trabalho=32
+prefetch: nao
+toss_immediate: nao
+hash_especificacao: 4fdd90f5eda3107
+duracao_s: 5.2

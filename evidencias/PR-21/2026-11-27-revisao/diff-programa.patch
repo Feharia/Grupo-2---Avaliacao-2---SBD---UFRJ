@@ -1,0 +1,54 @@
+diff --git a/PrototipoIA/Implementacao/src/layer1/bench.cpp b/PrototipoIA/Implementacao/src/layer1/bench.cpp
+index a38f6c4..07d02f2 100644
+--- a/PrototipoIA/Implementacao/src/layer1/bench.cpp
++++ b/PrototipoIA/Implementacao/src/layer1/bench.cpp
+@@ -842,9 +842,11 @@ int main(int argc, char** argv) {
+     Csv configurations(out_dir / "configuracoes.csv");
+     configurations.row({"politica", "operacao", "variante", "algoritmo",
+                         "externa", "campo_externa", "interna", "campo_interna"});
++    // Configuração física comum a todas as políticas: o manifesto grava exatamente esta base (#18)
++    const Config base;
+     for (Policy pol : spec.policies) {
+         const std::string pname = to_string(pol);
+-        Config cfg;
++        Config cfg = base;
+         cfg.policy = pol;
+         cfg.data_dir = out_dir / ("motor_" + pname);
+         fs::remove_all(cfg.data_dir);   // cada configuração começa num data_dir vazio (161)
+@@ -1041,6 +1043,11 @@ int main(int argc, char** argv) {
+     man << "escala: " << spec.scale << "\nsemente: " << spec.seed << "\nreps: " << spec.min_reps << ".." << spec.max_reps
+         << "\ntolerancia: " << spec.tolerance << "\nm_juncao: " << spec.m_join << "\nm_selecao: " << spec.m_select
+         << "\nlote: " << spec.batch << "\n";
++    // parâmetros físicos da medição (#18): todas as contagens estão em blocos deste tamanho
++    man << "bloco: " << base.block_size << "\nextent: " << base.extent_blocks << "\nmolduras: dados="
++        << base.area_frames[0] << " indices=" << base.area_frames[1] << " catalogo=" << base.area_frames[2]
++        << " trabalho=" << base.area_frames[3] << "\nprefetch: " << (base.prefetch ? "sim" : "nao")
++        << "\ntoss_immediate: " << (base.toss_immediate ? "sim" : "nao") << "\n";
+     std::string desc;
+     for (const auto& op : spec.ops) desc += op.id + ";" + op.sql + "\n";
+     for (const auto& v : spec.variants) desc += v.name + ";" + to_string(v.kind) + ";" + v.key + "\n";
+diff --git a/PrototipoIA/Implementacao/src/layer3/storage_manager.cpp b/PrototipoIA/Implementacao/src/layer3/storage_manager.cpp
+index 31b3c72..a790cc5 100644
+--- a/PrototipoIA/Implementacao/src/layer3/storage_manager.cpp
++++ b/PrototipoIA/Implementacao/src/layer3/storage_manager.cpp
+@@ -440,7 +440,7 @@ void StorageManager::erase(TableId t, RID rid) {
+         IndexRt& ix = indexes_.at(id);
+         if (!ix.spec.clustering && !v.is_null(ix.spec.key)) ix.idx->remove(v.key(ix.spec.key), rid);
+     }
+-    pf.erase(rid);   // movimentações avisadas ao MoveListener (141)
++    pf.erase(rid);   // movimentações avisadas pelo on_moved (141)
+     for (StructureId id : e.indexes) {
+         IndexRt& ix = indexes_.at(id);
+         if (ix.spec.clustering && !v.is_null(ix.spec.key)) {
+diff --git a/PrototipoIA/Implementacao/tools/tabelas.py b/PrototipoIA/Implementacao/tools/tabelas.py
+index 32f7a97..24dbdac 100644
+--- a/PrototipoIA/Implementacao/tools/tabelas.py
++++ b/PrototipoIA/Implementacao/tools/tabelas.py
+@@ -280,6 +280,7 @@ def t_resumo(b):
+                  if r["politica"] == b.politica)
+     linhas = [
+         ["Escala", m.get("escala", "?")],
++        ["Bloco", f"{m['bloco']} B (extent de {m.get('extent', '?')} blocos)" if "bloco" in m else "não registrado"],
+         ["Políticas comparadas", ", ".join(b.politicas)],
+         ["Repetições por combinação", f"{m.get('reps', '?')} (tolerância {m.get('tolerancia', '?')})"],
+         ["M das junções / das seleções", f"{m.get('m_juncao', '?')} / {m.get('m_selecao', '?')} molduras"],

@@ -1,0 +1,14 @@
+{
+  "tag": "entrega-programa-2026-11-27",
+  "commit": "d95acc612b7885e6d35839f15c227c1cd527fca0",
+  "tag_object": "51ce612a7bbfe53e7c94e9852476c6b0470a8ba9",
+  "ciMain": {
+    "conclusion": "success",
+    "headSha": "d95acc612b7885e6d35839f15c227c1cd527fca0",
+    "status": "completed",
+    "url": "https://github.com/Feharia/Grupo-2---Avaliacao-2---SBD---UFRJ/actions/runs/46085054328"
+  },
+  "evidenceDir": "/home/carlos/Documentos/UFRJ/cbd/sistema-banco-dados/pr19-slot-prefetch/evidencias/CONGELAMENTO/2026-11-27-entrega",
+  "publicationEvidenceDir": "/tmp/cbd-tag-entrega-Qc3oaS",
+  "published": true
+}

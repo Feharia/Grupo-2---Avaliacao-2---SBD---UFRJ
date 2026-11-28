@@ -1,0 +1,18 @@
+{
+  "simulated_ci": true,
+  "git_remote": "local bare repository only",
+  "results": [
+    {
+      "scenario": "failed-ci",
+      "exit_code": 1
+    },
+    {
+      "scenario": "success",
+      "exit_code": 0
+    },
+    {
+      "scenario": "repeat-success",
+      "exit_code": 0
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="2"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="2"
+	timestamp="2026-11-27T18:16:48"
+	>
+	<testcase name="testes" classname="testes" time="1.51362" status="run">
+		<properties/>
+		<system-out>Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+[==========] Running 103 tests from 13 test suites.
+[----------] Global test environment set-up.
+[----------] 16 tests from BPlusBulkLoadIntegration
+[ RUN      ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros
+[       OK ] BPlusBulkLoadIntegration.FolhasRespeitamMinimoCom22Registros (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros
+[       OK ] BPlusBulkLoadIntegration.InternosRespeitamMinimoCom7500Registros (5 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada
+[       OK ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaSubocupada (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes
+[       OK ] BPlusBulkLoadIntegration.VerifyRejeitaUltimaFolhaVariavelSubocupadaEmBytes (0 ms)
+[ RUN      ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoDoMinimo
+[       OK ] BPlusBulkLoadIntegration.RaizFolhaPodeFicarAbaixoD...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="testes_memoria" classname="testes_memoria" time="1.10344" status="run">
+		<properties/>
+		<system-out>Running main() from /tmp/cbd-googletest.XZl0qX/googletest/googletest/src/gtest_main.cc
+[==========] Running 11 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 11 tests from MemoriaAuxiliar
+[ RUN      ] MemoriaAuxiliar.BnlDiretorioDentroDasMolduras
+  [memoria] BNL densos (Int32, Int32), m = 3: chunk 1, diretório 4080 B em 1 molduras (4096 B); pico do heap 4860 B, dos quais 780 B de controle (limite 1408 B)
+  [memoria] BNL densos (Int32, Int32), m = 7: chunk 2, diretório 16368 B em 4 molduras (16384 B); pico do heap 17308 B, dos quais 940 B de controle (limite 1920 B)
+  [memoria] BNL densos (Int32, Int32), m = 32: chunk 10, diretório 81912 B em 20 molduras (81920 B); pico do heap 84244 B, dos quais 2332 B de controle (limite 5120 B)
+  [memoria] BNL variáveis (VarChar 1..24, Int32), m = 3: chunk 1, diretório 4080 B em 1 molduras (4096 B); pico do heap 5002 B, dos quais 922 B de controle (limite 1408 B)
+  [memoria] BNL variáveis (VarChar 1..24, Int32), m = 7: chunk 2, dire...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+</testsuite>

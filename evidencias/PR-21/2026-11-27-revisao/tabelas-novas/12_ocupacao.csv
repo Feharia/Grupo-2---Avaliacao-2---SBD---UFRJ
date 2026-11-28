@@ -1,0 +1,6 @@
+estrutura,dados_antes,dados_depois,overflow_antes,overflow_depois,total_antes,total_depois,delta_pct
+aluno_bt_dre:btree,95,101,0,0,106,114,7.5472
+aluno_h_curso:hash,83,83,29,30,113,121,7.0796
+aluno_h_dre:hash,83,83,6,11,97,97,0.0
+aluno_heap:heap,65,68,0,0,73,73,0.0
+aluno_heap_sem_indices:heap,65,68,0,0,73,73,0.0

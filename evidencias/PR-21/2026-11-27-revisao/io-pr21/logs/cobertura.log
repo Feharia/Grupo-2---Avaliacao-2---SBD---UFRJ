@@ -1,0 +1,2 @@
+/home/carlos/.pyenv/versions/3.11.14/bin/python3 -I /tmp/cbd-pr21-review-_lq6ai_g/source/PrototipoIA/Implementacao/tools/validar_smoke_ci.py /tmp/cbd-pr21-review-_lq6ai_g/io-pr21/smoke
+Smoke: cobertura mínima completa; 168 execuções com dumps presentes

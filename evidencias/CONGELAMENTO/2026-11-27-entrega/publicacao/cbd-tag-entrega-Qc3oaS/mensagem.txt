@@ -1,0 +1,7 @@
+Entrega do programa CBD/COS480 — 27/11/2026
+
+Commit: d95acc612b7885e6d35839f15c227c1cd527fca0
+Rodada oficial: escala 1, LRU/MRU, M=32/2, lote 1000, semente 20261122, 3..10 repetições.
+697 linhas medidas em 168 combinações; SQLite e matriz obrigatória aprovados.
+E/S convergiu em todos os grupos; 7 grupos sem convergência temporal (tempo complementar).
+Evidências locais: evidencias/CONGELAMENTO/2026-11-27-entrega/.

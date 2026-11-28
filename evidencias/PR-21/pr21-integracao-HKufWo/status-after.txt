@@ -1,0 +1,4 @@
+ M POST_MORTEM.md
+ M docs/superpowers/plans/2026-11-23-congelamento-programa.md
+?? evidencias/CONGELAMENTO/2026-11-23-publicacao/
+?? evidencias/PR-21/
